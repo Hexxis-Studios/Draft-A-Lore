@@ -1,5 +1,5 @@
 /* Draft A Lore — adventure-tools.js
- * Copyright 2026 Daymien Vanhorn — https://github.com/Hexxis-cmd/Draft-A-Lore
+ * Copyright 2026 Daymien Vanhorn — https://github.com/Hexxis-Studios/Draft-A-Lore
  * Free for noncommercial use under PolyForm Noncommercial 1.0.0 + supplemental
  * terms (see LICENSE.md). Credit to the original author must remain visible.
  * Commercial use requires a license — see COMMERCIAL-LICENSE.md.
@@ -29,9 +29,9 @@ DAL.renderStoryGraph = function(proj){
 
   var html = '<div class="canvas-toolbar">'+
     '<button class="tb-btn" data-action="sg-add-node" title="Add scene" aria-label="Add scene"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>'+
-    '<button class="tb-btn" data-action="sg-connect" title="Connect scenes" aria-label="Connect scenes" '+(DAL.connectMode?'style="background:var(--c-accent-soft);color:var(--c-accent)" aria-pressed="true"':'aria-pressed="false"')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>'+
+    ("<button class=\"tb-btn\" data-action=\"sg-connect\" title=\""+DAL.uiLabel("ui_Connect_scenes_3c4adf4","Connect scenes")+"\" aria-label=\""+DAL.uiLabel("ui_Connect_scenes_3c4adf4","Connect scenes")+"\" ")+(DAL.connectMode?'style="background:var(--c-accent-soft);color:var(--c-accent)" aria-pressed="true"':'aria-pressed="false"')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>'+
     '<button class="tb-btn" data-action="sg-delete-sel" title="Delete selected scene" aria-label="Delete selected scene"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg></button>'+
-    '<button class="tb-btn mobile-context-action" data-action="selection-menu" title="More actions for selected scene" aria-label="More actions for selected scene">&#8942;</button>'+
+    ("<button class=\"tb-btn mobile-context-action\" data-action=\"selection-menu\" title=\""+DAL.uiLabel("ui_More_actions_for_selected_scene_6726fed","More actions for selected scene")+"\" aria-label=\""+DAL.uiLabel("ui_More_actions_for_selected_scene_6726fed","More actions for selected scene")+"\">&#8942;</button>")+
     '<span class="tb-sep" style="width:1px;height:20px;background:var(--c-border);margin:0 4px"></span>'+
     '<button class="tb-btn" data-action="sg-checkup" title="Story checkup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><polyline points="9 11 12 14 20 6"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg></button>'+
     '<span class="tb-sep" style="width:1px;height:20px;background:var(--c-border);margin:0 4px"></span>'+
@@ -56,9 +56,9 @@ DAL.renderStoryGraph = function(proj){
   });
   if(!adv.nodes.length){
     html += '<div class="canvas-empty">'+
-      '<div class="canvas-empty-title">Story Graph</div>'+
-      '<p style="line-height:1.6">This is where you build your branching narrative. Each node is a scene the reader experiences. Connect scenes with choices to create paths through your story.</p>'+
-      '<p style="margin-top:8px">Click the + button above to create your first scene.</p>'+
+      ("<div class=\"canvas-empty-title\">"+DAL.uiLabel("tool_storygraph","Story Graph")+"</div>")+
+      ("<p style=\"line-height:1.6\">"+DAL.uiLabel("ui_This_is_where_you_build_your_branching_nar_abfe776","This is where you build your branching narrative. Each node is a scene the reader experiences. Connect scenes with choices to create paths through your story.")+"</p>")+
+      ("<p style=\"margin-top:8px\">"+DAL.uiLabel("ui_Click_the_button_above_to_create_your_firs_69b712f","Click the + button above to create your first scene.")+"</p>")+
     '</div>';
   }
   html += '</div></div></div>';
@@ -70,10 +70,10 @@ DAL.renderStoryGraph = function(proj){
     var node = adv.nodes.find(function(n){ return n.id === DAL.selectedNodeId; });
     if(node){
       html += '<div class="tool-panel-scrim" data-action="sg-close-detail" aria-hidden="true"></div>';
-      html += '<aside class="tool-panel" id="nodeDetailPanel" role="dialog" aria-label="Scene editor">';
+      html += ("<aside class=\"tool-panel\" id=\"nodeDetailPanel\" role=\"dialog\" aria-label=\""+DAL.uiLabel("ui_Scene_editor_b6eddad","Scene editor")+"\">");
       html += '<div class="tool-panel-header">'+
         '<div class="tool-panel-title">'+(node.title ? DAL.escapeHtml(node.title) : 'Scene Editor')+'</div>'+
-        '<button class="tool-panel-close" data-action="sg-close-detail" title="Close scene editor" aria-label="Close scene editor">&times;</button>'+
+        ("<button class=\"tool-panel-close\" data-action=\"sg-close-detail\" title=\""+DAL.uiLabel("ui_Close_scene_editor_70da673","Close scene editor")+"\" aria-label=\""+DAL.uiLabel("ui_Close_scene_editor_70da673","Close scene editor")+"\">&times;</button>")+
         '</div>';
       html += '<div class="tool-panel-body">';
       html += DAL.renderNodeDetail(proj, adv, node);
@@ -87,11 +87,11 @@ DAL.renderStoryGraph = function(proj){
 DAL.renderNodeDetail = function(proj, adv, node){
   // The panel chrome (title and close button) is supplied by .tool-panel, so
   // this renders only the fields.
-  var html = '<div class="form-group"><label class="form-label">Scene Title</label><input class="form-input" id="nodeTitle" value="'+DAL.escapeHtml(node.title||'')+'" placeholder="Scene title"></div>';
-  html += '<div class="form-group"><label class="form-label">What the Reader Sees</label><textarea class="form-textarea" id="nodeText" style="min-height:100px" placeholder="Write the scene text that the reader will experience...">'+DAL.escapeHtml(node.text||'')+'</textarea></div>';
+  var html = ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Scene_Title_849b9e2","Scene Title")+"</label><input class=\"form-input\" id=\"nodeTitle\" value=\"")+DAL.escapeHtml(node.title||'')+("\" placeholder=\""+DAL.uiLabel("ui_Scene_title_a614208","Scene title")+"\"></div>");
+  html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_What_the_Reader_Sees_e202be4","What the Reader Sees")+"</label><textarea class=\"form-textarea\" id=\"nodeText\" style=\"min-height:100px\" placeholder=\""+DAL.uiLabel("ui_Write_the_scene_text_that_the_reader_will__fcf6042","Write the scene text that the reader will experience...")+"\">")+DAL.escapeHtml(node.text||'')+'</textarea></div>';
 
-  html += '<div class="form-group asset-dropzone" data-drop="asset" data-asset-bind="node:'+node.id+'"><label class="form-label">Scene Illustrations</label>'+
-    '<p style="font-size:var(--ts-xs);color:var(--c-text-muted);margin-bottom:4px">Add artwork that shows alongside this scene in the playthrough, or drag one in from the Assets tool.</p>';
+  html += '<div class="form-group asset-dropzone" data-drop="asset" data-asset-bind="node:'+node.id+("\"><label class=\"form-label\">"+DAL.uiLabel("ui_Scene_Illustrations_6671d41","Scene Illustrations")+"</label>")+
+    ("<p style=\"font-size:var(--ts-xs);color:var(--c-text-muted);margin-bottom:4px\">"+DAL.uiLabel("ui_Add_artwork_that_shows_alongside_this_scen_508b46e","Add artwork that shows alongside this scene in the playthrough, or drag one in from the Assets tool.")+"</p>");
   if(node.images && node.images.length){
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">';
     node.images.forEach(function(img, si){
@@ -102,72 +102,72 @@ DAL.renderNodeDetail = function(proj, adv, node){
     });
     html += '</div>';
   }
-  html += '<button class="btn sm" data-action="upload-scene-image" data-nid="'+node.id+'">+ Add Scene Image</button>';
+  html += '<button class="btn sm" data-action="upload-scene-image" data-nid="'+node.id+("\">"+DAL.uiLabel("ui__Add_Scene_Image_42d00a1","+ Add Scene Image")+"</button>");
   html += '<input type="file" id="sceneImageInput" accept="image/*" style="display:none">';
   html += '</div>';
 
-  html += '<div class="form-group"><label class="form-label">Start Node</label><div style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="nodeIsStart" '+(adv.startNodeId===node.id?'checked':'')+' data-action="sg-set-start" data-nid="'+node.id+'"><label for="nodeIsStart" style="font-size:var(--ts-sm);cursor:pointer">Set as adventure start</label></div></div>';
+  html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Start_Node_9681e48","Start Node")+"</label><div style=\"display:flex;align-items:center;gap:8px\"><input type=\"checkbox\" id=\"nodeIsStart\" ")+(adv.startNodeId===node.id?'checked':'')+' data-action="sg-set-start" data-nid="'+node.id+("\"><label for=\"nodeIsStart\" style=\"font-size:var(--ts-sm);cursor:pointer\">"+DAL.uiLabel("ui_Set_as_adventure_start_85952db","Set as adventure start")+"</label></div></div>");
 
   html += '<div class="form-group"><label class="form-label">Scene Kind '+DAL.infoIcon('A normal scene carries on through its choices. An ending scene closes the run the moment the reader arrives, and the closing screen shows the ending name you give it — useful for tracking which endings a reader has found.')+'</label>'+
     '<select class="form-select" data-node-field="kind" data-nid="'+node.id+'">'+
-      '<option value="normal"'+(node.kind!=='ending'?' selected':'')+'>Normal scene</option>'+
-      '<option value="ending"'+(node.kind==='ending'?' selected':'')+'>Ending — the run stops here</option>'+
+      '<option value="normal"'+(node.kind!=='ending'?' selected':'')+(">"+DAL.uiLabel("ui_Normal_scene_4e2db66","Normal scene")+"</option>")+
+      '<option value="ending"'+(node.kind==='ending'?' selected':'')+(">"+DAL.uiLabel("ui_Ending_the_run_stops_here_c660821","Ending — the run stops here")+"</option>")+
     '</select>';
   if(node.kind === 'ending'){
-    html += '<input class="form-input" style="margin-top:4px" value="'+DAL.escapeHtml(node.endingLabel||'')+'" data-node-field="endingLabel" data-nid="'+node.id+'" placeholder="Ending name, e.g. Crowned in Bone">';
+    html += '<input class="form-input" style="margin-top:4px" value="'+DAL.escapeHtml(node.endingLabel||'')+'" data-node-field="endingLabel" data-nid="'+node.id+("\" placeholder=\""+DAL.uiLabel("ui_Ending_name_e_g_Crowned_in_Bone_181ab2b","Ending name, e.g. Crowned in Bone")+"\">");
   }
   html += '</div>';
 
   // What changes when the reader arrives
-  html += '<div class="form-group"><label class="form-label">What Changes When Arriving</label><p style="font-size:var(--ts-xs);color:var(--c-text-muted);margin-bottom:4px">Set up stats, traits, or items that change when the reader reaches this scene.</p><div id="entryEffectsList">';
+  html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_What_Changes_When_Arriving_435c92f","What Changes When Arriving")+"</label><p style=\"font-size:var(--ts-xs);color:var(--c-text-muted);margin-bottom:4px\">"+DAL.uiLabel("ui_Set_up_stats_traits_or_items_that_change_w_5ed5786","Set up stats, traits, or items that change when the reader reaches this scene.")+"</p><div id=\"entryEffectsList\">");
   (node.entryEffects||[]).forEach(function(eff, i){
     html += DAL.renderEffectRow('entry', i, eff, adv);
   });
-  html += '</div><button class="btn sm" data-action="sg-add-effect" data-nid="'+node.id+'" data-effect-type="entry">+ Add What Changes</button>';
+  html += '</div><button class="btn sm" data-action="sg-add-effect" data-nid="'+node.id+("\" data-effect-type=\"entry\">"+DAL.uiLabel("ui__Add_What_Changes_a09a338","+ Add What Changes")+"</button>");
   var entrySummary = DAL.describeEffectList(node.entryEffects, adv);
   if(entrySummary) html += '<div style="font-size:var(--ts-xs);color:var(--c-text-faint);margin-top:4px;font-style:italic">On arrival: '+DAL.escapeHtml(entrySummary)+'</div>';
   html += '</div>';
 
-  html += '<div class="form-group"><label class="form-label">Choices '+DAL.infoIcon('A choice is a button the reader can tap to leave the current scene. Conditions (optional) hide a choice until the reader meets a requirement, e.g. a stat is high enough or a trait is set. Effects change the story state when the choice is picked — set a flag, raise a stat, give or take an item.')+'</label><p style="font-size:var(--ts-xs);color:var(--c-text-muted);margin-bottom:4px">Each choice sends the reader to another scene. Add conditions to control when a choice appears.</p><div id="choicesList" style="display:flex;flex-direction:column;gap:8px">';
+  html += '<div class="form-group"><label class="form-label">Choices '+DAL.infoIcon('A choice is a button the reader can tap to leave the current scene. Conditions (optional) hide a choice until the reader meets a requirement, e.g. a stat is high enough or a trait is set. Effects change the story state when the choice is picked — set a flag, raise a stat, give or take an item.')+("</label><p style=\"font-size:var(--ts-xs);color:var(--c-text-muted);margin-bottom:4px\">"+DAL.uiLabel("ui_Each_choice_sends_the_reader_to_another_sc_568ea19","Each choice sends the reader to another scene. Add conditions to control when a choice appears.")+"</p><div id=\"choicesList\" style=\"display:flex;flex-direction:column;gap:8px\">");
   (node.choices||[]).forEach(function(ch, i){
     html += '<div style="border:1px solid var(--c-border);border-radius:var(--radius);padding:8px;margin-bottom:4px">';
-    html += '<input class="form-input" style="margin-bottom:4px" value="'+DAL.escapeHtml(ch.label||'')+'" data-choice-label="'+i+'" data-nid="'+node.id+'" placeholder="Choice label">';
-    html += '<select class="form-select" style="margin-bottom:4px;font-size:var(--ts-xs)" data-choice-target="'+i+'" data-nid="'+node.id+'"><option value="">— Which scene does this lead to? —</option>';
+    html += '<input class="form-input" style="margin-bottom:4px" value="'+DAL.escapeHtml(ch.label||'')+'" data-choice-label="'+i+'" data-nid="'+node.id+("\" placeholder=\""+DAL.uiLabel("ui_Choice_label_bbe0978","Choice label")+"\">");
+    html += '<select class="form-select" style="margin-bottom:4px;font-size:var(--ts-xs)" data-choice-target="'+i+'" data-nid="'+node.id+("\"><option value=\"\">"+DAL.uiLabel("ui__Which_scene_does_this_lead_to__68491d1","— Which scene does this lead to? —")+"</option>");
     adv.nodes.forEach(function(n){ html += '<option value="'+n.id+'"'+(ch.targetNodeId===n.id?' selected':'')+'>'+DAL.escapeHtml(n.title||'Untitled')+'</option>'; });
     html += '</select>';
     var condCount = (ch.conditions||[]).length;
-    html += '<div style="font-size:var(--ts-xs);color:var(--c-text-muted);margin-top:4px">Only show this choice if:</div><div id="choiceConds'+i+'">';
+    html += ("<div style=\"font-size:var(--ts-xs);color:var(--c-text-muted);margin-top:4px\">"+DAL.uiLabel("ui_Only_show_this_choice_if__631f62a","Only show this choice if:")+"</div><div id=\"choiceConds")+i+'">';
     (ch.conditions||[]).forEach(function(cond, ci){
       html += DAL.renderConditionRow(node.id, i, ci, cond, adv);
     });
-    html += '</div><button class="btn sm" style="margin-top:2px" data-action="sg-add-cond" data-nid="'+node.id+'" data-choice-idx="'+i+'">+ Add Condition</button>';
+    html += '</div><button class="btn sm" style="margin-top:2px" data-action="sg-add-cond" data-nid="'+node.id+'" data-choice-idx="'+i+("\">"+DAL.uiLabel("ui__Add_Condition_ec91a29","+ Add Condition")+"</button>");
     if(condCount > 1){
       html += ' <select class="form-select" style="width:auto;display:inline-block;font-size:var(--ts-xs)" data-choice-field="condLogic" data-nid="'+node.id+'" data-choice-idx="'+i+'">'+
-        '<option value="all"'+(ch.condLogic!=='any'?' selected':'')+'>reader must meet all of them</option>'+
-        '<option value="any"'+(ch.condLogic==='any'?' selected':'')+'>any one of them is enough</option></select>';
+        '<option value="all"'+(ch.condLogic!=='any'?' selected':'')+(">"+DAL.uiLabel("ui_reader_must_meet_all_of_them_5f08f64","reader must meet all of them")+"</option>")+
+        '<option value="any"'+(ch.condLogic==='any'?' selected':'')+(">"+DAL.uiLabel("ui_any_one_of_them_is_enough_5be90a6","any one of them is enough")+"</option></select>");
     }
     if(condCount){
       html += ' <select class="form-select" style="width:auto;display:inline-block;font-size:var(--ts-xs)" data-choice-field="whenLocked" data-nid="'+node.id+'" data-choice-idx="'+i+'">'+
-        '<option value="inherit"'+(!ch.whenLocked||ch.whenLocked==='inherit'?' selected':'')+'>when unmet: follow story setting</option>'+
-        '<option value="lock"'+(ch.whenLocked==='lock'?' selected':'')+'>when unmet: show it locked</option>'+
-        '<option value="hide"'+(ch.whenLocked==='hide'?' selected':'')+'>when unmet: hide it</option></select>';
+        '<option value="inherit"'+(!ch.whenLocked||ch.whenLocked==='inherit'?' selected':'')+(">"+DAL.uiLabel("ui_when_unmet_follow_story_setting_b210882","when unmet: follow story setting")+"</option>")+
+        '<option value="lock"'+(ch.whenLocked==='lock'?' selected':'')+(">"+DAL.uiLabel("ui_when_unmet_show_it_locked_f412491","when unmet: show it locked")+"</option>")+
+        '<option value="hide"'+(ch.whenLocked==='hide'?' selected':'')+(">"+DAL.uiLabel("ui_when_unmet_hide_it_c66bf8a","when unmet: hide it")+"</option></select>");
       html += '<div style="font-size:var(--ts-xs);color:var(--c-text-faint);margin-top:4px;font-style:italic">'+DAL.escapeHtml(DAL.describeChoiceGate(ch, adv))+'</div>';
     }
-    html += '<div style="font-size:var(--ts-xs);color:var(--c-text-muted);margin-top:4px">What changes when this choice is picked:</div><div id="choiceEffs'+i+'">';
+    html += ("<div style=\"font-size:var(--ts-xs);color:var(--c-text-muted);margin-top:4px\">"+DAL.uiLabel("ui_What_changes_when_this_choice_is_picked__7765adf","What changes when this choice is picked:")+"</div><div id=\"choiceEffs")+i+'">';
     (ch.effects||[]).forEach(function(eff, ei){
       html += DAL.renderEffectRow('choice'+i, ei, eff, adv, node.id, i);
     });
-    html += '</div><button class="btn sm" style="margin-top:2px" data-action="sg-add-choice-effect" data-nid="'+node.id+'" data-choice-idx="'+i+'">+ Add What Changes</button>';
+    html += '</div><button class="btn sm" style="margin-top:2px" data-action="sg-add-choice-effect" data-nid="'+node.id+'" data-choice-idx="'+i+("\">"+DAL.uiLabel("ui__Add_What_Changes_a09a338","+ Add What Changes")+"</button>");
     var effSummary = DAL.describeEffectList(ch.effects, adv);
     if(effSummary) html += '<div style="font-size:var(--ts-xs);color:var(--c-text-faint);margin-top:4px;font-style:italic">'+DAL.escapeHtml(effSummary.charAt(0).toUpperCase()+effSummary.slice(1))+'</div>';
-    html += '<button class="btn sm danger" style="margin-top:4px" data-action="sg-delete-choice" data-nid="'+node.id+'" data-choice-idx="'+i+'">Delete Choice</button>';
+    html += '<button class="btn sm danger" style="margin-top:4px" data-action="sg-delete-choice" data-nid="'+node.id+'" data-choice-idx="'+i+("\">"+DAL.uiLabel("ui_Delete_Choice_1701a31","Delete Choice")+"</button>");
     html += '</div>';
   });
-  html += '</div><button class="btn sm" data-action="sg-add-choice" data-nid="'+node.id+'">+ Add Choice</button></div>';
+  html += '</div><button class="btn sm" data-action="sg-add-choice" data-nid="'+node.id+("\">"+DAL.uiLabel("ui__Add_Choice_6df1754","+ Add Choice")+"</button></div>");
 
   html += DAL.renderAudioBinding(proj, node, 'node', node.id);
 
-  html += '<button class="btn sm danger" style="margin-top:12px" data-action="sg-delete-node" data-nid="'+node.id+'">Delete Scene</button>';
+  html += '<button class="btn sm danger" style="margin-top:12px" data-action="sg-delete-node" data-nid="'+node.id+("\">"+DAL.uiLabel("ui_Delete_Scene_76b6f8a","Delete Scene")+"</button>");
   return html;
 };
 
@@ -222,13 +222,13 @@ DAL.renderEffectRow = function(prefix, idx, eff, adv, nid, choiceIdx){
 
   if(kind === 'flag'){
     var listId = 'effflags_'+(nid||'x')+'_'+prefix+'_'+idx;
-    html += '<input class="form-input" style="flex:1 1 42%;min-width:104px;font-size:var(--ts-xs)" list="'+listId+'" value="'+DAL.escapeHtml(eff.key||'')+'" data-eff-field="key"'+attrs+' placeholder="flag name">';
+    html += '<input class="form-input" style="flex:1 1 42%;min-width:104px;font-size:var(--ts-xs)" list="'+listId+'" value="'+DAL.escapeHtml(eff.key||'')+'" data-eff-field="key"'+attrs+(" placeholder=\""+DAL.uiLabel("ui_flag_name_7d9737a","flag name")+"\">");
     html += '<datalist id="'+listId+'">';
     lists.flags.forEach(function(f){ html += '<option value="'+DAL.escapeHtml(f.value)+'"></option>'; });
     html += '</datalist>';
   } else if(kind === 'end'){
     /* An ending needs a label, not a reference to anything else. */
-    html += '<input class="form-input" style="flex:1 1 42%;min-width:104px;font-size:var(--ts-xs)" value="'+DAL.escapeHtml(eff.key||'')+'" data-eff-field="key"'+attrs+' placeholder="ending name">';
+    html += '<input class="form-input" style="flex:1 1 42%;min-width:104px;font-size:var(--ts-xs)" value="'+DAL.escapeHtml(eff.key||'')+'" data-eff-field="key"'+attrs+(" placeholder=\""+DAL.uiLabel("ui_ending_name_ee3a922","ending name")+"\">");
   } else {
     var keyList = kind === 'stat' ? lists.stats : kind === 'trait' ? lists.traits :
       (kind === 'inventory' || kind === 'equip') ? lists.items : lists.nodes;
@@ -353,7 +353,7 @@ DAL.renderConditionRow = function(nid, choiceIdx, condIdx, cond, adv){
     /* Flags are declared by being used rather than in a table, so known flags
        are offered as suggestions without blocking a brand new name. */
     var listId = 'flags_'+nid+'_'+choiceIdx+'_'+condIdx;
-    html += '<input class="form-input" style="flex:1;min-width:104px;font-size:var(--ts-xs)" list="'+listId+'" value="'+DAL.escapeHtml(cond.key||'')+'" data-cond-field="key"'+attrs+' placeholder="flag name">';
+    html += '<input class="form-input" style="flex:1;min-width:104px;font-size:var(--ts-xs)" list="'+listId+'" value="'+DAL.escapeHtml(cond.key||'')+'" data-cond-field="key"'+attrs+(" placeholder=\""+DAL.uiLabel("ui_flag_name_7d9737a","flag name")+"\">");
     html += '<datalist id="'+listId+'">';
     lists.flags.forEach(function(f){ html += '<option value="'+DAL.escapeHtml(f.value)+'"></option>'; });
     html += '</datalist>';
@@ -365,7 +365,7 @@ DAL.renderConditionRow = function(nid, choiceIdx, condIdx, cond, adv){
 
   if(DAL.condNeedsValue(cond)){
     var v = (cond.value === undefined || cond.value === null) ? '' : cond.value;
-    html += '<input class="form-input" style="width:58px;font-size:var(--ts-xs)" value="'+DAL.escapeHtml(String(v))+'" data-cond-field="value"'+attrs+' placeholder="value">';
+    html += '<input class="form-input" style="width:58px;font-size:var(--ts-xs)" value="'+DAL.escapeHtml(String(v))+'" data-cond-field="value"'+attrs+(" placeholder=\""+DAL.uiLabel("ui_value_cd42404","value")+"\">");
   }
 
   html += '<button class="btn sm danger" style="width:24px;padding:0" data-action="sg-delete-cond"'+attrs+'>&times;</button>';
@@ -386,33 +386,33 @@ DAL.renderStatsTraits = function(proj){
   var adv = DAL.ensureAdventure(proj);
   var html = '<div class="u-measure-mid">';
 
-  html += '<p style="color:var(--c-text-muted);font-size:var(--ts-sm);margin-bottom:16px;line-height:1.6">Stats are numbers that track things like Health, Gold, or Strength. Traits are yes/no flags like \"Knows Lockpicking\" or \"Has Met the King.\" Both are used to control which choices appear for the reader.</p>';
+  html += ("<p style=\"color:var(--c-text-muted);font-size:var(--ts-sm);margin-bottom:16px;line-height:1.6\">"+DAL.uiLabel("ui_Stats_are_numbers_that_track_things_like_H_e87937d","Stats are numbers that track things like Health, Gold, or Strength. Traits are yes/no flags like \"Knows Lockpicking\" or \"Has Met the King.\" Both are used to control which choices appear for the reader.")+"</p>");
 
-  html += '<div class="section-header"><div class="section-title">Stats (Numbers) '+DAL.infoIcon('Stats are numeric values like Health, Gold or Charisma. Use them in conditions (e.g. only show a choice if Health > 5) and change them with effects when a choice is picked.')+'</div><button class="btn primary" data-action="sg-add-stat">+ Add Stat</button></div>';
-  html += '<div class="card" style="margin-bottom:20px"><table class="stats-table"><thead><tr><th>Key</th><th>Label</th><th>Type</th><th>Default</th><th>Min '+DAL.infoIcon('The lowest this stat can go. Any change that would drop below it stops here instead, so Health cannot fall past zero and gold cannot go negative. Leave blank for no floor.')+'</th><th>Max '+DAL.infoIcon('The highest this stat can go. Healing past a full Health bar stops at the maximum. A maximum also gives the playthrough panel a bar to draw. Leave blank for no ceiling.')+'</th><th></th></tr></thead><tbody>';
+  html += '<div class="section-header"><div class="section-title">Stats (Numbers) '+DAL.infoIcon('Stats are numeric values like Health, Gold or Charisma. Use them in conditions (e.g. only show a choice if Health > 5) and change them with effects when a choice is picked.')+("</div><button class=\"btn primary\" data-action=\"sg-add-stat\">"+DAL.uiLabel("ui__Add_Stat_8e2b1ec","+ Add Stat")+"</button></div>");
+  html += ("<div class=\"card\" style=\"margin-bottom:20px\"><table class=\"stats-table\"><thead><tr><th>"+DAL.uiLabel("ui_Key_99a52df","Key")+"</th><th>"+DAL.uiLabel("label","Label")+"</th><th>"+DAL.uiLabel("ui_Type_baaddf7","Type")+"</th><th>"+DAL.uiLabel("ui_Default_21b111c","Default")+"</th><th>Min ")+DAL.infoIcon('The lowest this stat can go. Any change that would drop below it stops here instead, so Health cannot fall past zero and gold cannot go negative. Leave blank for no floor.')+'</th><th>Max '+DAL.infoIcon('The highest this stat can go. Healing past a full Health bar stops at the maximum. A maximum also gives the playthrough panel a bar to draw. Leave blank for no ceiling.')+'</th><th></th></tr></thead><tbody>';
   (adv.stats||[]).forEach(function(s, i){
     var numeric = (s.type||'number') === 'number';
     html += '<tr><td><input value="'+DAL.escapeHtml(s.key)+'" data-stat-field="key" data-idx="'+i+'"></td>'+
       '<td><input value="'+DAL.escapeHtml(s.label)+'" data-stat-field="label" data-idx="'+i+'"></td>'+
-      '<td><select data-stat-field="type" data-idx="'+i+'"><option value="number"'+(s.type==='number'?' selected':'')+'>number</option><option value="text"'+(s.type==='text'?' selected':'')+'>text</option><option value="boolean"'+(s.type==='boolean'?' selected':'')+'>boolean</option></select></td>'+
+      '<td><select data-stat-field="type" data-idx="'+i+'"><option value="number"'+(s.type==='number'?' selected':'')+(">"+DAL.uiLabel("ui_number_12886f9","number")+"</option><option value=\"text\"")+(s.type==='text'?' selected':'')+(">"+DAL.uiLabel("ui_text_982d9e3","text")+"</option><option value=\"boolean\"")+(s.type==='boolean'?' selected':'')+(">"+DAL.uiLabel("ui_boolean_bf84d3d","boolean")+"</option></select></td>")+
       '<td><input value="'+DAL.escapeHtml(String(s.default))+'" data-stat-field="default" data-idx="'+i+'"></td>'+
-      '<td>'+(numeric?'<input value="'+DAL.escapeHtml(s.min===undefined||s.min===null?'':String(s.min))+'" data-stat-field="min" data-idx="'+i+'" style="width:56px" placeholder="none">':'<span style="color:var(--c-text-faint)">—</span>')+'</td>'+
-      '<td>'+(numeric?'<input value="'+DAL.escapeHtml(s.max===undefined||s.max===null?'':String(s.max))+'" data-stat-field="max" data-idx="'+i+'" style="width:56px" placeholder="none">':'<span style="color:var(--c-text-faint)">—</span>')+'</td>'+
+      '<td>'+(numeric?'<input value="'+DAL.escapeHtml(s.min===undefined||s.min===null?'':String(s.min))+'" data-stat-field="min" data-idx="'+i+("\" style=\"width:56px\" placeholder=\""+DAL.uiLabel("ui_none_140bedb","none")+"\">"):'<span style="color:var(--c-text-faint)">—</span>')+'</td>'+
+      '<td>'+(numeric?'<input value="'+DAL.escapeHtml(s.max===undefined||s.max===null?'':String(s.max))+'" data-stat-field="max" data-idx="'+i+("\" style=\"width:56px\" placeholder=\""+DAL.uiLabel("ui_none_140bedb","none")+"\">"):'<span style="color:var(--c-text-faint)">—</span>')+'</td>'+
       '<td><button class="btn sm danger" data-action="sg-delete-stat" data-idx="'+i+'">&times;</button></td></tr>';
   });
-  if(!adv.stats||!adv.stats.length) html += '<tr><td colspan="7" style="text-align:center;color:var(--c-text-faint)">No stats defined</td></tr>';
+  if(!adv.stats||!adv.stats.length) html += ("<tr><td colspan=\"7\" style=\"text-align:center;color:var(--c-text-faint)\">"+DAL.uiLabel("ui_No_stats_defined_59d7d48","No stats defined")+"</td></tr>");
   html += '</tbody></table></div>';
 
-  html += '<div class="section-header"><div class="section-title">Traits (Yes/No Flags) '+DAL.infoIcon('Traits are simple on/off flags — e.g. “met the king”, “has sword”, “trusted by rebels”. They cost nothing to track and are perfect for branching conditions: show a choice only when a trait is set.')+'</div><button class="btn primary" data-action="sg-add-trait">+ Add Trait</button></div>';
-  html += '<div class="card"><table class="stats-table"><thead><tr><th>Key</th><th>Label</th><th>Description</th><th>Default</th><th></th></tr></thead><tbody>';
+  html += '<div class="section-header"><div class="section-title">Traits (Yes/No Flags) '+DAL.infoIcon('Traits are simple on/off flags — e.g. “met the king”, “has sword”, “trusted by rebels”. They cost nothing to track and are perfect for branching conditions: show a choice only when a trait is set.')+("</div><button class=\"btn primary\" data-action=\"sg-add-trait\">"+DAL.uiLabel("ui__Add_Trait_57ffd42","+ Add Trait")+"</button></div>");
+  html += ("<div class=\"card\"><table class=\"stats-table\"><thead><tr><th>"+DAL.uiLabel("ui_Key_99a52df","Key")+"</th><th>"+DAL.uiLabel("label","Label")+"</th><th>"+DAL.uiLabel("ui_Description_526e008","Description")+"</th><th>"+DAL.uiLabel("ui_Default_21b111c","Default")+"</th><th></th></tr></thead><tbody>");
   (adv.traits||[]).forEach(function(t, i){
     html += '<tr><td><input value="'+DAL.escapeHtml(t.key)+'" data-trait-field="key" data-idx="'+i+'"></td>'+
       '<td><input value="'+DAL.escapeHtml(t.label)+'" data-trait-field="label" data-idx="'+i+'"></td>'+
       '<td><input value="'+DAL.escapeHtml(t.description)+'" data-trait-field="description" data-idx="'+i+'"></td>'+
-      '<td><select data-trait-field="defaultActive" data-idx="'+i+'"><option value="true"'+(t.defaultActive?' selected':'')+'>active</option><option value="false"'+(!t.defaultActive?' selected':'')+'>inactive</option></select></td>'+
+      '<td><select data-trait-field="defaultActive" data-idx="'+i+'"><option value="true"'+(t.defaultActive?' selected':'')+(">"+DAL.uiLabel("ui_active_9687961","active")+"</option><option value=\"false\"")+(!t.defaultActive?' selected':'')+(">"+DAL.uiLabel("ui_inactive_d102261","inactive")+"</option></select></td>")+
       '<td><button class="btn sm danger" data-action="sg-delete-trait" data-idx="'+i+'">&times;</button></td></tr>';
   });
-  if(!adv.traits||!adv.traits.length) html += '<tr><td colspan="5" style="text-align:center;color:var(--c-text-faint)">No traits defined</td></tr>';
+  if(!adv.traits||!adv.traits.length) html += ("<tr><td colspan=\"5\" style=\"text-align:center;color:var(--c-text-faint)\">"+DAL.uiLabel("ui_No_traits_defined_3a7c276","No traits defined")+"</td></tr>");
   html += '</tbody></table></div>';
 
   html += '<div style="margin-top:24px">'+DAL.renderFailureRules(adv)+'</div>';
@@ -426,7 +426,7 @@ DAL.renderStatsTraits = function(proj){
 DAL.renderCheckup = function(adv){
   var report = DAL.rpg.audit(adv);
   if(report.ok){
-    return '<p style="font-size:var(--ts-sm);color:var(--c-text-muted);line-height:1.6">Nothing to fix. Every scene can be reached, every choice leads somewhere, and every requirement names something that still exists.</p>';
+    return ("<p style=\"font-size:var(--ts-sm);color:var(--c-text-muted);line-height:1.6\">"+DAL.uiLabel("ui_Nothing_to_fix_Every_scene_can_be_reached__e71a1a2","Nothing to fix. Every scene can be reached, every choice leads somewhere, and every requirement names something that still exists.")+"</p>");
   }
   var html = '<p style="font-size:var(--ts-sm);color:var(--c-text-muted);margin-bottom:12px;line-height:1.6">'+
     report.problems + (report.problems === 1 ? ' problem' : ' problems') + ' and ' +
@@ -440,7 +440,7 @@ DAL.renderCheckup = function(adv){
       html += '<div class="checkup-row '+level+'">'+
         '<div class="checkup-scope">'+DAL.escapeHtml(i.scope)+'</div>'+
         '<div class="checkup-text">'+DAL.escapeHtml(i.text)+'</div>'+
-        (i.nodeId ? '<button class="btn sm" data-action="checkup-goto" data-nid="'+DAL.escapeHtml(i.nodeId)+'">Open scene</button>' : '')+
+        (i.nodeId ? '<button class="btn sm" data-action="checkup-goto" data-nid="'+DAL.escapeHtml(i.nodeId)+("\">"+DAL.uiLabel("ui_Open_scene_12bf880","Open scene")+"</button>") : '')+
       '</div>';
     });
   });
@@ -450,7 +450,7 @@ DAL.renderCheckup = function(adv){
 DAL.openCheckup = function(){
   var proj = DAL.state.projects[DAL.currentProjectId];
   var adv = DAL.ensureAdventure(proj);
-  DAL.modal('Story Checkup', DAL.renderCheckup(adv), { wide: true });
+  DAL.modal((DAL.i18n?DAL.i18n.text("ui_Story_Checkup_bfc2e7a","Story Checkup"):"Story Checkup"), DAL.renderCheckup(adv), { wide: true });
 };
 
 /* Rules that end a run on their own, without the author wiring an ending
@@ -496,25 +496,25 @@ DAL.captureAdventureEdit = function(el){
 DAL.renderFailureRules = function(adv){
   var numStats = (adv.stats||[]).filter(function(s){ return (s.type||'number') === 'number'; });
   var rules = DAL.rpg.rules(adv).failures;
-  var html = '<div class="section-header"><div class="section-title">Run-Ending Rules '+DAL.infoIcon('A run-ending rule watches one stat and stops the story the moment it crosses a line — Health dropping to zero, or a Suspicion meter filling up. The reader sees the title and the closing line you write here.')+'</div><button class="btn primary" data-action="sg-add-failure"'+(numStats.length?'':' disabled')+'>+ Add Rule</button></div>';
+  var html = '<div class="section-header"><div class="section-title">Run-Ending Rules '+DAL.infoIcon('A run-ending rule watches one stat and stops the story the moment it crosses a line — Health dropping to zero, or a Suspicion meter filling up. The reader sees the title and the closing line you write here.')+'</div><button class="btn primary" data-action="sg-add-failure"'+(numStats.length?'':' disabled')+(">"+DAL.uiLabel("ui__Add_Rule_98315fd","+ Add Rule")+"</button></div>");
   html += '<div class="card" style="margin-bottom:20px">';
   if(!numStats.length){
-    html += '<div style="padding:12px;color:var(--c-text-faint);font-size:var(--ts-sm)">Add a number stat first, then a rule can watch it.</div>';
+    html += ("<div style=\"padding:12px;color:var(--c-text-faint);font-size:var(--ts-sm)\">"+DAL.uiLabel("ui_Add_a_number_stat_first_then_a_rule_can_wa_5ed4ed5","Add a number stat first, then a rule can watch it.")+"</div>");
   } else {
-    html += '<table class="stats-table"><thead><tr><th>Stat</th><th>When it</th><th>Value</th><th>Title</th><th>Closing Line</th><th></th></tr></thead><tbody>';
+    html += ("<table class=\"stats-table\"><thead><tr><th>"+DAL.uiLabel("ui_Stat_194535a","Stat")+"</th><th>"+DAL.uiLabel("ui_When_it_f2950e0","When it")+"</th><th>"+DAL.uiLabel("ui_Value_8e37953","Value")+"</th><th>"+DAL.uiLabel("worldField_title","Title")+"</th><th>"+DAL.uiLabel("ui_Closing_Line_73b8124","Closing Line")+"</th><th></th></tr></thead><tbody>");
     rules.forEach(function(r, i){
       html += '<tr><td><select data-failure-field="statKey" data-idx="'+i+'">'+
         DAL.rpgOptions(numStats.map(function(s){ return { value: s.key, label: s.label || s.key }; }), r.statKey, '— pick a stat —')+'</select></td>'+
         '<td><select data-failure-field="op" data-idx="'+i+'">'+
         DAL.rpgOptions(DAL.FAILURE_OPS, r.op || '<=')+'</select></td>'+
         '<td><input value="'+DAL.escapeHtml(String(r.value === undefined ? 0 : r.value))+'" data-failure-field="value" data-idx="'+i+'" style="width:56px" inputmode="numeric"></td>'+
-        '<td><input value="'+DAL.escapeHtml(r.label||'')+'" data-failure-field="label" data-idx="'+i+'" placeholder="Bled dry"></td>'+
-        '<td><input value="'+DAL.escapeHtml(r.message||'')+'" data-failure-field="message" data-idx="'+i+'" placeholder="The hall goes quiet around you."></td>'+
+        '<td><input value="'+DAL.escapeHtml(r.label||'')+'" data-failure-field="label" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("ui_Bled_dry_7432b75","Bled dry")+"\"></td>")+
+        '<td><input value="'+DAL.escapeHtml(r.message||'')+'" data-failure-field="message" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("ui_The_hall_goes_quiet_around_you__d743ec1","The hall goes quiet around you.")+"\"></td>")+
         '<td><button class="btn sm danger" data-action="sg-delete-failure" data-idx="'+i+'">&times;</button></td></tr>';
       html += '<tr><td colspan="6" style="padding-top:0;font-size:var(--ts-xs);color:var(--c-text-faint);font-style:italic">'+
         (r.statKey && DAL.rpg.statDef(adv, r.statKey) ? 'The run ends when '+DAL.escapeHtml(DAL.rpg.describeFailure(r, adv))+'.' : 'This rule watches a stat that no longer exists, so it never fires.')+'</td></tr>';
     });
-    if(!rules.length) html += '<tr><td colspan="6" style="text-align:center;color:var(--c-text-faint)">No run-ending rules — only ending scenes finish a run</td></tr>';
+    if(!rules.length) html += ("<tr><td colspan=\"6\" style=\"text-align:center;color:var(--c-text-faint)\">"+DAL.uiLabel("ui_No_run_ending_rules_only_ending_scenes_fin_a2dbbfe","No run-ending rules — only ending scenes finish a run")+"</td></tr>");
     html += '</tbody></table>';
   }
   html += '</div>';
@@ -532,25 +532,25 @@ DAL.FAILURE_OPS = [
 DAL.renderItems = function(proj){
   var adv = DAL.ensureAdventure(proj);
   var html = '<div class="u-measure-wide">';
-  html += '<p style="color:var(--c-text-muted);font-size:var(--ts-sm);margin-bottom:16px;line-height:1.6">Define the items readers can find during your story — keys, weapons, potions, treasure. Upload illustrations to show what each item looks like. Items can be checked in conditions to control which choices appear.</p>';
-  html += '<div class="section-header"><div class="section-title">Items</div><button class="btn primary" data-action="sg-add-item">+ Add Item</button></div>';
-  html += '<div class="card"><table class="stats-table"><thead><tr><th>Image</th><th>Name</th><th>Description</th><th>Stackable</th><th>Max Stack</th><th>Slot</th><th>Icon</th><th></th></tr></thead><tbody>';
+  html += ("<p style=\"color:var(--c-text-muted);font-size:var(--ts-sm);margin-bottom:16px;line-height:1.6\">"+DAL.uiLabel("ui_Define_the_items_readers_can_find_during_y_9cf6cc5","Define the items readers can find during your story — keys, weapons, potions, treasure. Upload illustrations to show what each item looks like. Items can be checked in conditions to control which choices appear.")+"</p>");
+  html += ("<div class=\"section-header\"><div class=\"section-title\">"+DAL.uiLabel("ui_Items_fb8e7a1","Items")+"</div><button class=\"btn primary\" data-action=\"sg-add-item\">"+DAL.uiLabel("ui__Add_Item_24da0c7","+ Add Item")+"</button></div>");
+  html += ("<div class=\"card\"><table class=\"stats-table\"><thead><tr><th>"+DAL.uiLabel("ui_Image_1aa4cb0","Image")+"</th><th>"+DAL.uiLabel("worldField_name","Name")+"</th><th>"+DAL.uiLabel("ui_Description_526e008","Description")+"</th><th>"+DAL.uiLabel("ui_Stackable_29681e4","Stackable")+"</th><th>"+DAL.uiLabel("ui_Max_Stack_46b59b5","Max Stack")+"</th><th>"+DAL.uiLabel("ui_Slot_7968978","Slot")+"</th><th>"+DAL.uiLabel("ui_Icon_a35abcd","Icon")+"</th><th></th></tr></thead><tbody>");
   (adv.items||[]).forEach(function(it, i){
     html += '<tr><td><div class="item-image-cell">'+
       (it.imageDataUrl?'<img src="'+it.imageDataUrl+'" class="item-thumb">':'<div class="item-thumb-placeholder">—</div>')+
       '<div style="display:flex;flex-direction:column;gap:2px">'+
       '<button class="btn sm" style="font-size:10px;padding:2px 6px" data-action="upload-item-image" data-idx="'+i+'">'+(it.imageDataUrl?'Change':'Upload')+'</button>'+
-      (it.imageDataUrl?'<button class="btn sm danger" style="font-size:10px;padding:2px 6px" data-action="remove-item-image" data-idx="'+i+'">Remove</button>':'')+
+      (it.imageDataUrl?'<button class="btn sm danger" style="font-size:10px;padding:2px 6px" data-action="remove-item-image" data-idx="'+i+("\">"+DAL.uiLabel("remove","Remove")+"</button>"):'')+
       '</div></div></td>'+
       '<td><input value="'+DAL.escapeHtml(it.name)+'" data-item-field="name" data-idx="'+i+'"></td>'+
       '<td><input value="'+DAL.escapeHtml(it.description)+'" data-item-field="description" data-idx="'+i+'"></td>'+
-      '<td><select data-item-field="stackable" data-idx="'+i+'"><option value="false"'+(!it.stackable?' selected':'')+'>No</option><option value="true"'+(it.stackable?' selected':'')+'>Yes</option></select></td>'+
+      '<td><select data-item-field="stackable" data-idx="'+i+'"><option value="false"'+(!it.stackable?' selected':'')+(">"+DAL.uiLabel("ui_No_1ea442a","No")+"</option><option value=\"true\"")+(it.stackable?' selected':'')+(">"+DAL.uiLabel("ui_Yes_85a39ab","Yes")+"</option></select></td>")+
       '<td><input value="'+DAL.escapeHtml(String(it.maxStack||1))+'" data-item-field="maxStack" data-idx="'+i+'" style="width:40px"></td>'+
-      '<td><select data-item-field="slot" data-idx="'+i+'"><option value="none"'+(it.slot==='none'||!it.slot?' selected':'')+'>none</option><option value="head"'+(it.slot==='head'?' selected':'')+'>head</option><option value="body"'+(it.slot==='body'?' selected':'')+'>body</option><option value="weapon"'+(it.slot==='weapon'?' selected':'')+'>weapon</option><option value="accessory"'+(it.slot==='accessory'?' selected':'')+'>accessory</option></select></td>'+
+      '<td><select data-item-field="slot" data-idx="'+i+'"><option value="none"'+(it.slot==='none'||!it.slot?' selected':'')+(">"+DAL.uiLabel("ui_none_140bedb","none")+"</option><option value=\"head\"")+(it.slot==='head'?' selected':'')+(">"+DAL.uiLabel("ui_head_9f2e6d3","head")+"</option><option value=\"body\"")+(it.slot==='body'?' selected':'')+(">"+DAL.uiLabel("ui_body_230d835","body")+"</option><option value=\"weapon\"")+(it.slot==='weapon'?' selected':'')+(">"+DAL.uiLabel("ui_weapon_c68fef1","weapon")+"</option><option value=\"accessory\"")+(it.slot==='accessory'?' selected':'')+(">"+DAL.uiLabel("ui_accessory_1a460ac","accessory")+"</option></select></td>")+
       '<td><input value="'+DAL.escapeHtml(it.symbol||'')+'" data-item-field="symbol" data-idx="'+i+'" style="width:30px;text-align:center"></td>'+
       '<td><button class="btn sm danger" data-action="sg-delete-item" data-idx="'+i+'">&times;</button></td></tr>';
   });
-  if(!adv.items||!adv.items.length) html += '<tr><td colspan="8" style="text-align:center;color:var(--c-text-faint)">No items defined</td></tr>';
+  if(!adv.items||!adv.items.length) html += ("<tr><td colspan=\"8\" style=\"text-align:center;color:var(--c-text-faint)\">"+DAL.uiLabel("ui_No_items_defined_801b73d","No items defined")+"</td></tr>");
   html += '</tbody></table></div>';
   html += '<input type="file" id="itemImageInput" accept="image/*" style="display:none">';
   html += '</div>';
@@ -559,7 +559,7 @@ DAL.renderItems = function(proj){
 DAL.renderPlaytest = function(proj){
   var adv = DAL.ensureAdventure(proj);
   if(!adv.nodes || !adv.nodes.length){
-    return '<div class="empty-state"><h3>No Scenes Yet</h3><p>Add scenes in the Story Graph first, then come back here to play through your story.</p></div>';
+    return ("<div class=\"empty-state\"><h3>"+DAL.uiLabel("ui_No_Scenes_Yet_c83f389","No Scenes Yet")+"</h3><p>"+DAL.uiLabel("ui_Add_scenes_in_the_Story_Graph_first_then_c_5f1b08a","Add scenes in the Story Graph first, then come back here to play through your story.")+"</p></div>");
   }
   if(!adv.startNodeId) adv.startNodeId = adv.nodes[0].id;
 
@@ -573,16 +573,16 @@ DAL.renderPlaytest = function(proj){
   var html = '<div class="playtest-layout u-fill-body device-'+(proj.previewProfile||'responsive')+(DAL.playtestStyle==='terminal'?' terminal-mode':'')+'">';
   html += '<div class="playtest-main">';
   html += '<div style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap">'+
-    '<button class="btn sm" data-action="pt-restart">Restart</button>'+
-    '<button class="btn sm" data-action="pt-stepback">Step Back</button>'+
-    '<button class="btn sm" data-action="pt-speedrun">Speed-run</button>'+
+    ("<button class=\"btn sm\" data-action=\"pt-restart\">"+DAL.uiLabel("ui_Restart_6b983a8","Restart")+"</button>")+
+    ("<button class=\"btn sm\" data-action=\"pt-stepback\">"+DAL.uiLabel("ui_Step_Back_1ddf073","Step Back")+"</button>")+
+    ("<button class=\"btn sm\" data-action=\"pt-speedrun\">"+DAL.uiLabel("ui_Speed_run_451000c","Speed-run")+"</button>")+
     (DAL.previewProfileControl?DAL.previewProfileControl(proj):'')+
     '<div style="margin-left:auto;display:flex;gap:4px;align-items:center">'+
       /* The story-wide answer to "what does an unmet choice look like?", set
          where the author can see the result immediately. */
-      '<select class="form-select" style="width:auto;font-size:var(--ts-xs)" data-adv-rule="lockedChoices" title="What readers see when they do not meet a choice\'s requirements">'+
-        '<option value="lock"'+(DAL.rpg.rules(adv).lockedChoices!=='hide'?' selected':'')+'>Unmet choices: show locked</option>'+
-        '<option value="hide"'+(DAL.rpg.rules(adv).lockedChoices==='hide'?' selected':'')+'>Unmet choices: hide</option>'+
+      ("<select class=\"form-select\" style=\"width:auto;font-size:var(--ts-xs)\" data-adv-rule=\"lockedChoices\" title=\""+DAL.uiLabel("ui_What_readers_see_when_they_do_not_meet_a_c_3b5368f","What readers see when they do not meet a choice's requirements")+"\">")+
+        '<option value="lock"'+(DAL.rpg.rules(adv).lockedChoices!=='hide'?' selected':'')+(">"+DAL.uiLabel("ui_Unmet_choices_show_locked_32757f5","Unmet choices: show locked")+"</option>")+
+        '<option value="hide"'+(DAL.rpg.rules(adv).lockedChoices==='hide'?' selected':'')+(">"+DAL.uiLabel("ui_Unmet_choices_hide_03ea561","Unmet choices: hide")+"</option>")+
       '</select>'+
       '<button class="btn sm" data-action="pt-style">'+(DAL.playtestStyle==='book'?'Terminal':'Book Page')+'</button>'+
     '</div></div>';
@@ -620,7 +620,7 @@ DAL.renderPlaytest = function(proj){
     }
   });
   if(!shown){
-    html += '<div style="color:var(--c-text-faint);font-size:var(--ts-sm)">— End of this path —</div>';
+    html += ("<div style=\"color:var(--c-text-faint);font-size:var(--ts-sm)\">"+DAL.uiLabel("ui__End_of_this_path__47c51c8","— End of this path —")+"</div>");
   }
   html += '</div>';
 
@@ -639,7 +639,7 @@ DAL.renderPlaytest = function(proj){
 
 DAL.renderPlaytestHistory = function(adv){
   if(!DAL.playtestHistory || DAL.playtestHistory.length < 2) return '';
-  var html = '<div style="margin-top:16px;border-top:1px solid var(--c-divider);padding-top:8px"><div style="font-size:var(--ts-xs);color:var(--c-text-faint);margin-bottom:4px">History:</div>';
+  var html = ("<div style=\"margin-top:16px;border-top:1px solid var(--c-divider);padding-top:8px\"><div style=\"font-size:var(--ts-xs);color:var(--c-text-faint);margin-bottom:4px\">"+DAL.uiLabel("ui_History__9ccfe93","History:")+"</div>");
   html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
   DAL.playtestHistory.forEach(function(nid, i){
     var n = (adv.nodes||[]).find(function(nn){ return nn.id === nid; });
@@ -659,14 +659,14 @@ DAL.renderPlaytestEnd = function(adv, currentNode){
     html += '<div class="playtest-end-title">'+DAL.escapeHtml(ended.label || (failure ? 'Run over' : 'The End'))+'</div>';
     if(ended.message) html += '<div class="playtest-end-note">'+DAL.escapeHtml(ended.message)+'</div>';
   } else {
-    html += '<div class="playtest-end-kind">Nowhere to go</div>';
+    html += ("<div class=\"playtest-end-kind\">"+DAL.uiLabel("ui_Nowhere_to_go_246fd28","Nowhere to go")+"</div>");
     html += '<div class="playtest-end-title">'+DAL.escapeHtml(currentNode.title || 'This scene')+' has no way out</div>';
-    html += '<div class="playtest-end-note">Readers who arrive here are stuck. Give the scene a choice, or mark it as an ending in the Story Graph.</div>';
+    html += ("<div class=\"playtest-end-note\">"+DAL.uiLabel("ui_Readers_who_arrive_here_are_stuck_Give_the_aefaf17","Readers who arrive here are stuck. Give the scene a choice, or mark it as an ending in the Story Graph.")+"</div>");
   }
   html += '<div class="playtest-end-stats">Scenes visited: '+Object.keys(st.visited||{}).length+' · Choices made: '+Math.max(0,st.step-1)+'</div>';
   html += '<div class="playtest-end-actions">'+
-    '<button class="btn primary sm" data-action="pt-restart">Play again</button>'+
-    '<button class="btn sm" data-action="pt-stepback">Step back</button>'+
+    ("<button class=\"btn primary sm\" data-action=\"pt-restart\">"+DAL.uiLabel("ui_Play_again_5ef30d2","Play again")+"</button>")+
+    ("<button class=\"btn sm\" data-action=\"pt-stepback\">"+DAL.uiLabel("ui_Step_back_b863269","Step back")+"</button>")+
     '</div></div>';
   return html;
 };
@@ -676,9 +676,9 @@ DAL.renderPlaytestPanels = function(adv){
   var prev = (DAL.playtestPast && DAL.playtestPast.length) ? DAL.playtestPast[DAL.playtestPast.length - 1] : null;
   var html = '';
 
-  html += '<h4>Stats</h4>';
+  html += ("<h4>"+DAL.uiLabel("ui_Stats_b4a7365","Stats")+"</h4>");
   var rows = DAL.rpg.statRows(st, adv);
-  if(!rows.length) html += '<div class="playtest-empty">No stats defined</div>';
+  if(!rows.length) html += ("<div class=\"playtest-empty\">"+DAL.uiLabel("ui_No_stats_defined_59d7d48","No stats defined")+"</div>");
   rows.forEach(function(row){
     var before = prev ? prev.stats[row.key] : undefined;
     var delta = '';
@@ -694,18 +694,18 @@ DAL.renderPlaytestPanels = function(adv){
     }
   });
 
-  html += '<h4>Traits</h4>';
+  html += ("<h4>"+DAL.uiLabel("ui_Traits_e0ab4ad","Traits")+"</h4>");
   var traits = DAL.rpg.traitRows(st, adv);
   var activeTraits = traits.filter(function(t){ return t.active; });
-  if(!traits.length) html += '<div class="playtest-empty">No traits defined</div>';
-  else if(!activeTraits.length) html += '<div class="playtest-empty">None set yet</div>';
+  if(!traits.length) html += ("<div class=\"playtest-empty\">"+DAL.uiLabel("ui_No_traits_defined_3a7c276","No traits defined")+"</div>");
+  else if(!activeTraits.length) html += ("<div class=\"playtest-empty\">"+DAL.uiLabel("ui_None_set_yet_57c8e1d","None set yet")+"</div>");
   else activeTraits.forEach(function(t){
     html += '<div class="playtest-item"><span>'+DAL.escapeHtml(t.label)+'</span></div>';
   });
 
-  html += '<h4>Inventory</h4>';
+  html += ("<h4>"+DAL.uiLabel("ui_Inventory_758f487","Inventory")+"</h4>");
   var invRows = DAL.rpg.inventoryRows(st, adv);
-  if(!invRows.length) html += '<div class="playtest-empty">Empty</div>';
+  if(!invRows.length) html += ("<div class=\"playtest-empty\">"+DAL.uiLabel("ui_Empty_c6c094b","Empty")+"</div>");
   invRows.forEach(function(row){
     html += '<div class="playtest-item">';
     if(row.image) html += '<img src="'+row.image+'" class="playtest-item-thumb">';
@@ -719,8 +719,8 @@ DAL.renderPlaytestPanels = function(adv){
   var equipped = DAL.rpg.equipRows(st, adv).filter(function(r){ return r.key; });
   var usesSlots = (adv.items||[]).some(function(it){ return it.slot && it.slot !== 'none'; });
   if(usesSlots){
-    html += '<h4>Equipped</h4>';
-    if(!equipped.length) html += '<div class="playtest-empty">Nothing equipped</div>';
+    html += ("<h4>"+DAL.uiLabel("ui_Equipped_c4dc8a3","Equipped")+"</h4>");
+    if(!equipped.length) html += ("<div class=\"playtest-empty\">"+DAL.uiLabel("ui_Nothing_equipped_9e9c1c7","Nothing equipped")+"</div>");
     equipped.forEach(function(r){
       html += '<div class="playtest-stat"><span>'+DAL.escapeHtml(r.slot.charAt(0).toUpperCase()+r.slot.slice(1))+'</span><span>'+DAL.escapeHtml(r.name)+'</span></div>';
     });
@@ -728,15 +728,15 @@ DAL.renderPlaytestPanels = function(adv){
 
   var flags = Object.keys(st.flags || {}).filter(function(k){ return st.flags[k]; });
   if(flags.length){
-    html += '<h4>Flags</h4>';
+    html += ("<h4>"+DAL.uiLabel("ui_Flags_f38d995","Flags")+"</h4>");
     flags.sort().forEach(function(f){ html += '<div class="playtest-item"><span>'+DAL.escapeHtml(f)+'</span></div>'; });
   }
 
-  html += '<h4>Current Scene</h4>';
+  html += ("<h4>"+DAL.uiLabel("ui_Current_Scene_0000d15","Current Scene")+"</h4>");
   var node = DAL.rpg.currentNode(st, adv);
-  html += '<div class="playtest-stat"><span>Scene</span><span>'+DAL.escapeHtml(node ? (node.title||'Untitled') : '—')+'</span></div>';
-  html += '<div class="playtest-stat"><span>Step</span><span>'+st.step+'</span></div>';
-  html += '<div class="playtest-stat"><span>Times here</span><span>'+DAL.rpg.visitCount(st, st.nodeId)+'</span></div>';
+  html += ("<div class=\"playtest-stat\"><span>"+DAL.uiLabel("linkScene","Scene")+"</span><span>")+DAL.escapeHtml(node ? (node.title||'Untitled') : '—')+'</span></div>';
+  html += ("<div class=\"playtest-stat\"><span>"+DAL.uiLabel("ui_Step_8e6a6cc","Step")+"</span><span>")+st.step+'</span></div>';
+  html += ("<div class=\"playtest-stat\"><span>"+DAL.uiLabel("ui_Times_here_3866f99","Times here")+"</span><span>")+DAL.rpg.visitCount(st, st.nodeId)+'</span></div>';
   return html;
 };
 
@@ -747,7 +747,7 @@ DAL.renderPlaytestChanges = function(adv){
   var last = entries[0];
   var changes = (last.changes || []).filter(function(c){ return c && c.text; });
   if(!changes.length && !last.note) return '';
-  var html = '<div class="playtest-changes"><div class="playtest-changes-head">What just changed</div>';
+  var html = ("<div class=\"playtest-changes\"><div class=\"playtest-changes-head\">"+DAL.uiLabel("ui_What_just_changed_e661e05","What just changed")+"</div>");
   changes.forEach(function(c){
     html += '<div class="playtest-change '+(c.kind === 'up' ? 'up' : (c.kind === 'down' ? 'down' : ''))+'">'+DAL.escapeHtml(c.text)+'</div>';
   });
@@ -779,12 +779,12 @@ DAL.applyEffects = function(effects, adv){
 DAL.renderRPGExport = function(proj){
   var adv = DAL.ensureAdventure(proj);
   var report = DAL.rpg.audit(adv);
-  var html = '<div class="u-measure"><div class="section-header"><div class="section-title">Export</div></div>';
-  html += '<p class="export-intro">The standalone and SugarCube exports carry the same RPG runtime — gear slots, stack limits, clamping, run endings and visit counts — and embed scene artwork, bound audio and narration so the file plays anywhere on its own.</p>';
+  var html = ("<div class=\"u-measure\"><div class=\"section-header\"><div class=\"section-title\">"+DAL.uiLabel("tool_export-rpg","Export")+"</div></div>");
+  html += ("<p class=\"export-intro\">"+DAL.uiLabel("ui_The_standalone_and_SugarCube_exports_carry_1e73ffe","The standalone and SugarCube exports carry the same RPG runtime — gear slots, stack limits, clamping, run endings and visit counts — and embed scene artwork, bound audio and narration so the file plays anywhere on its own.")+"</p>");
   if(report.problems || report.warnings){
-    html += '<div class="card rpg-export-readiness warning"><strong>Release check: '+report.problems+' problem'+(report.problems===1?'':'s')+' and '+report.warnings+' warning'+(report.warnings===1?'':'s')+'</strong><p>Exports remain available for testing, but readers may encounter missing or unreachable content.</p><button class="btn sm" data-action="sg-checkup">Review story checkup</button></div>';
+    html += '<div class="card rpg-export-readiness warning"><strong>Release check: '+report.problems+' problem'+(report.problems===1?'':'s')+' and '+report.warnings+' warning'+(report.warnings===1?'':'s')+("</strong><p>"+DAL.uiLabel("ui_Exports_remain_available_for_testing_but_r_7d6e5b3","Exports remain available for testing, but readers may encounter missing or unreachable content.")+"</p><button class=\"btn sm\" data-action=\"sg-checkup\">"+DAL.uiLabel("ui_Review_story_checkup_e55424a","Review story checkup")+"</button></div>");
   } else {
-    html += '<div class="card rpg-export-readiness ready"><strong>Release check passed</strong><p>No broken or unreachable story paths were found.</p></div>';
+    html += ("<div class=\"card rpg-export-readiness ready\"><strong>"+DAL.uiLabel("ui_Release_check_passed_20903e8","Release check passed")+"</strong><p>"+DAL.uiLabel("ui_No_broken_or_unreachable_story_paths_were__2d5f5b9","No broken or unreachable story paths were found.")+"</p></div>");
   }
   // Same registry the Export Project dialog uses, so the formats and wording match.
   html += DAL.renderExportGroups(proj);
@@ -1252,10 +1252,10 @@ DAL.handleAdventureClick = function(action, el, e){
     if(DAL.connectMode){
       if(!DAL.connectFromNodeId){
         DAL.connectFromNodeId = el.getAttribute('data-nid');
-        DAL.toast('Now select the destination scene','info');
+        DAL.toast((DAL.i18n?DAL.i18n.text("ui_Now_select_the_destination_scene_28141ae","Now select the destination scene"):"Now select the destination scene"),'info');
         DAL.render();
       } else if(DAL.connectFromNodeId === el.getAttribute('data-nid')){
-        DAL.toast('Select a different destination scene','info');
+        DAL.toast((DAL.i18n?DAL.i18n.text("ui_Select_a_different_destination_scene_de0381c","Select a different destination scene"):"Select a different destination scene"),'info');
       } else {
         var proj2 = DAL.state.projects[DAL.currentProjectId];
         var adv2 = DAL.ensureAdventure(proj2);
@@ -1268,7 +1268,7 @@ DAL.handleAdventureClick = function(action, el, e){
         DAL.connectMode = false;
         DAL.connectFromNodeId = null;
         DAL.selectedNodeId = el.getAttribute('data-nid');
-        DAL.toast('Scenes connected','success');
+        DAL.toast((DAL.i18n?DAL.i18n.text("ui_Scenes_connected_157d2e9","Scenes connected"):"Scenes connected"),'success');
         DAL.saveState(); DAL.render();
       }
     } else {
@@ -1579,7 +1579,7 @@ DAL.handleAdventureClick = function(action, el, e){
       if(DAL.playtestHistory && DAL.playtestHistory.length > 1) DAL.playtestHistory.pop();
       DAL.render();
     } else {
-      DAL.toast('Nothing to step back to','warning');
+      DAL.toast((DAL.i18n?DAL.i18n.text("ui_Nothing_to_step_back_to_5ce9b76","Nothing to step back to"):"Nothing to step back to"),'warning');
     }
     return;
   }
@@ -1589,7 +1589,7 @@ DAL.handleAdventureClick = function(action, el, e){
     var html = '<div class="form-group"><label class="form-label">Jump to node</label><select class="form-select" id="speedrunSelect">';
     adv20.nodes.forEach(function(n){ html += '<option value="'+n.id+'">'+DAL.escapeHtml(n.title||'Untitled')+'</option>'; });
     html += '</select></div>';
-    DAL.modal('Speed-run: Jump to Node', html, { footer: '<button class="btn" data-action="close-modal">Cancel</button><button class="btn primary" data-action="pt-speedrun-go">Jump</button>' });
+    DAL.modal((DAL.i18n?DAL.i18n.text("ui_Speed_run_Jump_to_Node_d7fbbb7","Speed-run: Jump to Node"):"Speed-run: Jump to Node"), html, { footer: '<button class="btn" data-action="close-modal">Cancel</button><button class="btn primary" data-action="pt-speedrun-go">Jump</button>' });
     return;
   }
   if(action === 'pt-speedrun-go'){
@@ -1610,7 +1610,7 @@ DAL.handleAdventureClick = function(action, el, e){
     var moved = DAL.rpg.toggleEquip(DAL.playtestState, advEq, el.getAttribute('data-item'));
     if(!moved){
       DAL.playtestPast.pop();
-      DAL.toast('That item cannot be equipped','warning');
+      DAL.toast((DAL.i18n?DAL.i18n.text("ui_That_item_cannot_be_equipped_93b821f","That item cannot be equipped"):"That item cannot be equipped"),'warning');
     }
     DAL.render();
     return;
@@ -1628,7 +1628,7 @@ DAL.handleAdventureClick = function(action, el, e){
     if(!entry){
       /* The engine refused: the choice is not actually available. */
       DAL.playtestPast.pop();
-      DAL.toast('That choice is not available right now','warning');
+      DAL.toast((DAL.i18n?DAL.i18n.text("ui_That_choice_is_not_available_right_now_71c00b7","That choice is not available right now"):"That choice is not available right now"),'warning');
       return;
     }
     DAL.playtestHistory.push(DAL.playtestState.nodeId);
@@ -1639,20 +1639,18 @@ DAL.handleAdventureClick = function(action, el, e){
   if(action === 'export-twee'){
     var proj23 = DAL.exportTarget(el);
     if(!proj23) return;
-    DAL.toast('Packing artwork and audio\u2026');
-    DAL.exportTwee(proj23).then(function(out){
-      DAL.download(DAL.sanitizeFilename(proj23.name)+'.twee', out.content, 'text/plain');
-      DAL.reportExport(out, 'Twine source downloaded');
+    DAL.toast((DAL.i18n?DAL.i18n.text("ui_Packing_artwork_and_audio__dc0bdb5","Packing artwork and audio…"):"Packing artwork and audio…"));
+    DAL.exportTwee(proj23).then(async function(out){
+      if(await DAL.download(DAL.sanitizeFilename(proj23.name)+'.twee', out.content, 'text/plain'))DAL.reportExport(out, 'Twine source export completed');
     }).catch(function(err){ DAL.toast('Twine export failed: '+(err && err.message ? err.message : 'unknown error'), 'error'); });
     return;
   }
   if(action === 'export-playable-html'){
     var proj24 = DAL.exportTarget(el);
     if(!proj24) return;
-    DAL.toast('Packing artwork and audio\u2026');
-    DAL.exportPlayableHTML(proj24).then(function(out){
-      DAL.download(DAL.sanitizeFilename(proj24.name)+'-game.html', out.content, 'text/html');
-      DAL.reportExport(out, 'Playable adventure HTML downloaded');
+    DAL.toast((DAL.i18n?DAL.i18n.text("ui_Packing_artwork_and_audio__dc0bdb5","Packing artwork and audio…"):"Packing artwork and audio…"));
+    DAL.exportPlayableHTML(proj24).then(async function(out){
+      if(await DAL.download(DAL.sanitizeFilename(proj24.name)+'-game.html', out.content, 'text/html'))DAL.reportExport(out, 'Playable adventure HTML export completed');
     }).catch(function(err){ DAL.toast('Export failed: '+(err && err.message ? err.message : 'unknown error'), 'error'); });
     return;
   }
@@ -1663,7 +1661,7 @@ DAL.handleAdventureClick = function(action, el, e){
     var nodeId = DAL.exportSelectValue('exportNodeSelect');
     var node25 = adv25.nodes.find(function(n){ return n.id === nodeId; });
     if(node25) DAL.download(DAL.sanitizeFilename(node25.title||'node')+'.txt', node25.text||'', 'text/plain');
-    DAL.toast('Selected scene TXT downloaded.','success');
+    DAL.toast((DAL.i18n?DAL.i18n.text("ui_Selected_scene_TXT_downloaded__51926f5","Selected scene TXT downloaded."):"Selected scene TXT downloaded."),'success');
     return;
   }
 };
@@ -1951,24 +1949,24 @@ document.addEventListener('focusout', function(e){
   var oldNodeDetail = DAL.renderNodeDetail;
   DAL.renderNodeDetail = function(proj, adv, node){
     var body = oldNodeDetail(proj, adv, node);
-    body = body.replace('placeholder="Scene title"', 'placeholder="Scene title" list="rpgNodeTitles"');
+    body = body.replace(("placeholder=\""+DAL.uiLabel("ui_Scene_title_a614208","Scene title")+"\""), ("placeholder=\""+DAL.uiLabel("ui_Scene_title_a614208","Scene title")+"\" list=\"rpgNodeTitles\""));
     body += '<datalist id="rpgNodeTitles">'+(adv.nodes||[]).map(function(n){ return '<option value="'+DAL.escapeHtml(n.title||'')+'"></option>'; }).join('')+'</datalist>';
     return DAL.panel('rpg-node-'+node.id, 'Scene authoring', body, { defaultOpen:true, className:'rpg-node-panel' });
   };
 
   DAL.renderStatsTraits = function(proj){
     var adv = DAL.ensureAdventure(proj), html = '<div class="u-measure-mid rpg-tools">';
-    var stats = '<p class="rpg-intro">Use stats for measured values and text. Use traits for every yes/no fact; new boolean stats are intentionally unavailable so a choice always has one clear home.</p>';
-    stats += '<div class="section-header"><div class="section-title">Stats</div><button class="btn primary" data-action="sg-add-stat">+ Add Stat</button></div><div class="card rpg-table-wrap"><table class="stats-table rpg-responsive-table"><thead><tr><th>Key</th><th>Label</th><th>Kind</th><th>Default</th><th>Min</th><th>Max</th><th></th></tr></thead><tbody>';
+    var stats = ("<p class=\"rpg-intro\">"+DAL.uiLabel("ui_Use_stats_for_measured_values_and_text_Use_7a98090","Use stats for measured values and text. Use traits for every yes/no fact; new boolean stats are intentionally unavailable so a choice always has one clear home.")+"</p>");
+    stats += ("<div class=\"section-header\"><div class=\"section-title\">"+DAL.uiLabel("ui_Stats_b4a7365","Stats")+"</div><button class=\"btn primary\" data-action=\"sg-add-stat\">"+DAL.uiLabel("ui__Add_Stat_8e2b1ec","+ Add Stat")+"</button></div><div class=\"card rpg-table-wrap\"><table class=\"stats-table rpg-responsive-table\"><thead><tr><th>"+DAL.uiLabel("ui_Key_99a52df","Key")+"</th><th>"+DAL.uiLabel("label","Label")+"</th><th>"+DAL.uiLabel("ui_Kind_f5387f9","Kind")+"</th><th>"+DAL.uiLabel("ui_Default_21b111c","Default")+"</th><th>"+DAL.uiLabel("ui_Min_dea7933","Min")+"</th><th>"+DAL.uiLabel("ui_Max_a1a5936","Max")+"</th><th></th></tr></thead><tbody>");
     (adv.stats||[]).forEach(function(s, i){
       var numeric = (s.type||'number') === 'number', legacy = s.type === 'boolean';
-      stats += '<tr data-sel="rpg-stat:'+s.key+'" data-ctx="rpg-stat" data-ctx-id="'+s.key+'" data-drag="rpg-stat:'+s.key+'" data-drag-label="'+DAL.escapeHtml(s.label||s.key)+'"><td data-label="Key"><input value="'+DAL.escapeHtml(s.key)+'" data-stat-field="key" data-idx="'+i+'"></td><td data-label="Label"><input value="'+DAL.escapeHtml(s.label)+'" data-stat-field="label" data-idx="'+i+'"></td><td data-label="Kind">'+(legacy ? '<span class="u-hint">legacy yes/no</span> <button class="btn sm" data-action="sg-convert-bool-stat" data-idx="'+i+'">Convert</button>' : '<select data-stat-field="type" data-idx="'+i+'"><option value="number"'+(numeric?' selected':'')+'>number</option><option value="text"'+(!numeric?' selected':'')+'>text</option></select>')+'</td><td data-label="Default"><input value="'+DAL.escapeHtml(String(s.default === undefined ? '' : s.default))+'" data-stat-field="default" data-idx="'+i+'"></td><td data-label="Minimum">'+(numeric?'<input value="'+DAL.escapeHtml(s.min==null?'':String(s.min))+'" data-stat-field="min" data-idx="'+i+'">':'—')+'</td><td data-label="Maximum">'+(numeric?'<input value="'+DAL.escapeHtml(s.max==null?'':String(s.max))+'" data-stat-field="max" data-idx="'+i+'">':'—')+'</td><td class="rpg-row-actions"><button class="btn sm danger" data-action="sg-delete-stat" data-idx="'+i+'">Delete</button></td></tr>';
+      stats += '<tr data-sel="rpg-stat:'+s.key+'" data-ctx="rpg-stat" data-ctx-id="'+s.key+'" data-drag="rpg-stat:'+s.key+'" data-drag-label="'+DAL.escapeHtml(s.label||s.key)+'"><td data-label="Key"><input value="'+DAL.escapeHtml(s.key)+'" data-stat-field="key" data-idx="'+i+'"></td><td data-label="Label"><input value="'+DAL.escapeHtml(s.label)+'" data-stat-field="label" data-idx="'+i+'"></td><td data-label="Kind">'+(legacy ? ("<span class=\"u-hint\">"+DAL.uiLabel("ui_legacy_yes_no_7bfc65c","legacy yes/no")+"</span> <button class=\"btn sm\" data-action=\"sg-convert-bool-stat\" data-idx=\"")+i+("\">"+DAL.uiLabel("ui_Convert_5cd425f","Convert")+"</button>") : '<select data-stat-field="type" data-idx="'+i+'"><option value="number"'+(numeric?' selected':'')+(">"+DAL.uiLabel("ui_number_12886f9","number")+"</option><option value=\"text\"")+(!numeric?' selected':'')+(">"+DAL.uiLabel("ui_text_982d9e3","text")+"</option></select>"))+'</td><td data-label="Default"><input value="'+DAL.escapeHtml(String(s.default === undefined ? '' : s.default))+'" data-stat-field="default" data-idx="'+i+'"></td><td data-label="Minimum">'+(numeric?'<input value="'+DAL.escapeHtml(s.min==null?'':String(s.min))+'" data-stat-field="min" data-idx="'+i+'">':'—')+'</td><td data-label="Maximum">'+(numeric?'<input value="'+DAL.escapeHtml(s.max==null?'':String(s.max))+'" data-stat-field="max" data-idx="'+i+'">':'—')+'</td><td class="rpg-row-actions"><button class="btn sm danger" data-action="sg-delete-stat" data-idx="'+i+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></td></tr>");
     });
-    if(!(adv.stats||[]).length) stats += '<tr><td colspan="7" class="rpg-empty">No stats defined</td></tr>';
+    if(!(adv.stats||[]).length) stats += ("<tr><td colspan=\"7\" class=\"rpg-empty\">"+DAL.uiLabel("ui_No_stats_defined_59d7d48","No stats defined")+"</td></tr>");
     stats += '</tbody></table></div>';
-    var traits = '<p class="rpg-intro">Traits are the app’s single yes/no system: “met the king”, “knows lockpicking”, or “cursed”.</p><div class="section-header"><div class="section-title">Traits</div><button class="btn primary" data-action="sg-add-trait">+ Add Trait</button></div><div class="card rpg-table-wrap"><table class="stats-table rpg-responsive-table"><thead><tr><th>Key</th><th>Label</th><th>Description</th><th>Default</th><th></th></tr></thead><tbody>';
-    (adv.traits||[]).forEach(function(t, i){ traits += '<tr><td data-label="Key"><input value="'+DAL.escapeHtml(t.key)+'" data-trait-field="key" data-idx="'+i+'"></td><td data-label="Label"><input value="'+DAL.escapeHtml(t.label)+'" data-trait-field="label" data-idx="'+i+'"></td><td data-label="Description"><input value="'+DAL.escapeHtml(t.description||'')+'" data-trait-field="description" data-idx="'+i+'"></td><td data-label="Default"><select data-trait-field="defaultActive" data-idx="'+i+'"><option value="true"'+(t.defaultActive?' selected':'')+'>set</option><option value="false"'+(!t.defaultActive?' selected':'')+'>clear</option></select></td><td class="rpg-row-actions"><button class="btn sm danger" data-action="sg-delete-trait" data-idx="'+i+'">Delete</button></td></tr>'; });
-    if(!(adv.traits||[]).length) traits += '<tr><td colspan="5" class="rpg-empty">No traits defined</td></tr>';
+    var traits = ("<p class=\"rpg-intro\">"+DAL.uiLabel("ui_Traits_are_the_app_s_single_yes_no_system__a1a0e6d","Traits are the app’s single yes/no system: “met the king”, “knows lockpicking”, or “cursed”.")+"</p><div class=\"section-header\"><div class=\"section-title\">"+DAL.uiLabel("ui_Traits_e0ab4ad","Traits")+"</div><button class=\"btn primary\" data-action=\"sg-add-trait\">"+DAL.uiLabel("ui__Add_Trait_57ffd42","+ Add Trait")+"</button></div><div class=\"card rpg-table-wrap\"><table class=\"stats-table rpg-responsive-table\"><thead><tr><th>"+DAL.uiLabel("ui_Key_99a52df","Key")+"</th><th>"+DAL.uiLabel("label","Label")+"</th><th>"+DAL.uiLabel("ui_Description_526e008","Description")+"</th><th>"+DAL.uiLabel("ui_Default_21b111c","Default")+"</th><th></th></tr></thead><tbody>");
+    (adv.traits||[]).forEach(function(t, i){ traits += '<tr><td data-label="Key"><input value="'+DAL.escapeHtml(t.key)+'" data-trait-field="key" data-idx="'+i+'"></td><td data-label="Label"><input value="'+DAL.escapeHtml(t.label)+'" data-trait-field="label" data-idx="'+i+'"></td><td data-label="Description"><input value="'+DAL.escapeHtml(t.description||'')+'" data-trait-field="description" data-idx="'+i+'"></td><td data-label="Default"><select data-trait-field="defaultActive" data-idx="'+i+'"><option value="true"'+(t.defaultActive?' selected':'')+(">"+DAL.uiLabel("ui_set_6ee0eb4","set")+"</option><option value=\"false\"")+(!t.defaultActive?' selected':'')+(">"+DAL.uiLabel("ui_clear_913a4cb","clear")+"</option></select></td><td class=\"rpg-row-actions\"><button class=\"btn sm danger\" data-action=\"sg-delete-trait\" data-idx=\"")+i+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></td></tr>"); });
+    if(!(adv.traits||[]).length) traits += ("<tr><td colspan=\"5\" class=\"rpg-empty\">"+DAL.uiLabel("ui_No_traits_defined_3a7c276","No traits defined")+"</td></tr>");
     traits += '</tbody></table></div>';
     html += DAL.panel('rpg-stats', 'Stats and traits', stats + traits, { defaultOpen:true });
     html += DAL.panel('rpg-flags', 'Flags', DAL.renderFlagTable(adv), { defaultOpen:false, badge:(adv.flags||[]).length || '' });
@@ -1982,27 +1980,27 @@ document.addEventListener('focusout', function(e){
      works and is offered for adoption so it stops being invisible. */
   DAL.renderFlagTable = function(adv){
     var R = DAL.rpg;
-    var html = '<p class="rpg-intro">Traits are the recommended yes/no system. Flags do the same job with less structure \u2014 declare one here to give it a starting value and see everywhere it is used.</p>';
-    html += '<div class="section-header"><div class="section-title">Declared flags</div><button class="btn primary" data-action="sg-add-flag">+ Add Flag</button></div>';
-    html += '<div class="card rpg-table-wrap"><table class="stats-table rpg-responsive-table"><thead><tr><th>Key</th><th>Label</th><th>Starts</th><th>Set</th><th>Checked</th><th></th></tr></thead><tbody>';
+    var html = ("<p class=\"rpg-intro\">"+DAL.uiLabel("ui_Traits_are_the_recommended_yes_no_system_F_29cce31","Traits are the recommended yes/no system. Flags do the same job with less structure — declare one here to give it a starting value and see everywhere it is used.")+"</p>");
+    html += ("<div class=\"section-header\"><div class=\"section-title\">"+DAL.uiLabel("ui_Declared_flags_f3de505","Declared flags")+"</div><button class=\"btn primary\" data-action=\"sg-add-flag\">"+DAL.uiLabel("ui__Add_Flag_dff5e23","+ Add Flag")+"</button></div>");
+    html += ("<div class=\"card rpg-table-wrap\"><table class=\"stats-table rpg-responsive-table\"><thead><tr><th>"+DAL.uiLabel("ui_Key_99a52df","Key")+"</th><th>"+DAL.uiLabel("label","Label")+"</th><th>"+DAL.uiLabel("ui_Starts_96dbede","Starts")+"</th><th>"+DAL.uiLabel("ui_Set_b6f6f3a","Set")+"</th><th>"+DAL.uiLabel("ui_Checked_0efd92a","Checked")+"</th><th></th></tr></thead><tbody>");
     (adv.flags||[]).forEach(function(f, i){
       var writers = R.flagWriters(adv, f.key).length, readers = R.flagReaders(adv, f.key).length;
-      html += '<tr><td data-label="Key"><input value="'+DAL.escapeHtml(f.key||'')+'" data-flag-field="key" data-idx="'+i+'" placeholder="metTheWizard"></td>'+
-        '<td data-label="Label"><input value="'+DAL.escapeHtml(f.label||'')+'" data-flag-field="label" data-idx="'+i+'" placeholder="Met the wizard"></td>'+
-        '<td data-label="Starts"><select data-flag-field="default" data-idx="'+i+'"><option value="false"'+(f['default']?'':' selected')+'>clear</option><option value="true"'+(f['default']?' selected':'')+'>set</option></select></td>'+
-        '<td data-label="Set">'+(writers ? writers + ' place' + (writers===1?'':'s') : '<span class="u-hint">never set</span>')+'</td>'+
-        '<td data-label="Checked">'+(readers ? readers + ' choice' + (readers===1?'':'s') : '<span class="u-hint">unused</span>')+'</td>'+
-        '<td class="rpg-row-actions"><button class="btn sm danger" data-action="sg-delete-flag" data-idx="'+i+'">Delete</button></td></tr>';
+      html += '<tr><td data-label="Key"><input value="'+DAL.escapeHtml(f.key||'')+'" data-flag-field="key" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("ui_metTheWizard_bbc603e","metTheWizard")+"\"></td>")+
+        '<td data-label="Label"><input value="'+DAL.escapeHtml(f.label||'')+'" data-flag-field="label" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("ui_Met_the_wizard_f78a6cd","Met the wizard")+"\"></td>")+
+        '<td data-label="Starts"><select data-flag-field="default" data-idx="'+i+'"><option value="false"'+(f['default']?'':' selected')+(">"+DAL.uiLabel("ui_clear_913a4cb","clear")+"</option><option value=\"true\"")+(f['default']?' selected':'')+(">"+DAL.uiLabel("ui_set_6ee0eb4","set")+"</option></select></td>")+
+        '<td data-label="Set">'+(writers ? writers + ' place' + (writers===1?'':'s') : ("<span class=\"u-hint\">"+DAL.uiLabel("ui_never_set_b6cedfa","never set")+"</span>"))+'</td>'+
+        '<td data-label="Checked">'+(readers ? readers + ' choice' + (readers===1?'':'s') : ("<span class=\"u-hint\">"+DAL.uiLabel("ui_unused_febe1d7","unused")+"</span>"))+'</td>'+
+        '<td class="rpg-row-actions"><button class="btn sm danger" data-action="sg-delete-flag" data-idx="'+i+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></td></tr>");
     });
-    if(!(adv.flags||[]).length) html += '<tr><td colspan="6" class="rpg-empty">No flags declared</td></tr>';
+    if(!(adv.flags||[]).length) html += ("<tr><td colspan=\"6\" class=\"rpg-empty\">"+DAL.uiLabel("ui_No_flags_declared_5b9b40f","No flags declared")+"</td></tr>");
     html += '</tbody></table></div>';
 
     var loose = R.undeclaredFlags(adv);
     if(loose.length){
-      html += '<p class="rpg-intro" style="margin-top:12px">Used in the story but not declared \u2014 adopt one to give it a starting value, or check it for a typo.</p><div class="rpg-loose-flags">';
+      html += ("<p class=\"rpg-intro\" style=\"margin-top:12px\">"+DAL.uiLabel("ui_Used_in_the_story_but_not_declared_adopt_o_728ad4c","Used in the story but not declared — adopt one to give it a starting value, or check it for a typo.")+"</p><div class=\"rpg-loose-flags\">");
       loose.forEach(function(k){
         html += '<span class="rpg-loose-flag">'+DAL.escapeHtml(k)+
-          '<button class="btn sm" data-action="sg-adopt-flag" data-key="'+DAL.escapeHtml(k)+'">Adopt</button></span>';
+          '<button class="btn sm" data-action="sg-adopt-flag" data-key="'+DAL.escapeHtml(k)+("\">"+DAL.uiLabel("ui_Adopt_0ed3345","Adopt")+"</button></span>");
       });
       html += '</div>';
     }
@@ -2011,17 +2009,17 @@ document.addEventListener('focusout', function(e){
 
   DAL.renderItems = function(proj){
     var adv = DAL.ensureAdventure(proj), types = DAL.rpgItemTypes(adv), html = '<div class="u-measure-wide rpg-tools">';
-    var gear = '<p class="rpg-intro">Slots are author-defined. A restriction is a comma-separated list of item types; leave it blank to accept any type.</p><div class="rpg-slot-list">';
-    DAL.rpg.gearSlots(adv).forEach(function(slot, i){ gear += '<div class="rpg-slot-card"><input class="form-input" value="'+DAL.escapeHtml(slot.label)+'" data-slot-field="label" data-idx="'+i+'" placeholder="Slot name"><input class="form-input" value="'+DAL.escapeHtml((slot.allowedTypes||[]).join(', '))+'" data-slot-field="allowedTypes" data-idx="'+i+'" list="rpgItemTypes" placeholder="Allowed item types"><div class="rpg-slot-actions"><button class="btn sm" data-action="sg-slot-up" data-idx="'+i+'"'+(i?'':' disabled')+'>↑</button><button class="btn sm" data-action="sg-slot-down" data-idx="'+i+'"'+(i < adv.gearSlots.length-1?'':' disabled')+'>↓</button><button class="btn sm danger" data-action="sg-delete-slot" data-idx="'+i+'">Delete</button></div></div>'; });
-    gear += '</div><button class="btn sm" data-action="sg-add-slot">+ Add Slot</button><datalist id="rpgItemTypes">'+types.map(function(type){ return '<option value="'+DAL.escapeHtml(type)+'"></option>'; }).join('')+'</datalist>';
+    var gear = ("<p class=\"rpg-intro\">"+DAL.uiLabel("ui_Slots_are_author_defined_A_restriction_is__57d7ae1","Slots are author-defined. A restriction is a comma-separated list of item types; leave it blank to accept any type.")+"</p><div class=\"rpg-slot-list\">");
+    DAL.rpg.gearSlots(adv).forEach(function(slot, i){ gear += '<div class="rpg-slot-card"><input class="form-input" value="'+DAL.escapeHtml(slot.label)+'" data-slot-field="label" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("ui_Slot_name_cfd7a32","Slot name")+"\"><input class=\"form-input\" value=\"")+DAL.escapeHtml((slot.allowedTypes||[]).join(', '))+'" data-slot-field="allowedTypes" data-idx="'+i+("\" list=\"rpgItemTypes\" placeholder=\""+DAL.uiLabel("ui_Allowed_item_types_277235c","Allowed item types")+"\"><div class=\"rpg-slot-actions\"><button class=\"btn sm\" data-action=\"sg-slot-up\" data-idx=\"")+i+'"'+(i?'':' disabled')+'>↑</button><button class="btn sm" data-action="sg-slot-down" data-idx="'+i+'"'+(i < adv.gearSlots.length-1?'':' disabled')+'>↓</button><button class="btn sm danger" data-action="sg-delete-slot" data-idx="'+i+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></div></div>"); });
+    gear += ("</div><button class=\"btn sm\" data-action=\"sg-add-slot\">"+DAL.uiLabel("ui__Add_Slot_63c896c","+ Add Slot")+"</button><datalist id=\"rpgItemTypes\">")+types.map(function(type){ return '<option value="'+DAL.escapeHtml(type)+'"></option>'; }).join('')+'</datalist>';
     html += DAL.panel('rpg-gear-slots', 'Gear slots', gear, { defaultOpen:true, badge:adv.gearSlots.length });
-    var items = '<div class="section-header"><div class="section-title">Items</div><button class="btn primary" data-action="sg-add-item">+ Add Item</button></div><p class="rpg-intro">Stack limits and capacity are enforced at play time. Consumables spend one item and then run their listed effects.</p><label class="form-label">Carrying capacity <span class="u-hint">Leave blank for unlimited total weight.</span></label><input class="form-input rpg-capacity" value="'+DAL.escapeHtml(String(adv.rules.capacity == null ? '' : adv.rules.capacity))+'" data-adv-capacity placeholder="unlimited" inputmode="decimal"><div class="card rpg-table-wrap"><table class="stats-table rpg-responsive-table rpg-items-table"><thead><tr><th>Item</th><th>Type</th><th>Stack</th><th>Weight</th><th>Gear slot</th><th>Use</th><th></th></tr></thead><tbody>';
+    var items = ("<div class=\"section-header\"><div class=\"section-title\">"+DAL.uiLabel("ui_Items_fb8e7a1","Items")+"</div><button class=\"btn primary\" data-action=\"sg-add-item\">"+DAL.uiLabel("ui__Add_Item_24da0c7","+ Add Item")+"</button></div><p class=\"rpg-intro\">"+DAL.uiLabel("ui_Stack_limits_and_capacity_are_enforced_at__68fddca","Stack limits and capacity are enforced at play time. Consumables spend one item and then run their listed effects.")+"</p><label class=\"form-label\">"+DAL.uiLabel("ui_Carrying_capacity_4170ff2","Carrying capacity ")+"<span class=\"u-hint\">"+DAL.uiLabel("ui_Leave_blank_for_unlimited_total_weight__84077d5","Leave blank for unlimited total weight.")+"</span></label><input class=\"form-input rpg-capacity\" value=\"")+DAL.escapeHtml(String(adv.rules.capacity == null ? '' : adv.rules.capacity))+("\" data-adv-capacity placeholder=\""+DAL.uiLabel("ui_unlimited_2044fbd","unlimited")+"\" inputmode=\"decimal\"><div class=\"card rpg-table-wrap\"><table class=\"stats-table rpg-responsive-table rpg-items-table\"><thead><tr><th>"+DAL.uiLabel("ui_Item_652bcc3","Item")+"</th><th>"+DAL.uiLabel("ui_Type_baaddf7","Type")+"</th><th>"+DAL.uiLabel("ui_Stack_e551641","Stack")+"</th><th>"+DAL.uiLabel("ui_Weight_81d27ef","Weight")+"</th><th>"+DAL.uiLabel("ui_Gear_slot_f9b07c1","Gear slot")+"</th><th>"+DAL.uiLabel("ui_Use_c36d819","Use")+"</th><th></th></tr></thead><tbody>");
     (adv.items||[]).forEach(function(item, i){
       var use = (item.useEffects||[]);
-      items += '<tr data-sel="rpg-item:'+item.id+'" data-ctx="rpg-item" data-ctx-id="'+item.id+'" data-drag="rpg-item:'+item.id+'" data-drag-label="'+DAL.escapeHtml(item.name||'Untitled item')+'"><td data-label="Item"><input value="'+DAL.escapeHtml(item.name||'')+'" data-item-field="name" data-idx="'+i+'" placeholder="Name"><input value="'+DAL.escapeHtml(item.description||'')+'" data-item-field="description" data-idx="'+i+'" placeholder="Description"></td><td data-label="Type"><input value="'+DAL.escapeHtml(item.type||'')+'" data-item-field="type" data-idx="'+i+'" list="rpgItemTypes" placeholder="e.g. blade"></td><td data-label="Stack"><select data-item-field="stackable" data-idx="'+i+'"><option value="false"'+(!item.stackable?' selected':'')+'>single</option><option value="true"'+(item.stackable?' selected':'')+'>stack</option></select><input value="'+DAL.escapeHtml(String(item.maxStack||1))+'" data-item-field="maxStack" data-idx="'+i+'" placeholder="limit"></td><td data-label="Weight"><input value="'+DAL.escapeHtml(String(item.weight||0))+'" data-item-field="weight" data-idx="'+i+'" inputmode="decimal"></td><td data-label="Gear slot"><select data-item-field="slot" data-idx="'+i+'">'+DAL.slotOptions(adv, item.slot)+'</select></td><td data-label="Use"><select data-item-field="consumable" data-idx="'+i+'"><option value="false"'+(!item.consumable?' selected':'')+'>not usable</option><option value="true"'+(item.consumable?' selected':'')+'>consumable</option></select>'+(item.consumable?'<button class="btn sm" data-action="item-add-use-effect" data-idx="'+i+'">+ effect</button><span class="u-hint">'+use.length+' effect'+(use.length===1?'':'s')+'</span>':'')+'</td><td class="rpg-row-actions"><button class="btn sm danger" data-action="sg-delete-item" data-idx="'+i+'">Delete</button></td></tr>';
+      items += '<tr data-sel="rpg-item:'+item.id+'" data-ctx="rpg-item" data-ctx-id="'+item.id+'" data-drag="rpg-item:'+item.id+'" data-drag-label="'+DAL.escapeHtml(item.name||'Untitled item')+'"><td data-label="Item"><input value="'+DAL.escapeHtml(item.name||'')+'" data-item-field="name" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("worldField_name","Name")+"\"><input value=\"")+DAL.escapeHtml(item.description||'')+'" data-item-field="description" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("ui_Description_526e008","Description")+"\"></td><td data-label=\"Type\"><input value=\"")+DAL.escapeHtml(item.type||'')+'" data-item-field="type" data-idx="'+i+("\" list=\"rpgItemTypes\" placeholder=\""+DAL.uiLabel("ui_e_g_blade_75ce4ff","e.g. blade")+"\"></td><td data-label=\"Stack\"><select data-item-field=\"stackable\" data-idx=\"")+i+'"><option value="false"'+(!item.stackable?' selected':'')+(">"+DAL.uiLabel("ui_single_947f187","single")+"</option><option value=\"true\"")+(item.stackable?' selected':'')+(">"+DAL.uiLabel("ui_stack_6ee08e6","stack")+"</option></select><input value=\"")+DAL.escapeHtml(String(item.maxStack||1))+'" data-item-field="maxStack" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("ui_limit_55ea09e","limit")+"\"></td><td data-label=\"Weight\"><input value=\"")+DAL.escapeHtml(String(item.weight||0))+'" data-item-field="weight" data-idx="'+i+'" inputmode="decimal"></td><td data-label="Gear slot"><select data-item-field="slot" data-idx="'+i+'">'+DAL.slotOptions(adv, item.slot)+'</select></td><td data-label="Use"><select data-item-field="consumable" data-idx="'+i+'"><option value="false"'+(!item.consumable?' selected':'')+(">"+DAL.uiLabel("ui_not_usable_9e2c58e","not usable")+"</option><option value=\"true\"")+(item.consumable?' selected':'')+(">"+DAL.uiLabel("ui_consumable_242e701","consumable")+"</option></select>")+(item.consumable?'<button class="btn sm" data-action="item-add-use-effect" data-idx="'+i+("\">"+DAL.uiLabel("ui__effect_dc25f09","+ effect")+"</button><span class=\"u-hint\">")+use.length+' effect'+(use.length===1?'':'s')+'</span>':'')+'</td><td class="rpg-row-actions"><button class="btn sm danger" data-action="sg-delete-item" data-idx="'+i+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></td></tr>");
       if(item.consumable && use.length){ items += '<tr class="rpg-effect-row"><td colspan="7" class="rpg-use-effects">'+use.map(function(eff, ei){ return DAL.renderItemUseEffect(i, ei, eff, adv); }).join('')+'</td></tr>'; }
     });
-    if(!(adv.items||[]).length) items += '<tr><td colspan="7" class="rpg-empty">No items defined</td></tr>';
+    if(!(adv.items||[]).length) items += ("<tr><td colspan=\"7\" class=\"rpg-empty\">"+DAL.uiLabel("ui_No_items_defined_801b73d","No items defined")+"</td></tr>");
     items += '</tbody></table></div><input type="file" id="itemImageInput" accept="image/*" style="display:none">';
     html += DAL.panel('rpg-items', 'Inventory and items', items, { defaultOpen:true, badge:(adv.items||[]).length || '' });
     return html + '</div>';
@@ -2047,7 +2045,7 @@ document.addEventListener('focusout', function(e){
     var html = oldConditionRow(nid, choiceIdx, condIdx, cond, adv);
     if((cond.type||'stat') === 'stat'){
       var attrs = ' data-nid="'+nid+'" data-choice-idx="'+choiceIdx+'" data-cond-idx="'+condIdx+'"';
-      var mode = '<select class="form-select" data-cond-field="valueSource"'+attrs+'><option value="literal"'+(cond.valueSource !== 'stat'?' selected':'')+'>number</option><option value="stat"'+(cond.valueSource === 'stat'?' selected':'')+'>another stat</option></select>';
+      var mode = '<select class="form-select" data-cond-field="valueSource"'+attrs+'><option value="literal"'+(cond.valueSource !== 'stat'?' selected':'')+(">"+DAL.uiLabel("ui_number_12886f9","number")+"</option><option value=\"stat\"")+(cond.valueSource === 'stat'?' selected':'')+(">"+DAL.uiLabel("ui_another_stat_e9964c4","another stat")+"</option></select>");
       var value = cond.valueSource === 'stat' ? '<select class="form-select" data-cond-field="valueStatKey"'+attrs+'>'+DAL.rpgOptions(DAL.rpgPickLists(adv).numStats, cond.valueStatKey, '— compare with —')+'</select>' : '';
       html = html.replace('</div>', mode+value+'</div>');
     }
@@ -2058,8 +2056,8 @@ document.addEventListener('focusout', function(e){
   DAL.renderPlaytestPanels = function(adv){
     var st = DAL.playtestState, node = DAL.rpg.currentNode(st, adv), choices = DAL.rpg.choiceStates(node, st, adv);
     var html = DAL.panel('rpg-live-state', 'Live state', oldPanels(adv), { defaultOpen:true });
-    var visits = Object.keys(st.visited||{}).map(function(id){ return '<div class="playtest-stat"><span>'+DAL.escapeHtml(DAL.rpg.nodeTitle(adv,id))+'</span><span>×'+DAL.rpg.visitCount(st,id)+'</span></div>'; }).join('') || '<div class="playtest-empty">No scenes visited</div>';
-    var gates = choices.map(function(cs){ return '<div class="rpg-gate '+(cs.ok&&!cs.broken?'open':cs.hidden?'hidden':'locked')+'"><strong>'+DAL.escapeHtml(cs.choice.label||'Continue')+'</strong><span>'+(cs.ok&&!cs.broken?'available':cs.hidden?'hidden: ':'locked: ')+DAL.escapeHtml(cs.broken?'missing destination':cs.unmet.join(cs.logic==='any'?' or ':' and '))+'</span></div>'; }).join('') || '<div class="playtest-empty">No choices</div>';
+    var visits = Object.keys(st.visited||{}).map(function(id){ return '<div class="playtest-stat"><span>'+DAL.escapeHtml(DAL.rpg.nodeTitle(adv,id))+'</span><span>×'+DAL.rpg.visitCount(st,id)+'</span></div>'; }).join('') || ("<div class=\"playtest-empty\">"+DAL.uiLabel("ui_No_scenes_visited_78db7e1","No scenes visited")+"</div>");
+    var gates = choices.map(function(cs){ return '<div class="rpg-gate '+(cs.ok&&!cs.broken?'open':cs.hidden?'hidden':'locked')+'"><strong>'+DAL.escapeHtml(cs.choice.label||'Continue')+'</strong><span>'+(cs.ok&&!cs.broken?'available':cs.hidden?'hidden: ':'locked: ')+DAL.escapeHtml(cs.broken?'missing destination':cs.unmet.join(cs.logic==='any'?' or ':' and '))+'</span></div>'; }).join('') || ("<div class=\"playtest-empty\">"+DAL.uiLabel("ui_No_choices_48790aa","No choices")+"</div>");
     html += DAL.panel('rpg-visited', 'Visited scenes', visits, { defaultOpen:false, badge:Object.keys(st.visited||{}).length || '' });
     html += DAL.panel('rpg-choice-debug', 'Choice visibility and locks', gates, { defaultOpen:true, badge:choices.length || '' });
     return html;
@@ -2082,7 +2080,7 @@ document.addEventListener('focusout', function(e){
     var proj = DAL.state.projects[DAL.currentProjectId], adv = proj && DAL.ensureAdventure(proj), idx, item;
     if(action === 'show-integrity' || action === 'sg-checkup'){ DAL.openCheckup(); return; }
     if(action === 'rpg-edit-node'){ DAL.connectMode=false; DAL.selectedNodeId=el.getAttribute('data-nid'); DAL.render(); return; }
-    if(action === 'rpg-start-connect'){ DAL.selectedNodeId=null; DAL.connectFromNodeId=el.getAttribute('data-nid'); DAL.connectMode=true; DAL.render(); DAL.toast('Select the destination scene','info'); return; }
+    if(action === 'rpg-start-connect'){ DAL.selectedNodeId=null; DAL.connectFromNodeId=el.getAttribute('data-nid'); DAL.connectMode=true; DAL.render(); DAL.toast((DAL.i18n?DAL.i18n.text("ui_Select_the_destination_scene_03f2e0f","Select the destination scene"):"Select the destination scene"),'info'); return; }
     if(action === 'rpg-node-image'){ DAL.selectedNodeId=el.getAttribute('data-nid'); DAL.render(); setTimeout(function(){ var input=document.getElementById('sceneImageInput'); if(input){ DAL._uploadSceneNodeId=DAL.selectedNodeId; input.click(); } },0); return; }
     if(action === 'rpg-node-audio'){ DAL.selectedNodeId=el.getAttribute('data-nid'); DAL.state.panels=DAL.state.panels||{}; DAL.state.panels['audio-bind-node']=true; DAL.render(); return; }
     if(action === 'rpg-node-choice'){ var choiceNode=DAL.rpg.nodeById(adv,el.getAttribute('data-nid')); if(choiceNode){ DAL.pushHistory(); choiceNode.choices=choiceNode.choices||[]; choiceNode.choices.push({id:DAL.uid('choice'),label:'Continue',targetNodeId:'',conditions:[],effects:[]}); DAL.selectedNodeId=choiceNode.id; DAL.saveState(); DAL.render(); } return; }
@@ -2103,7 +2101,7 @@ document.addEventListener('focusout', function(e){
   DAL.renderCheckup = function(adv){
     var report = DAL.rpg.audit(adv), groups = { problem:[], warning:[], info:[] };
     (report.issues||[]).forEach(function(issue){ (groups[issue.level] || groups.warning).push(issue); });
-    if(!report.issues.length) return '<p class="rpg-integrity-ok">No integrity issues found.</p>';
+    if(!report.issues.length) return ("<p class=\"rpg-integrity-ok\">"+DAL.uiLabel("ui_No_integrity_issues_found__897c809","No integrity issues found.")+"</p>");
     var html = '<p class="rpg-intro">'+report.problems+' blocking issue'+(report.problems===1?'':'s')+' and '+report.warnings+' warning'+(report.warnings===1?'':'s')+'. Click an issue to open its scene.</p>';
     ['problem','warning','info'].forEach(function(level){ if(!groups[level].length) return; html += '<div class="checkup-head">'+(level==='problem'?'Blocking':level==='warning'?'Warnings':'Notes')+'</div>'; groups[level].forEach(function(i){ html += '<button class="rpg-integrity-row '+level+'" data-action="checkup-goto" data-nid="'+DAL.escapeHtml(i.nodeId||'')+'"'+(i.nodeId?'':' disabled')+'><span>'+DAL.escapeHtml(i.scope)+'</span><strong>'+DAL.escapeHtml(i.text)+'</strong></button>'; }); });
     return html;
@@ -2132,8 +2130,8 @@ document.addEventListener('focusout', function(e){
   });
 
   DAL.DROP = DAL.DROP || {};
-  DAL.DROP['rpg-item'] = function(payload, zone){ var proj=DAL.state.projects[DAL.currentProjectId], adv=DAL.ensureAdventure(proj), node=DAL.rpg.nodeById(adv,zone.getAttribute('data-nid')); if(node){ DAL.pushHistory(); node.entryEffects=node.entryEffects||[]; node.entryEffects.push({ type:'inventory', op:'give', key:payload.id, value:1 }); DAL.saveState(); DAL.render(); DAL.toast('Item grant added to scene.','success'); } };
-  DAL.DROP['rpg-stat'] = function(payload, zone){ var proj=DAL.state.projects[DAL.currentProjectId], adv=DAL.ensureAdventure(proj), node=DAL.rpg.nodeById(adv,zone.getAttribute('data-nid')); if(node){ DAL.pushHistory(); node.entryEffects=node.entryEffects||[]; node.entryEffects.push({ type:'stat', op:'add', key:payload.id, value:1 }); DAL.saveState(); DAL.render(); DAL.toast('Stat change added to scene.','success'); } };
+  DAL.DROP['rpg-item'] = function(payload, zone){ var proj=DAL.state.projects[DAL.currentProjectId], adv=DAL.ensureAdventure(proj), node=DAL.rpg.nodeById(adv,zone.getAttribute('data-nid')); if(node){ DAL.pushHistory(); node.entryEffects=node.entryEffects||[]; node.entryEffects.push({ type:'inventory', op:'give', key:payload.id, value:1 }); DAL.saveState(); DAL.render(); DAL.toast((DAL.i18n?DAL.i18n.text("ui_Item_grant_added_to_scene__e085078","Item grant added to scene."):"Item grant added to scene."),'success'); } };
+  DAL.DROP['rpg-stat'] = function(payload, zone){ var proj=DAL.state.projects[DAL.currentProjectId], adv=DAL.ensureAdventure(proj), node=DAL.rpg.nodeById(adv,zone.getAttribute('data-nid')); if(node){ DAL.pushHistory(); node.entryEffects=node.entryEffects||[]; node.entryEffects.push({ type:'stat', op:'add', key:payload.id, value:1 }); DAL.saveState(); DAL.render(); DAL.toast((DAL.i18n?DAL.i18n.text("ui_Stat_change_added_to_scene__4141e29","Stat change added to scene."):"Stat change added to scene."),'success'); } };
 })();
 
 (function(){
@@ -2149,7 +2147,7 @@ document.addEventListener('focusout', function(e){
   var priorPanels=DAL.renderPlaytestPanels;
   DAL.renderPlaytestPanels=function(adv){
     var html=priorPanels(adv), usable=DAL.rpg.inventoryRows(DAL.playtestState,adv).filter(function(row){ var item=DAL.rpg.itemDef(adv,row.key); return item&&item.consumable; });
-    if(usable.length){ html += DAL.panel('rpg-usable-items','Usable items',usable.map(function(row){ return '<div class="playtest-item"><span>'+DAL.escapeHtml(row.name)+(row.count>1?' ×'+row.count:'')+'</span><button class="btn sm" data-action="pt-use" data-item="'+DAL.escapeHtml(row.key)+'">Use</button></div>'; }).join(''),{defaultOpen:true,badge:usable.length}); }
+    if(usable.length){ html += DAL.panel('rpg-usable-items','Usable items',usable.map(function(row){ return '<div class="playtest-item"><span>'+DAL.escapeHtml(row.name)+(row.count>1?' ×'+row.count:'')+'</span><button class="btn sm" data-action="pt-use" data-item="'+DAL.escapeHtml(row.key)+("\">"+DAL.uiLabel("ui_Use_c36d819","Use")+"</button></div>"); }).join(''),{defaultOpen:true,badge:usable.length}); }
     return html;
   };
   document.addEventListener('input',function(e){

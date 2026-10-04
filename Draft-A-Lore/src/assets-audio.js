@@ -207,13 +207,19 @@
     return new Promise(function(resolve){
       if(!url){ resolve(0); return; }
       var probe = document.createElement('audio');
-      var done = false;
-      function finish(v){ if(done) return; done = true; resolve(v); }
+      var done = false, timer;
+      function finish(v){
+        if(done) return; done = true;
+        clearTimeout(timer);
+        probe.onloadedmetadata = null; probe.onerror = null;
+        try{probe.pause();probe.removeAttribute('src');probe.load();}catch(error){}
+        resolve(v);
+      }
       probe.preload = 'metadata';
       probe.onloadedmetadata = function(){ finish(isFinite(probe.duration) ? probe.duration : 0); };
       probe.onerror = function(){ finish(0); };
-      setTimeout(function(){ finish(0); }, 4000);
-      probe.src = url;
+      timer = setTimeout(function(){ finish(0); }, 4000);
+      try{probe.src = url;}catch(error){finish(0);}
     });
   };
 
@@ -330,12 +336,14 @@
     var el = new Audio(src);
     el.volume = vol.muted ? 0 : vol.voice;
     Bus.voice = el;
-    el.onended = function(){ if(Bus.voice===el) Bus.voice=null; if(onEnd) onEnd(); };
-    return el.play().then(function(){ return true; }).catch(function(){ if(Bus.voice===el) Bus.voice=null; return false; });
+    el.onended = function(){ if(Bus.voice!==el)return;Bus.voice=null;el.onended=null;el.onerror=null;el.src='';if(onEnd)onEnd(); };
+    el.onerror = function(){if(Bus.voice!==el)return;Bus._voiceSession=(Bus._voiceSession||0)+1;Bus.voice=null;el.onended=null;el.onerror=null;el.src='';if(DAL.toast)DAL.toast((DAL.i18n?DAL.i18n.text("ui_The_voiceover_clip_could_not_be_played_You_8b1bd16","The voiceover clip could not be played. Your manuscript is unchanged."):"The voiceover clip could not be played. Your manuscript is unchanged."),'warning');if(onEnd)onEnd('Voiceover playback failed');};
+    return el.play().then(function(){ return true; }).catch(function(){ if(Bus.voice===el){Bus.voice=null;el.onended=null;el.onerror=null;el.src='';}return false; });
   };
 
   Bus.stopVoice = function(){
-    if(Bus.voice){ try{ Bus.voice.pause(); }catch(e){} Bus.voice.src = ''; }
+    Bus._voiceSession=(Bus._voiceSession||0)+1;
+    if(Bus.voice){Bus.voice.onended=null;Bus.voice.onerror=null;try{ Bus.voice.pause(); }catch(e){} Bus.voice.src = ''; }
     Bus.voice = null;
     DAL.tts.stop();
   };
@@ -356,7 +364,10 @@
 
   TTS.voices = function(){
     if(!TTS.available()) return [];
-    return window.speechSynthesis.getVoices() || [];
+    try{return window.speechSynthesis.getVoices() || [];}catch(error){return [];}
+  };
+  TTS.voiceLabel = function(voice){
+    return voice.name+' ('+voice.lang+') — '+(voice.localService===true?'Installed':voice.localService===false?'May require internet':'Availability depends on device');
   };
 
   /* Voices arrive asynchronously in Chromium: the first call after load returns
@@ -371,36 +382,98 @@
     };
   };
 
-  TTS.pickVoice = function(name){
+  TTS.pickVoice = function(name,language){
     var list = TTS.voices();
     for(var i=0;i<list.length;i++){ if(list[i].name === name) return list[i]; }
+    if(name)return null;
+    list=list.filter(function(voice){return voice.localService===true;});
+    if(language){
+      var normalized=String(language).toLowerCase().replace(/_/g,'-'),base=normalized.split('-')[0];
+      var matches=list.filter(function(voice){return String(voice.lang||'').toLowerCase().replace(/_/g,'-')===normalized;});
+      if(!matches.length)matches=list.filter(function(voice){return String(voice.lang||'').toLowerCase().split(/[-_]/)[0]===base;});
+      if(matches.length)return matches.find(function(voice){return voice.localService;})||matches[0];
+      return null;
+    }
     for(var j=0;j<list.length;j++){ if(list[j].default) return list[j]; }
     return list[0] || null;
   };
 
   TTS.speak = function(text, proj, onEnd){
-    if(!TTS.available() || !text) { if(onEnd) onEnd(); return false; }
+    if(!text) { if(onEnd) onEnd(); return false; }
+    if(!TTS.available()){
+      TTS.lastError='Narration is unavailable on this device. Attach a voiceover clip, or use a supported speech engine. Your manuscript is unchanged.';
+      if(DAL.toast)DAL.toast(TTS.lastError,'warning');
+      if(onEnd)onEnd(TTS.lastError);
+      return false;
+    }
     DAL.ensureAssets(proj);
     if(proj.audio.muted || !proj.audio.ttsEnabled){ if(onEnd) onEnd(); return false; }
     TTS.stop();
-    var utter = new SpeechSynthesisUtterance(String(text).slice(0, 32000));
-    var voice = TTS.pickVoice(proj.audio.ttsVoice);
-    if(voice) utter.voice = voice;
-    utter.rate = Math.min(2, Math.max(0.5, proj.audio.ttsRate || 1));
-    utter.pitch = Math.min(2, Math.max(0, proj.audio.ttsPitch || 1));
-    utter.volume = Math.min(1, Math.max(0, proj.audio.voiceVolume));
-    utter.onend = function(){ TTS.speaking = false; if(onEnd) onEnd(); };
-    utter.onerror = function(){ TTS.speaking = false; if(onEnd) onEnd(); };
+    TTS.lastError = '';
+    var remaining = String(text), chunks = [];
+    while(remaining.length){
+      var end = Math.min(remaining.length, 1200);
+      if(end < remaining.length){
+        var boundary = remaining.lastIndexOf(' ', end);
+        if(boundary > 600) end = boundary + 1;
+        var last=remaining.charCodeAt(end-1),nextCode=remaining.charCodeAt(end);
+        if(last>=0xD800&&last<=0xDBFF&&nextCode>=0xDC00&&nextCode<=0xDFFF)end--;
+      }
+      chunks.push(remaining.slice(0, end));
+      remaining = remaining.slice(end);
+    }
+    var session = TTS._session, index = 0, settled = false;
+    var voice = TTS.pickVoice(proj.audio.ttsVoice,proj.language);
+    if(!voice){
+      TTS.lastError=proj.audio.ttsVoice?'The selected narration voice is unavailable. Choose an available voice in Audio & narration.':'No installed voice matches this language. Choose an installed voice, or explicitly select a provider voice in Audio & narration before playback.';
+      if(DAL.toast)DAL.toast(TTS.lastError,'warning');
+      if(onEnd)onEnd(TTS.lastError);
+      return false;
+    }
+    function finish(error){
+      if(settled || session !== TTS._session) return;
+      settled = true;
+      TTS.speaking = false;
+      if(error){TTS.lastError=error;if(DAL.toast)DAL.toast(error,'warning');}
+      if(onEnd) onEnd(error);
+    }
+    function next(){
+      if(settled || session !== TTS._session) return;
+      if(index >= chunks.length){ finish(); return; }
+      var utter, ended = false;
+      try{utter = new SpeechSynthesisUtterance(chunks[index++]);}catch(error){finish('Narration could not initialize. Your manuscript is unchanged.');return;}
+      if(voice) utter.voice = voice;
+      utter.lang = (voice && voice.lang) || proj.language || '';
+      utter.rate = Math.min(2, Math.max(0.5, proj.audio.ttsRate || 1));
+      utter.pitch = Math.min(2, Math.max(0, Number.isFinite(proj.audio.ttsPitch) ? proj.audio.ttsPitch : 1));
+      utter.volume = Math.min(1, Math.max(0, proj.audio.voiceVolume));
+      utter.onend = function(){ if(ended) return; ended = true; next(); };
+      utter.onerror = function(event){
+        if(ended) return;ended = true;
+        var code=event && event.error;
+        finish(code==='not-allowed'?'Narration was blocked. Start playback again, or check device audio permissions.':code==='voice-unavailable'||code==='language-unavailable'?'The selected narration voice or language is unavailable. Choose an installed voice in Audio & narration.':'Narration stopped unexpectedly. Your manuscript is unchanged.');
+      };
+      try{ window.speechSynthesis.speak(utter); }catch(e){ finish('Narration could not start. Check your installed voices and audio settings.'); }
+    }
     TTS.speaking = true;
-    window.speechSynthesis.speak(utter);
+    next();
     return true;
   };
 
   TTS.stop = function(){
-    if(!TTS.available()) return;
-    try{ window.speechSynthesis.cancel(); }catch(e){}
+    TTS._session = (TTS._session || 0) + 1;
     TTS.speaking = false;
+    if(TTS.available()){ try{ window.speechSynthesis.cancel(); }catch(e){} }
   };
+  TTS.pause = function(){
+    if(!TTS.available() || !TTS.speaking) return false;
+    try{ window.speechSynthesis.pause(); return true; }catch(e){ return false; }
+  };
+  TTS.resume = function(){
+    if(!TTS.available() || !TTS.speaking) return false;
+    try{ window.speechSynthesis.resume(); return true; }catch(e){ return false; }
+  };
+  if(DAL.installNativeNarration) DAL.installNativeNarration(TTS);
   /* One entry point for "present this scene": art, bed and narration together,
      so the playtester and the library reader behave identically. */
   DAL.presentScene = function(proj, holder, text, onEnd){
@@ -411,8 +484,9 @@
     if(proj.audio.muted) return;
     Bus.playEffect(proj, audio.sfx);
     if(audio.voice){
-      Bus.playVoice(proj, audio.voice, onEnd).then(function(ok){
-        if(!ok) TTS.speak(text, proj, onEnd);
+      var playback=Bus.playVoice(proj, audio.voice, onEnd),voiceSession=Bus._voiceSession;
+      playback.then(function(ok){
+        if(!ok && voiceSession===Bus._voiceSession) TTS.speak(text, proj, onEnd);
       });
     } else if(proj.audio.ttsEnabled){
       Bus.stopVoice();
@@ -488,15 +562,49 @@
   /* The reader speaks whatever page is on screen. A chapter that has a voiceover
      clip bound plays the clip instead of the synthesised voice, which is the same
      rule scenes follow, so an author only has to learn it once. */
-  DAL.readAloud = { speaking:false, page:null };
+  DAL.readAloud = { speaking:false, paused:false, page:null };
+
+  DAL.refreshReadAloudControls = function(){
+    var stop = document.querySelector('[data-action="read-aloud"]');
+    var pause = document.querySelector('[data-action="read-aloud-pause"]');
+    if(stop) stop.textContent = DAL.readAloud.speaking ? '\u25a0 Stop reading' : DAL.READ_ALOUD_LABEL;
+    if(pause){
+      pause.hidden = !DAL.readAloud.speaking;
+      pause.textContent = DAL.readAloud.paused ? '\u25b6 Resume' : '\u23f8 Pause';
+    }
+  };
+
+  DAL.toggleReadAloudPause = async function(){
+    if(!DAL.readAloud.speaking || DAL.readAloud.controlling) return false;
+    var request=DAL.readAloud.request,paused=DAL.readAloud.paused;
+    DAL.readAloud.controlling=true;
+    try{
+    if(Bus.voice){
+      if(paused){
+        var voice = Bus.voice;
+        await Promise.resolve(voice.play());
+        if(Bus.voice!==voice)return false;
+      }else Bus.voice.pause();
+    }else if(!(await Promise.resolve(paused ? TTS.resume() : TTS.pause()))) return false;
+    if(request!==DAL.readAloud.request || !DAL.readAloud.speaking)return false;
+    DAL.readAloud.paused = !paused;
+    DAL.refreshReadAloudControls();
+    return true;
+    }catch(error){if(request===DAL.readAloud.request){DAL.stopReadAloud();DAL.toast((DAL.i18n?DAL.i18n.text("ui_Audio_could_not_resume_or_pause_Start_read_e8eff76","Audio could not resume or pause. Start reading again."):"Audio could not resume or pause. Start reading again."),'error');}return false;}
+    finally{if(request===DAL.readAloud.request)DAL.readAloud.controlling=false;}
+  };
 
   DAL.stopReadAloud = function(){
+    DAL.readAloud.request=(DAL.readAloud.request||0)+1;
+    DAL.readAloud.controlling=false;
     TTS.stop();
     Bus.stopVoice();
     Bus.stopAmbient();
     Bus.stopEffect();
     DAL.readAloud.speaking = false;
+    DAL.readAloud.paused = false;
     DAL.readAloud.page = null;
+    DAL.refreshReadAloudControls();
   };
 
   /* Page furniture — folios, cover controls, captions and controls — is not part
@@ -517,33 +625,38 @@
     DAL.ensureAssets(proj);
     var clip = holder && holder.audio && holder.audio.voice;
     if(proj.audio.muted){
-      DAL.toast('Audio is muted for this project. Unmute it in Audio & narration.', 'error');
+      DAL.toast((DAL.i18n?DAL.i18n.text("ui_Audio_is_muted_for_this_project_Unmute_it__31c83af","Audio is muted for this project. Unmute it in Audio & narration."):"Audio is muted for this project. Unmute it in Audio & narration."), 'error');
       return false;
     }
     if(!clip && !proj.audio.ttsEnabled){
-      DAL.toast('Turn on narration in Audio & narration, or bind a voiceover clip to this chapter.', 'error');
+      DAL.toast((DAL.i18n?DAL.i18n.text("ui_Turn_on_narration_in_Audio_narration_or_bi_0282717","Turn on narration in Audio & narration, or bind a voiceover clip to this chapter."):"Turn on narration in Audio & narration, or bind a voiceover clip to this chapter."), 'error');
       return false;
     }
     if(!clip && !TTS.available()){
-      DAL.toast('This browser has no speech voices available.', 'error');
+      DAL.toast((DAL.i18n?DAL.i18n.text("ui_This_browser_has_no_speech_voices_availabl_ba3fcb4","This browser has no speech voices available."):"This browser has no speech voices available."), 'error');
       return false;
     }
     var text = DAL.sceneNarrationText(holder, DAL.pageReadText());
     if(!clip && !text){
-      DAL.toast('There is nothing on this page to read.', 'error');
+      DAL.toast((DAL.i18n?DAL.i18n.text("ui_There_is_nothing_on_this_page_to_read__5983269","There is nothing on this page to read."):"There is nothing on this page to read."), 'error');
       return false;
     }
     DAL.readAloud.speaking = true;
+    var request=DAL.readAloud.request=(DAL.readAloud.request||0)+1;
+    DAL.readAloud.controlling=false;
+    DAL.readAloud.paused = false;
     DAL.readAloud.page = DAL.readerPage;
     /* The button label is corrected in place when the voice finishes rather than
        re-rendering, because a re-render would scroll the page back to the top. */
     function settle(){
+      if(request!==DAL.readAloud.request)return;
       DAL.readAloud.speaking = false;
-      var btn = document.querySelector('[data-action="read-aloud"]');
-      if(btn) btn.textContent = DAL.READ_ALOUD_LABEL;
+      DAL.readAloud.paused = false;
+      DAL.refreshReadAloudControls();
     }
     if(holder) DAL.presentScene(proj, holder, text, settle);
     else TTS.speak(text, proj, settle);
+    DAL.refreshReadAloudControls();
     return true;
   };
 
@@ -552,7 +665,9 @@
   /* One label helper so the two readers cannot disagree about the button. */
   DAL.readAloudButton = function(){
     return '<button class="btn sm" data-action="read-aloud" title="Read this page aloud">' +
-      (DAL.readAloud.speaking ? '\u25a0 Stop reading' : DAL.READ_ALOUD_LABEL) + '</button>';
+      (DAL.readAloud.speaking ? '\u25a0 Stop reading' : DAL.READ_ALOUD_LABEL) + '</button>' +
+      '<button class="btn sm" data-action="read-aloud-pause"'+(DAL.readAloud.speaking ? '' : ' hidden')+'>' +
+      (DAL.readAloud.paused ? '\u25b6 Resume' : '\u23f8 Pause') + '</button>';
   };
 
 })();

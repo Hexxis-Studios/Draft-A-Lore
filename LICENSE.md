@@ -1,6 +1,6 @@
 # Draft A Lore — License
 
-Copyright 2026 Daymien Vanhorn (https://github.com/Hexxis-cmd)
+Copyright 2026 Daymien Vanhorn (https://github.com/Hexxis-Studios)
 
 Draft A Lore is **source-available and free for noncommercial use**. Commercial use
 requires a separate paid license from the author — see `COMMERCIAL-LICENSE.md`.
@@ -10,7 +10,7 @@ below, together with the supplemental terms stated in *Supplemental Terms* at th
 this file (source availability for public forks, reservation of the name and artwork,
 no commercial use without a license, and **required credit to the original author**).
 
-`Required Notice: Copyright 2026 Daymien Vanhorn (https://github.com/Hexxis-cmd/Draft-A-Lore)`
+`Required Notice: Copyright 2026 Daymien Vanhorn (https://github.com/Hexxis-Studios/Draft-A-Lore)`
 
 ---
 
@@ -137,7 +137,7 @@ If you publicly distribute the software with changes — as a download, a hosted
 app store or storefront listing, or in any other public form — you must also make the
 complete corresponding source of your version publicly available at no charge, and state
 clearly that it is a modified version of Draft A Lore, with a link to
-<https://github.com/Hexxis-cmd/Draft-A-Lore>.
+<https://github.com/Hexxis-Studios/Draft-A-Lore>.
 
 ## S2. Reserved Name and Artwork
 
@@ -152,10 +152,10 @@ Attribution is a condition of every license granted by these terms, not a courte
 
 Any copy or modified version of the software that you distribute, host, publish, or show
 publicly must credit **Daymien Vanhorn** as the original author of Draft A Lore, with a
-link to <https://github.com/Hexxis-cmd/Draft-A-Lore>, and that credit must be:
+link to <https://github.com/Hexxis-Studios/Draft-A-Lore>, and that credit must be:
 
 1. **Visible in the running software** — the credit shown in the Settings view ("Drafted By
-   Hexxis-cmd (Daymien Vanhorn)" with the repository link) must remain present, legible, and
+   Hexxis Studios (Daymien Vanhorn)" with the repository link) must remain present, legible, and
    unobstructed. You may restyle it to match your own design; you may not remove, hide,
    truncate, or replace it.
 2. **Present in the source** — the copyright notice and the `Required Notice:` line above

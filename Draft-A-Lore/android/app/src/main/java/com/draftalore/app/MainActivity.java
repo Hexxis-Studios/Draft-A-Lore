@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import androidx.activity.EdgeToEdge;
@@ -22,6 +24,12 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
         registerPlugin(FolderSyncPlugin.class);
+        registerPlugin(VoicePlugin.class);
+        registerPlugin(NarrationPlugin.class);
+        registerPlugin(LocalePlugin.class);
+        registerPlugin(BookPrintPlugin.class);
+        registerPlugin(FileExportPlugin.class);
+        registerPlugin(GoogleBackupPlugin.class);
         int systemBarColor = Color.rgb(10, 8, 20);
         EdgeToEdge.enable(
             this,
@@ -31,16 +39,25 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
 
         applySystemBarStyle();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
         WebView webView = getBridge().getWebView();
         ViewCompat.setOnApplyWindowInsetsListener(webView, (view, windowInsets) -> {
             Insets safeArea = windowInsets.getInsets(
                 WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
             );
-            view.setPadding(safeArea.left, safeArea.top, safeArea.right, safeArea.bottom);
-            return windowInsets;
+            Insets keyboard = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
+            ViewGroup.MarginLayoutParams layout = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            int bottom = Math.max(safeArea.bottom, keyboard.bottom);
+            if (layout.leftMargin != safeArea.left || layout.topMargin != safeArea.top
+                || layout.rightMargin != safeArea.right || layout.bottomMargin != bottom) {
+                layout.setMargins(safeArea.left, safeArea.top, safeArea.right, bottom);
+                view.setLayoutParams(layout);
+            }
+            return WindowInsetsCompat.CONSUMED;
         });
         ViewCompat.requestApplyInsets(webView);
+        webView.post(() -> ViewCompat.requestApplyInsets(webView));
 
         // The bundled offline app needs local files and browser storage.
         WebSettings settings = webView.getSettings();

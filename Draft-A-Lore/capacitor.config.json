@@ -4,6 +4,12 @@
   "webDir": "www",
   "bundledWebRuntime": false,
   "android": {
-    "allowMixedContent": false
+    "allowMixedContent": false,
+    "loggingBehavior": "none"
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "disable"
+    }
   }
 }

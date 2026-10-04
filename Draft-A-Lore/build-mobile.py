@@ -33,6 +33,7 @@ def main() -> None:
         if ANDROID_ASSETS.exists():
             shutil.rmtree(ANDROID_ASSETS)
         shutil.copytree(WWW, ANDROID_ASSETS)
+        shutil.copyfile(ROOT / "capacitor.config.json", ANDROID_ASSETS.parent / "capacitor.config.json")
         print(f"Mirrored them into {ANDROID_ASSETS} for the Android build")
 
 

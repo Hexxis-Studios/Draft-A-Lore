@@ -37,7 +37,7 @@ using System.Windows.Forms;
 
 [assembly: AssemblyTitle("Draft A Lore")]
 [assembly: AssemblyDescription("Offline writing and RPG adventure design studio")]
-[assembly: AssemblyCompany("Hexxis-cmd (Daymien Vanhorn)")]
+[assembly: AssemblyCompany("Hexxis Studios (Daymien Vanhorn)")]
 [assembly: AssemblyProduct("Draft A Lore")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
@@ -64,14 +64,20 @@ internal static class DraftALoreLauncher
             string browser = FindBrowser();
             if (browser != null)
             {
-                string fileUrl = new Uri(htmlPath).AbsoluteUri;
-                Process.Start(new ProcessStartInfo
+                GoogleBackupBroker helper = null;
+                try { helper = new GoogleBackupBroker(); } catch (Exception) { }
+                using (GoogleBackupBroker backup = helper)
                 {
-                    FileName = browser,
-                    Arguments = "--app=\"" + fileUrl + "\" --window-size=1400,900",
-                    WorkingDirectory = appDirectory,
-                    UseShellExecute = false
-                });
+                    string fileUrl = new Uri(htmlPath).AbsoluteUri + (backup == null ? "" : backup.LaunchFragment);
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = browser,
+                        Arguments = "--app=\"" + fileUrl + "\" --window-size=1400,900",
+                        WorkingDirectory = appDirectory,
+                        UseShellExecute = false
+                    });
+                    if (backup != null) backup.Wait();
+                }
             }
             else
             {
@@ -131,12 +137,15 @@ internal static class DraftALoreLauncher
         '/optimize+',
         '/platform:anycpu',
         '/reference:System.Windows.Forms.dll',
+        '/reference:System.Web.dll',
+        '/reference:System.Web.Extensions.dll',
         ('/out:' + $outputPath)
     )
     if (Test-Path -LiteralPath $iconPath -PathType Leaf) {
         $compilerArguments += '/win32icon:' + $iconPath
     }
     $compilerArguments += $sourcePath
+    $compilerArguments += (Join-Path $repoRoot 'scripts/GoogleBackupBroker.cs')
 
     & $compiler $compilerArguments
     if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $outputPath -PathType Leaf)) {

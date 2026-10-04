@@ -23,7 +23,8 @@ test('continuity detects post-death appearances and stale world links',()=>{
   const report=DAL.runContinuity(project),rules=Array.from(report.issues,issue=>issue.rule);
   assert.ok(rules.includes('post-death-appearance'));
   assert.ok(rules.includes('stale-reference'));
-  assert.equal(report.counts.error,2);
+  assert.equal(report.counts.error,1);
+  assert.equal(report.issues.find(issue=>issue.rule==='post-death-appearance').severity,'warning');
 });
 
 test('continuity compares project facts with the linked shared Bible',()=>{

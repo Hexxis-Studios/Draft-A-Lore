@@ -49,6 +49,9 @@
   function get16(data, at){ return data[at] | (data[at+1] << 8); }
   function get32(data, at){ return (data[at] | (data[at+1] << 8) | (data[at+2] << 16) | (data[at+3] << 24)) >>> 0; }
   function copy(out, at, data){ out.set(data, at); return at + data.length; }
+  function unsafePath(name){
+    return !name||name.charAt(0)==='/'||/^[a-z]:\//i.test(name)||name.indexOf('\0')>=0||/(^|\/)\.\.(\/|$)/.test(name);
+  }
 
   function dosTime(now){
     return ((now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2)) & 0xffff;
@@ -60,9 +63,18 @@
   /* STORE-only ZIPs are deliberately simple and work with the archive tools
      already present on Windows, macOS and common Unix installations. */
   DAL.makeZip = function(files){
+    if(!Array.isArray(files)||files.length>MAX_ENTRIES) throw new Error('This project has too many files for a ZIP bundle.');
     var now = new Date(), time = dosTime(now), date = dosDate(now), localSize = 0, centralSize = 0, offset = 0;
+    var names=Object.create(null);
     var entries = (files || []).map(function(file){
       var name = bytes(file.name), data = file.data instanceof Uint8Array ? file.data : new Uint8Array(file.data);
+      var normalized=String(file.name).replace(/\\/g,'/');
+      if(unsafePath(normalized)) throw new Error('Cannot export an unsafe file path.');
+      if(names[normalized]) throw new Error('Cannot export duplicate file paths. Rename the conflicting assets before saving a bundle.');
+      names[normalized]=true;
+      if(!name.length||name.length>65535) throw new Error('A bundle filename is empty or too long.');
+      if(data.length>MAX_ENTRY_BYTES) throw new Error('A bundle file exceeds the 512 MB safety limit.');
+      if(localSize+centralSize+76+name.length*2+data.length+22>MAX_ARCHIVE_BYTES) throw new Error('This bundle exceeds the 512 MB safety limit.');
       var entry = { name: name, data: data, crc: crc32(data), time: time, date: date, offset: offset };
       offset += 30 + name.length + data.length;
       localSize += 30 + name.length + data.length;
@@ -109,14 +121,17 @@
       throw new Error('ZIP64 bundles are not supported.');
     }
     if(count > MAX_ENTRIES) throw new Error('That bundle contains too many files.');
-    var unpackedTotal = 0;
+    var unpackedTotal = 0, seenNames = Object.create(null);
     for(i=0; i<count; i++){
       if(get32(data, at) !== 0x02014b50) throw new Error('The ZIP directory is damaged.');
       var flags = get16(data, at+8), method = get16(data, at+10), compressed = get32(data, at+20), size = get32(data, at+24);
       var nameLength = get16(data, at+28), extraLength = get16(data, at+30), commentLength = get16(data, at+32), localOffset = get32(data, at+42);
       if(at + 46 + nameLength + extraLength + commentLength > data.length) throw new Error('The ZIP directory is truncated.');
       var entryName = text(data.slice(at+46, at+46+nameLength)).replace(/\\/g, '/');
-      if(entryName.charAt(0) === '/' || /^[a-z]:\//i.test(entryName) || entryName.indexOf('\0') >= 0 || /(^|\/)\.\.(\/|$)/.test(entryName)) throw new Error('The bundle contains an unsafe file path.');
+      if(unsafePath(entryName)) throw new Error('The bundle contains an unsafe file path.');
+      if(seenNames[entryName]) throw new Error('The bundle contains duplicate file paths.');
+      seenNames[entryName] = true;
+      if(flags & 1) throw new Error('Encrypted ZIP bundles are not supported.');
       if(size > MAX_ENTRY_BYTES) throw new Error('The ZIP entry “'+entryName+'” is larger than the safety limit.');
       unpackedTotal += size;
       if(unpackedTotal > MAX_UNPACKED_BYTES) throw new Error('The expanded bundle is larger than the 1 GB safety limit.');
@@ -136,12 +151,27 @@
       if(entry.method !== 8) return Promise.reject(new Error('The ZIP entry “'+entry.name+'” uses unsupported compression method '+entry.method+'.'));
       if(typeof DecompressionStream === 'undefined') return Promise.reject(new Error('The ZIP entry “'+entry.name+'” is deflated, but this browser cannot decompress deflated ZIP files.'));
       try{
-        return new Response(new Blob([packed]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer().then(function(buffer){
-          var unpacked = new Uint8Array(buffer);
+        return (async function(){
+          var reader=new Blob([packed]).stream().pipeThrough(new DecompressionStream('deflate-raw')).getReader();
+          var chunks=[],length=0,finished=false;
+          try{
+            while(true){
+              var chunk=await reader.read();
+              if(chunk.done){finished=true;break;}
+              length+=chunk.value.byteLength;
+              if(length>entry.size||length>MAX_ENTRY_BYTES) throw new Error('The ZIP entry “'+entry.name+'” expands beyond its declared size.');
+              chunks.push(chunk.value);
+            }
+          }finally{
+            if(!finished){try{await reader.cancel();}catch(error){}}
+            reader.releaseLock();
+          }
+          var unpacked=new Uint8Array(length),position=0;
+          chunks.forEach(function(chunk){unpacked.set(chunk,position);position+=chunk.byteLength;});
           if(unpacked.length !== entry.size) throw new Error('The ZIP entry “'+entry.name+'” has an unexpected size.');
           if(crc32(unpacked) !== entry.crc) throw new Error('The ZIP entry “'+entry.name+'” failed its integrity check.');
           return unpacked;
-        });
+        })();
       } catch(err){ return Promise.reject(new Error('Could not decompress “'+entry.name+'”: '+err.message)); }
     }
     return { entries: entries, read: entryData };
@@ -154,17 +184,18 @@
     return holder.textContent || '';
   }
 
-  DAL.projectTextFiles = function(proj){
+  DAL.projectTextFiles = function(proj,linkedBible){
     if(!proj) throw new Error('Open a project before saving a bundle.');
     var snapshot = DAL.clone(proj), files = [];
     delete snapshot.folderHandle;
     var portable={project:snapshot};
-    if(proj.bibleId&&DAL.state.bibles&&DAL.state.bibles[proj.bibleId]) portable.linkedBible=DAL.clone(DAL.state.bibles[proj.bibleId]);
+    if(arguments.length>1){if(linkedBible)portable.linkedBible=DAL.clone(linkedBible);}
+    else if(proj.bibleId&&DAL.state.bibles&&DAL.state.bibles[proj.bibleId]) portable.linkedBible=DAL.clone(DAL.state.bibles[proj.bibleId]);
     files.push(textFile('project.json', JSON.stringify(portable, null, 2)));
     (proj.chapters || []).forEach(function(ch, i){ files.push(textFile('chapters/'+String(i+1).padStart(2, '0')+'-'+DAL.sanitizeFilename(ch.title)+'.txt', chapterText(ch))); });
-    (proj.characters || []).forEach(function(character){ files.push(textFile('characters/'+DAL.sanitizeFilename(character.name)+'.txt', character.backstory || '')); });
-    ((proj.lore && proj.lore.entries) || []).forEach(function(entry){ files.push(textFile('lore/'+DAL.sanitizeFilename(entry.folder || 'miscellaneous')+'/'+DAL.sanitizeFilename(entry.title)+'.txt', entry.content || '')); });
-    (proj.plots || []).forEach(function(plot){ files.push(textFile('plots/'+DAL.sanitizeFilename(plot.title)+'.txt', plot.description || '')); });
+    (proj.characters || []).forEach(function(character,i){ files.push(textFile('characters/'+String(i+1).padStart(2,'0')+'-'+DAL.sanitizeFilename(character.name)+'.txt', character.backstory || '')); });
+    ((proj.lore && proj.lore.entries) || []).forEach(function(entry,i){ files.push(textFile('lore/'+DAL.sanitizeFilename(entry.folder || 'miscellaneous')+'/'+String(i+1).padStart(2,'0')+'-'+DAL.sanitizeFilename(entry.title)+'.txt', entry.content || '')); });
+    (proj.plots || []).forEach(function(plot,i){ files.push(textFile('plots/'+String(i+1).padStart(2,'0')+'-'+DAL.sanitizeFilename(plot.title)+'.txt', plot.description || '')); });
     return files;
   };
 
@@ -186,10 +217,10 @@
   };
 
   DAL.projectFolderFiles = function(proj){
-    var textFiles;
-    try{ textFiles = DAL.projectTextFiles(proj); }
+    var textFiles,snapshot;
+    try{ snapshot=DAL.clone(proj);textFiles = DAL.projectTextFiles(snapshot); }
     catch(error){ return Promise.reject(error); }
-    return DAL.projectAssetFiles(proj).then(function(assetFiles){ return textFiles.concat(assetFiles); });
+    return DAL.projectAssetFiles(snapshot).then(function(assetFiles){ return textFiles.concat(assetFiles); });
   };
 
   DAL.projectBundleBytes = function(proj){
@@ -213,13 +244,13 @@
     }).then(function(){ if(handle) handle.assetsSynced = true; });
   };
 
-  DAL.syncNativeFolder = function(proj, handle){
+  DAL.syncNativeFolder = function(proj, handle, linkedBible){
     var plugin = DAL.nativeFolderPlugin && DAL.nativeFolderPlugin();
     if(!plugin) return Promise.reject(new Error('Android folder access is unavailable.'));
-    var files = DAL.projectTextFiles(proj).map(function(file){ return { path:file.name, text:text(file.data), mime:file.name === 'project.json' ? 'application/json' : 'text/plain' }; });
-    return plugin.syncTextFiles({ projectId:proj.id, files:files }).then(function(){
-      return handle.assetsSynced ? null : DAL.syncNativeAssets(proj, handle);
-    });
+    var source=arguments.length>2?DAL.projectTextFiles(proj,linkedBible):DAL.projectTextFiles(proj);
+    var files = source.map(function(file){ return { path:file.name, text:text(file.data), mime:file.name === 'project.json' ? 'application/json' : 'text/plain' }; });
+    var metadata=files.shift();files.push(metadata);
+    return Promise.resolve().then(function(){return handle.assetsSynced ? null : DAL.syncNativeAssets(proj, handle);}).then(function(){return plugin.syncTextFiles({ projectId:proj.id, files:files });});
   };
 
   function xml(value){ return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -273,7 +304,7 @@
   }
 
   DAL.exportManuscriptDocx = function(proj){
-    if(!proj || !(proj.chapters || []).length){ DAL.toast('Add a chapter before exporting a Word manuscript.', 'info'); return; }
+    if(!proj || !(proj.chapters || []).length){ DAL.toast((DAL.i18n?DAL.i18n.text("ui_Add_a_chapter_before_exporting_a_Word_manu_25b85b4","Add a chapter before exporting a Word manuscript."):"Add a chapter before exporting a Word manuscript."), 'info'); return; }
     var body = '<w:p><w:pPr><w:pStyle w:val="Title"/></w:pPr><w:r><w:t>'+xml((proj.cover&&proj.cover.title)||proj.name)+'</w:t></w:r></w:p>';
     var author = (proj.cover&&proj.cover.author) || (DAL.state.autoFillAuthor ? DAL.state.authorName : '');
     if(author) body += '<w:p><w:pPr><w:pStyle w:val="Subtitle"/></w:pPr><w:r><w:t>'+xml(author)+'</w:t></w:r></w:p>';
@@ -287,28 +318,24 @@
       textFile('word/document.xml',documentXml), textFile('word/styles.xml',styles),
       textFile('word/_rels/document.xml.rels','<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>')
     ];
-    DAL.download(DAL.sanitizeFilename(proj.name)+'-manuscript.docx', DAL.makeZip(files), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    DAL.toast('Word manuscript exported.', 'success');
+    return DAL.download(DAL.sanitizeFilename(proj.name)+'-manuscript.docx', DAL.makeZip(files), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document').then(function(saved){if(saved)DAL.toast((DAL.i18n?DAL.i18n.text("ui_Word_manuscript_export_completed_Check_the_028a96f","Word manuscript export completed. Check the saved file."):"Word manuscript export completed. Check the saved file."),'success');return saved;});
   };
 
   DAL.exportProjectBundle = function(projectId){
     var proj = DAL.state.projects[projectId || DAL.currentProjectId];
-    if(!proj){ DAL.toast('Open a project before saving a bundle.', 'error'); return Promise.resolve(false); }
-    DAL.toast('Packing project bundle…', 'info');
-    return DAL.projectBundleBytes(proj).then(function(data){
-      var blob = new Blob([data], { type:'application/zip' }), url = URL.createObjectURL(blob), link = document.createElement('a');
-      link.href = url; link.download = DAL.sanitizeFilename(proj.name)+'.dalz';
-      document.body.appendChild(link); link.click(); document.body.removeChild(link);
-      setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
-      DAL.toast('Saved “'+proj.name+'” as a project bundle.', 'success');
+    if(!proj){ DAL.toast((DAL.i18n?DAL.i18n.text("ui_Open_a_project_before_saving_a_bundle__fec49f1","Open a project before saving a bundle."):"Open a project before saving a bundle."), 'error'); return Promise.resolve(false); }
+    DAL.toast((DAL.i18n?DAL.i18n.text("ui_Packing_project_bundle__dc6e043","Packing project bundle…"):"Packing project bundle…"), 'info');
+    return DAL.projectBundleBytes(proj).then(async function(data){
+      if(!await DAL.download(DAL.sanitizeFilename(proj.name)+'.dalz',data,'application/zip'))return false;
+      DAL.toast('Project bundle export completed for “'+proj.name+'”. Check the saved file.','success');
       return true;
     }).catch(function(err){ DAL.toast('Could not save project bundle: '+err.message, 'error'); return false; });
   };
 
   function bundleProjectEntry(zip){
-    var entry = zip.entries.filter(function(item){ return item.name === 'project.json'; })[0];
-    if(entry) return entry;
-    return zip.entries.filter(function(item){ return /(^|\/)project\.json$/.test(item.name); })[0] || null;
+    var entries=zip.entries.filter(function(item){return /(^|\/)project\.json$/.test(item.name);});
+    if(entries.length>1)throw new Error('That archive contains multiple project.json files. Import one project bundle at a time.');
+    return entries[0]||null;
   }
 
   /* Asset records in project.json retain their source ids. Reusing the normal
@@ -316,16 +343,19 @@
      scene, chapter and audio binding to the new local asset ids. */
   DAL.importProjectBundle = function(file){
     if(!file) return Promise.resolve(false);
-    if(file.size > MAX_ARCHIVE_BYTES){ DAL.toast('That bundle is larger than the 512 MB safety limit.', 'error'); return Promise.resolve(false); }
-    DAL.toast('Reading project bundle…', 'info');
+    if(DAL._folderRestoreBusy||DAL._workspaceRestoreBusy||DAL._bundleImportBusy){DAL.toast('Wait for the current import or restore to finish.','info');return Promise.resolve(false);}
+    if(file.size > MAX_ARCHIVE_BYTES){ DAL.toast(DAL.importText('bundleImportTooLarge','That bundle is larger than the 512 MB safety limit.'), 'error'); return Promise.resolve(false); }
+    var workspace=DAL.state;
+    DAL._bundleImportBusy=true;
+    DAL.toast(DAL.importText('readingProjectBundle','Reading project bundle…'), 'info');
     return file.arrayBuffer().then(function(buffer){
       var zip = DAL.readZip(buffer), projectEntry = bundleProjectEntry(zip);
-      if(!projectEntry) throw new Error('That archive has no project.json.');
+      if(!projectEntry) throw new Error(DAL.importText('bundleProjectMissing','That archive has no project.json.'));
       var root = projectEntry.name.slice(0, -'project.json'.length);
       return zip.read(projectEntry).then(function(raw){
         var data;
-        try{ data = JSON.parse(text(raw)); }catch(err){ throw new Error('project.json is not valid JSON.'); }
-        var proj = DAL.adoptImportedProject(data), jobs = [];
+        try{ data = JSON.parse(text(raw)); }catch(err){ throw new Error(DAL.importText('bundleProjectInvalid','project.json is not valid JSON.')); }
+        var proj = DAL.adoptImportedProject(data, true), jobs = [];
         DAL.ASSET_FOLDERS.forEach(function(folder){
           var prefix = root+'Assets/'+folder.dir+'/';
           zip.entries.forEach(function(entry){
@@ -341,20 +371,18 @@
                 if(!importedFile.name) importedFile.name = name;
                 return DAL.remapImportedAsset(proj, importedFile, folder.key);
               });
-            }());
+            });
           });
         });
-        return jobs.reduce(function(chain, job){ return chain.then(function(results){ return job.then(function(result){ results.push(result); return results; }); }); }, Promise.resolve([])).then(function(results){
+        return jobs.reduce(function(chain, job){ return chain.then(function(results){ return job().then(function(result){ if(!result) throw new Error('An asset could not be imported. The project was not added.'); results.push(result); return results; }); }); }, Promise.resolve([])).then(function(results){
           var count = results.filter(Boolean).length;
-          DAL.saveState();
-          return DAL.primeAssetUrls(proj).then(function(){
-            DAL.closeModal(); DAL.render();
-            DAL.toast('Imported “'+proj.name+'” with '+count+' asset'+(count === 1 ? '' : 's'), 'success');
-            return proj;
+          return Promise.resolve(DAL.validateFolderAssets?DAL.validateFolderAssets(proj):null).then(function(){
+            if(DAL.state!==workspace||DAL._workspaceRestoreBusy||DAL._folderRestoreBusy)throw new Error('The workspace changed while importing. No project was added.');
+            return DAL.finishImportedProject(proj,count);
           });
         });
       });
-    }).catch(function(err){ DAL.toast('Could not import that bundle: '+(err && err.message ? err.message : 'unknown error'), 'error'); return false; });
+    }).catch(function(err){ DAL.toast(DAL.importText('bundleImportFailed','Could not import that bundle: '+(err&&err.message||'unknown error'),{reason:err&&err.message||'unknown error'}), 'error'); return false; }).finally(function(){DAL._bundleImportBusy=false;});
   };
 
   DAL.chooseProjectBundle = function(){

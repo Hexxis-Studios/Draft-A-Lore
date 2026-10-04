@@ -1,5 +1,5 @@
 /* Draft A Lore — rpg-engine.js
- * Copyright 2026 Daymien Vanhorn — https://github.com/Hexxis-cmd/Draft-A-Lore
+ * Copyright 2026 Daymien Vanhorn — https://github.com/Hexxis-Studios/Draft-A-Lore
  * Free for noncommercial use under PolyForm Noncommercial 1.0.0 + supplemental
  * terms (see LICENSE.md). Credit to the original author must remain visible.
  * Commercial use requires a license — see COMMERCIAL-LICENSE.md.

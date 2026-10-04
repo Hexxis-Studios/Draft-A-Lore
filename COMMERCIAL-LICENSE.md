@@ -1,6 +1,6 @@
 # Commercial Licensing — Draft A Lore
 
-Copyright 2026 Daymien Vanhorn · <https://github.com/Hexxis-cmd/Draft-A-Lore>
+Copyright 2026 Daymien Vanhorn · <https://github.com/Hexxis-Studios/Draft-A-Lore>
 
 Draft A Lore is free for noncommercial use under `LICENSE.md`
 (PolyForm Noncommercial 1.0.0 plus supplemental terms). **Commercial use requires a
@@ -42,8 +42,8 @@ If you are unsure which side of the line you're on, ask before you ship.
 ## How to get a license
 
 Open an issue or start a discussion at
-<https://github.com/Hexxis-cmd/Draft-A-Lore>, or contact **Daymien Vanhorn** through the
-GitHub profile at <https://github.com/Hexxis-cmd>.
+<https://github.com/Hexxis-Studios/Draft-A-Lore>, or email **Daymien Vanhorn / Hexxis Studios**
+at <contact.draft-a-lore@proton.me>.
 
 Include:
 

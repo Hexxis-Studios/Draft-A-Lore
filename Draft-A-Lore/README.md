@@ -6,7 +6,7 @@ There is no account, advertising, analytics, or telemetry. Your projects stay on
 
 ## Download
 
-Get the newest files from the [latest GitHub release](https://github.com/Hexxis-cmd/Draft-A-Lore/releases/latest).
+Get the newest files from the [latest GitHub release](https://github.com/Hexxis-Studios/Draft-A-Lore/releases/latest).
 
 | Platform | File | How to use it |
 | --- | --- | --- |
@@ -81,7 +81,9 @@ Read the full [Privacy Policy](privacy-policy.html).
 
 ## Help and feedback
 
-Check the in-app help text beside unfamiliar tools. For reproducible problems, open a [GitHub issue](https://github.com/Hexxis-cmd/Draft-A-Lore/issues) and include:
+For support or privacy questions, email [contact.draft-a-lore@proton.me](mailto:contact.draft-a-lore@proton.me).
+
+Check the in-app help text beside unfamiliar tools. For reproducible problems, open a [GitHub issue](https://github.com/Hexxis-Studios/Draft-A-Lore/issues) and include:
 
 - the platform and device size;
 - what you expected;
@@ -96,4 +98,4 @@ Draft A Lore is available for noncommercial use under [LICENSE.md](LICENSE.md). 
 
 Anything you create with Draft A Lore remains yours. You may publish or sell your own writing, notes, campaigns, art, and adventures without royalties, permission, or app credit.
 
-Drafted By Hexxis-cmd (Daymien Vanhorn)
+Drafted By Hexxis Studios (Daymien Vanhorn)

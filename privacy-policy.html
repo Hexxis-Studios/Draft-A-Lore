@@ -4,8 +4,8 @@
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#090716;color:#eee9fa;font:17px/1.7 Georgia,serif}main{width:min(780px,calc(100% - 32px));margin:48px auto;padding:32px;background:#120d24;border:1px solid #392762;border-radius:18px;box-shadow:0 20px 60px #0007}h1,h2{line-height:1.2;color:#fff}h1{font-size:clamp(2rem,7vw,3.4rem);background:linear-gradient(90deg,#8b5cf6,#ec4899,#22d3ee);background-clip:text;color:transparent}h2{margin-top:2rem;font-size:1.25rem}a{color:#c4b5fd}small{color:#b8accb}@media(max-width:560px){main{margin:16px auto;padding:22px}}
 </style></head><body><main>
 <h1>Draft A Lore Privacy Policy</h1>
-<p><strong>Effective and last updated August 30, 2026</strong></p>
-<p>Draft A Lore is an offline-first writing and RPG-building app by Hexxis-cmd (Daymien Vanhorn). It has no user accounts, advertising, analytics, tracking, or telemetry.</p>
+<p><strong>Effective and last updated October 4, 2026</strong></p>
+<p>Draft A Lore is an offline-first writing and RPG-building app by Hexxis Studios (Daymien Vanhorn). It does not require an account and has no advertising, analytics, tracking, or telemetry. An optional Google connection is used only if you choose Google backup.</p>
 
 <h2>Information stored on your device</h2>
 <p>Projects, manuscripts, notes, character and RPG data, imported images, audio, fonts, preferences, recovery copies, and backups are processed and stored locally. The developer does not receive this content. Draft A Lore does not sell personal information.</p>
@@ -18,6 +18,18 @@
 <p>Optional Online Fonts is off by default, and the app works without it. If you enable it while connected, Draft A Lore requests font stylesheets and font files from Google Fonts over HTTPS. Google may receive network information such as your IP address, which can reveal an approximate location, and browser or device request details. This connection is used only to load the fonts you enabled. Draft A Lore does not receive that network information. You can stop future font requests by turning Online Fonts off.</p>
 <p>Google handles information it receives under the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
 
+<h2>Optional Google backup</h2>
+<p>Google backup is off by default. Enabling Google sign-in loads or opens Google’s authorization service, which may receive your IP address and browser or device request details. You choose the Google account and explicitly grant only access to Draft A Lore’s private app-data folder in Drive. This permission does not let Draft A Lore read your ordinary Drive files, Gmail, contacts, or photos. No Google password is handled by Draft A Lore.</p>
+<p>Only choosing <strong>Back up this project</strong> sends a portable snapshot of that project, its linked World Bible, and its attachments directly to Google. The developer does not receive your writing, backups, account identity, or authorization tokens. Backups consume space in your Google account. Google controls the account, storage, and authorization services under the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>. You can keep using local writing and file exports without connecting to Google.</p>
+<p>Uploads create separate snapshots rather than replace your prior backups. Restoring adds a separate local project; it does not silently overwrite your current work. Backups are not live collaboration or unattended synchronization. Availability depends on your connection, Google’s service limits, supported app distribution, and available account storage.</p>
+<p>Short-lived access tokens are kept in memory for the connected app session, not in manuscripts, exports, or project backups. Android’s Google Play services also manage their own authorization cache. Disconnect cancels unfinished transfers and clears the app’s session; it does not delete completed backups or revoke the Google account grant. You can revoke access through <a href="https://myaccount.google.com/permissions">Google Account permissions</a>. To remove the hidden backups, use Drive’s <strong>Settings → Manage apps → Draft A Lore → Delete hidden app data</strong>; that deletion is permanent. Clearing local app storage does not delete your Google backups.</p>
+<p>Draft A Lore’s use and transfer of information received from Google APIs complies with the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including its Limited Use requirements. This information is used only to provide the backup and restore feature you choose—not advertising, AI training, or unrelated profiling.</p>
+
+<h2>Optional dictation and read aloud</h2>
+<p>Dictation starts only when you choose Start listening. Android requests microphone permission for this feature; denying permission does not prevent typing or using other writing tools. Completed speech results are saved locally as a reviewable project draft. Draft A Lore does not record or retain microphone audio and the developer does not receive your audio or transcript.</p>
+<p>Dictation defaults to on-device recognition where the device or browser provides it. It does not silently switch to an online service when offline recognition is unavailable. If you explicitly enable online speech recognition, your browser or Android speech provider may transmit microphone audio to its service under that provider’s privacy policy. Recognition availability and languages depend on your installed speech services. Closing dictation or leaving the Android app stops microphone capture.</p>
+<p>Read aloud sends selected text to your device or browser’s speech engine. Some voices require a network service; the installed voice provider controls that processing. Choose an installed offline voice if you want speech synthesis to stay on your device.</p>
+
 <h2>Links to other sites</h2>
 <p>If you choose to open a web link from a manuscript or from Draft A Lore, the destination site may receive standard connection information and will apply its own privacy policy.</p>
 
@@ -25,13 +37,14 @@
 <p>Local data remains until you delete it in Draft A Lore, use <strong>Settings → Clear All Data</strong>, clear the app or browser storage, uninstall the Android app, or replace it by restoring a backup. Files you exported or synchronized to a chosen folder remain there until you delete them yourself.</p>
 
 <h2>Security</h2>
-<p>Draft A Lore limits network use to user-enabled online fonts and uses HTTPS for those requests. Local projects rely on your device, browser profile, screen lock, and file protections; the app does not add separate encryption to project files. Keep private devices locked and maintain backups in a safe location.</p>
+<p>Optional online fonts use HTTPS. Optional online speech services are provided by your browser or installed speech engine. Local projects rely on your device, browser profile, screen lock, and file protections; the app does not add separate encryption to project files. Keep private devices locked and maintain backups in a safe location.</p>
 
 <h2>Children</h2>
 <p>Draft A Lore is intended for a general audience age 13 and older and is not directed to children under 13. The developer does not knowingly collect personal information from children or other users.</p>
 
 <h2>Policy changes and contact</h2>
-<p>Material changes will be published on this page with a new effective date. Questions can be submitted through <a href="https://github.com/Hexxis-cmd/Draft-A-Lore/issues">Draft A Lore’s GitHub Issues page</a>. GitHub issues are public, so do not include a private manuscript, project, address, or other sensitive information.</p>
+<p>For support or privacy questions, email <a href="mailto:contact.draft-a-lore@proton.me">contact.draft-a-lore@proton.me</a>.</p>
+<p>Material changes will be published on this page with a new effective date. Questions can be submitted through <a href="https://github.com/Hexxis-Studios/Draft-A-Lore/issues">Draft A Lore’s GitHub Issues page</a>. GitHub issues are public, so do not include a private manuscript, project, address, or other sensitive information.</p>
 
 <p><small>This policy covers the official Draft A Lore Android, Windows, and browser releases.</small></p>
 </main></body></html>

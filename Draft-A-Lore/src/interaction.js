@@ -58,24 +58,24 @@ document.addEventListener('contextmenu', function(e){
 DAL.handleEditAction = function(action){
   if(action === 'edit-select-all'){
     if(DAL.SELECT_ALL) DAL.SELECT_ALL();
-    else DAL.toast('Select all is not available here', 'info');
+    else DAL.toast((DAL.i18n?DAL.i18n.text("ui_Select_all_is_not_available_here_734b3fc","Select all is not available here"):"Select all is not available here"), 'info');
     return;
   }
   if(action === 'edit-paste'){
     var board = DAL.clipboard();
-    if(!board.length){ DAL.toast('Nothing copied yet', 'info'); return; }
+    if(!board.length){ DAL.toast((DAL.i18n?DAL.i18n.text("ui_Nothing_copied_yet_1c0006e","Nothing copied yet"):"Nothing copied yet"), 'info'); return; }
     // Paste what is most recently copied that something here can actually take.
     var usable = board.find(function(c){ return DAL.PASTE[c.kind]; });
-    if(!usable){ DAL.toast('Nothing on the board can be pasted here', 'info'); return; }
+    if(!usable){ DAL.toast((DAL.i18n?DAL.i18n.text("ui_Nothing_on_the_board_can_be_pasted_here_b1a6181","Nothing on the board can be pasted here"):"Nothing on the board can be pasted here"), 'info'); return; }
     DAL.clipPasteEntry(usable);
     return;
   }
   var sel = DAL.selection;
-  if(!sel){ DAL.toast('Select something first', 'info'); return; }
+  if(!sel){ DAL.toast((DAL.i18n?DAL.i18n.text("ui_Select_something_first_a869446","Select something first"):"Select something first"), 'info'); return; }
   var handler = DAL.SELECT[sel.kind];
-  if(!handler){ DAL.toast('That cannot be edited here', 'info'); return; }
+  if(!handler){ DAL.toast((DAL.i18n?DAL.i18n.text("ui_That_cannot_be_edited_here_9ef1909","That cannot be edited here"):"That cannot be edited here"), 'info'); return; }
   if(action === 'edit-copy' || action === 'edit-cut'){
-    if(!handler.copy){ DAL.toast('That cannot be copied', 'info'); return; }
+    if(!handler.copy){ DAL.toast((DAL.i18n?DAL.i18n.text("ui_That_cannot_be_copied_b673606","That cannot be copied"):"That cannot be copied"), 'info'); return; }
     DAL.clipCopy(sel.kind, sel.label, handler.copy(sel.id));
     if(action === 'edit-cut' && handler.remove){ handler.remove(sel.id); DAL.clearSelection(); }
     return;
@@ -83,28 +83,29 @@ DAL.handleEditAction = function(action){
   if(action === 'edit-duplicate'){
     if(handler.duplicate) handler.duplicate(sel.id);
     else if(handler.copy && DAL.PASTE[sel.kind]) DAL.PASTE[sel.kind](handler.copy(sel.id));
-    else DAL.toast('That cannot be duplicated', 'info');
+    else DAL.toast((DAL.i18n?DAL.i18n.text("ui_That_cannot_be_duplicated_3e62259","That cannot be duplicated"):"That cannot be duplicated"), 'info');
     return;
   }
   if(action === 'edit-delete'){
     if(handler.remove){ handler.remove(sel.id); DAL.clearSelection(); }
-    else DAL.toast('That cannot be deleted here', 'info');
+    else DAL.toast((DAL.i18n?DAL.i18n.text("ui_That_cannot_be_deleted_here_31bafa0","That cannot be deleted here"):"That cannot be deleted here"), 'info');
   }
 };
 /* Items are plain objects so both menu systems and every view can describe a
    menu without touching the DOM: {label, action, shortcut, attr, data, divider,
    danger, disabled, submenu, checked}. */
 DAL.menuItemHtml = function(it, subIndex){
+  var label=it.labelKey&&DAL.i18n?DAL.i18n.text(it.labelKey,it.label):it.label;
   if(it.divider) return '<div class="menu-divider" role="separator"></div>';
   if(it.heading) return '<div class="menu-heading" role="presentation">'+DAL.escapeHtml(it.heading)+'</div>';
-  if(it.submenu) return '<div class="menu-item has-sub" role="menuitem" tabindex="0" aria-haspopup="menu" data-menu-sub="'+subIndex+'">'+DAL.escapeHtml(it.label)+'<span class="menu-chev">\u203A</span></div>';
+  if(it.submenu) return '<div class="menu-item has-sub" role="menuitem" tabindex="0" aria-haspopup="menu" aria-expanded="false" data-menu-sub="'+subIndex+'"><span class="menu-label">'+DAL.escapeHtml(label)+'</span><span class="menu-chev" aria-hidden="true">\u203A</span></div>';
   var cls = 'menu-item' + (it.danger ? ' danger' : '') + (it.disabled ? ' disabled' : '');
   var attrs = ' role="menuitem" tabindex="'+(it.disabled?'-1':'0')+'"'+(it.disabled?' aria-disabled="true"':' data-action="menu" data-do="'+DAL.escapeHtml(it.action)+'"');
   if(it.attr !== undefined) attrs += ' data-theme="'+DAL.escapeHtml(it.attr)+'"';
   if(it.data) for(var k in it.data){ if(it.data.hasOwnProperty(k)) attrs += ' data-'+k+'="'+DAL.escapeHtml(String(it.data[k]))+'"'; }
   var check = it.checked ? '<span class="menu-check">\u2713</span>' : (it.checked === false ? '<span class="menu-check"></span>' : '');
   var right = it.shortcut ? '<span class="menu-shortcut">'+DAL.escapeHtml(it.shortcut)+'</span>' : '';
-  return '<div class="'+cls+'"'+attrs+'>'+check+DAL.escapeHtml(it.label)+right+'</div>';
+  return '<div class="'+cls+'"'+attrs+'>'+check+'<span class="menu-label">'+DAL.escapeHtml(label)+'</span>'+right+'</div>';
 };
 
 DAL.menuHtml = function(items){
@@ -121,6 +122,7 @@ DAL.clampToViewport = function(el, x, y, flipFrom){
   if(r.right > window.innerWidth - 8){
     el.style.left = Math.max(8, (flipFrom !== undefined ? flipFrom - r.width : window.innerWidth - r.width - 8)) + 'px';
   }
+  if(r.left < 8)el.style.left=Math.max(8,Math.min(window.innerWidth-r.width-8,flipFrom!==undefined?flipFrom-r.width:8))+'px';
   if(r.bottom > window.innerHeight - 8) el.style.top = Math.max(8, window.innerHeight - r.height - 8) + 'px';
 };
 
@@ -128,17 +130,20 @@ DAL.clampToViewport = function(el, x, y, flipFrom){
 DAL.bindSubmenus = function(dd, items){
   dd.querySelectorAll('.menu-item.has-sub').forEach(function(sub){
     var openSub = function(){
+      dd.querySelectorAll('.menu-item.has-sub').forEach(function(item){item.setAttribute('aria-expanded','false');});
       dd.querySelectorAll('.menu-sub-dropdown').forEach(function(s){ s.remove(); });
       var parent = items[parseInt(sub.getAttribute('data-menu-sub'), 10)];
       if(!parent || !parent.submenu) return;
       var sd = document.createElement('div');
       sd.className = 'menu-sub-dropdown';
       sd.setAttribute('role','menu');
+      sd._menuParent=sub;sub.setAttribute('aria-expanded','true');
       sd.innerHTML = DAL.menuHtml(parent.submenu);
       dd.appendChild(sd);
       DAL.bindMenuKeyboard(sd);
       var sr = sub.getBoundingClientRect();
-      DAL.clampToViewport(sd, sr.right - 4, sr.top, sr.left + 4);
+      var rtl=document.documentElement&&document.documentElement.dir==='rtl';
+      DAL.clampToViewport(sd, rtl?sr.left-sd.getBoundingClientRect().width+4:sr.right-4, sr.top, rtl?sr.right+sd.getBoundingClientRect().width-4:sr.left+4);
     };
     sub.addEventListener('mouseenter', openSub);
     sub.addEventListener('click', openSub);
@@ -150,32 +155,40 @@ DAL.bindMenuKeyboard = function(menu){
   menu.addEventListener('keydown',function(e){
     var item=e.target.closest('.menu-item');
     if(!item||!menu.contains(item)) return;
-    if(['ArrowDown','ArrowUp','Enter',' ','ArrowRight','Escape'].indexOf(e.key)<0) return;
-    if(e.key==='ArrowRight'&&!item.classList.contains('has-sub')) return;
+    var rtl=document.documentElement&&document.documentElement.dir==='rtl',forward=rtl?'ArrowLeft':'ArrowRight',back=rtl?'ArrowRight':'ArrowLeft';
+    if(['ArrowDown','ArrowUp','Home','End','Enter',' ',forward,back,'Escape','Tab'].indexOf(e.key)<0) return;
+    if(e.key===forward&&!item.classList.contains('has-sub')) return;
+    if(e.key===back&&!menu._menuParent)return;
     e.stopPropagation();
     var items=Array.prototype.slice.call(menu.querySelectorAll(':scope > .menu-item:not(.disabled)'));
     var index=items.indexOf(item);
-    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'||e.key==='Home'||e.key==='End'){
       e.preventDefault();
-      if(items.length) items[(index+(e.key==='ArrowDown'?1:-1)+items.length)%items.length].focus();
-    } else if(e.key==='Enter'||e.key===' '||e.key==='ArrowRight'){
+      if(items.length)items[e.key==='Home'?0:e.key==='End'?items.length-1:(index+(e.key==='ArrowDown'?1:-1)+items.length)%items.length].focus();
+    } else if(e.key==='Enter'||e.key===' '||e.key===forward){
       e.preventDefault(); item.click();
       var sub=menu.querySelector(':scope > .menu-sub-dropdown');
       if(sub){ var first=sub.querySelector('.menu-item:not(.disabled)'); if(first) first.focus(); }
-    } else if(e.key==='Escape'){
-      e.preventDefault(); DAL.closeContextMenu(); DAL.closeMenu();
+    } else if(menu._menuParent&&(e.key===back||e.key==='Escape')){
+      e.preventDefault();var parent=menu._menuParent;menu.remove();parent.setAttribute('aria-expanded','false');parent.focus();
+    } else if(e.key==='Escape'||e.key==='Tab'){
+      if(e.key==='Escape')e.preventDefault();
+      DAL.closeContextMenu(true); DAL.closeMenu(true);
     }
   });
 };
-DAL.closeContextMenu = function(){
+DAL.closeContextMenu = function(restoreFocus){
   var m = document.getElementById('dalCtxMenu');
   if(m) m.remove();
+  var focus=DAL._contextMenuReturnFocus;DAL._contextMenuReturnFocus=null;
+  if(restoreFocus&&m&&focus&&focus.isConnected&&focus.focus)focus.focus();
 };
 
 DAL.contextMenu = function(x, y, items){
   DAL.closeContextMenu();
   DAL.closeMenu();
   if(!items || !items.length) return;
+  DAL._contextMenuReturnFocus=document.activeElement;
   var dd = document.createElement('div');
   dd.id = 'dalCtxMenu';
   dd.className = 'menu-dropdown ctx-menu';
@@ -252,10 +265,10 @@ DAL.registerActionHandler(function(action, el){
   var target = selectedSpec && Array.prototype.find.call(document.querySelectorAll('[data-sel]'), function(candidate){
     return candidate.getAttribute('data-sel') === selectedSpec;
   });
-  if(!target){ DAL.toast('Select something first', 'info'); return true; }
+  if(!target){ DAL.toast((DAL.i18n?DAL.i18n.text("ui_Select_something_first_a869446","Select something first"):"Select something first"), 'info'); return true; }
   var contextTarget = target.closest('[data-ctx]');
   var rect = el.getBoundingClientRect();
-  if(!DAL.openElementContextMenu(contextTarget, rect.left, rect.bottom+4, {})) DAL.toast('More actions are not available here', 'info');
+  if(!DAL.openElementContextMenu(contextTarget, rect.left, rect.bottom+4, {})) DAL.toast((DAL.i18n?DAL.i18n.text("ui_More_actions_are_not_available_here_b057a5b","More actions are not available here"):"More actions are not available here"), 'info');
   return true;
 });
 
@@ -300,7 +313,7 @@ DAL.clipPasteEntry = function(entry){
 
 DAL.clipPaste = function(kind){
   var entry = DAL.clipLatest(kind);
-  if(!entry){ DAL.toast('Nothing copied yet', 'info'); return false; }
+  if(!entry){ DAL.toast((DAL.i18n?DAL.i18n.text("ui_Nothing_copied_yet_1c0006e","Nothing copied yet"):"Nothing copied yet"), 'info'); return false; }
   return DAL.clipPasteEntry(entry);
 };
 
@@ -313,7 +326,7 @@ DAL.showClipboardBoard = function(){
   var board = DAL.clipboard();
   var body;
   if(!board.length){
-    body = '<p class="u-hint">Nothing on the board yet. Copy a character, chapter, scene node or item and it will collect here, ready to paste into any project.</p>';
+    body = ("<p class=\"u-hint\">"+DAL.uiLabel("ui_Nothing_on_the_board_yet_Copy_a_character__b3565cc","Nothing on the board yet. Copy a character, chapter, scene node or item and it will collect here, ready to paste into any project.")+"</p>");
   } else {
     body = '<div class="clip-board">' + board.map(function(c){
       var kindLabel = DAL.CLIP_LABELS[c.kind] || c.kind;
@@ -324,13 +337,13 @@ DAL.showClipboardBoard = function(){
           '<span class="u-hint-faint">'+DAL.formatDate(c.ts)+'</span>' +
         '</div>' +
         '<div class="clip-entry-actions">' +
-          '<button class="btn sm" data-action="clip-paste" data-clip="'+c.id+'">Paste</button>' +
-          '<button class="btn sm icon" data-action="clip-remove" data-clip="'+c.id+'" aria-label="Remove from board">\u2715</button>' +
+          '<button class="btn sm" data-action="clip-paste" data-clip="'+c.id+("\">"+DAL.uiLabel("menu_edit_paste","Paste")+"</button>") +
+          '<button class="btn sm icon" data-action="clip-remove" data-clip="'+c.id+("\" aria-label=\""+DAL.uiLabel("ui_Remove_from_board_1c6124d","Remove from board")+"\">✕</button>") +
         '</div></div>';
     }).join('') + '</div>';
   }
-  DAL.modal('Clipboard Board', body, {
-    footer: '<button class="btn" data-action="clip-clear">Clear board</button><button class="btn primary" data-action="close-modal">Done</button>'
+  DAL.modal((DAL.i18n?DAL.i18n.text("ui_Clipboard_Board_01c1946","Clipboard Board"):"Clipboard Board"), body, {
+    footer: ("<button class=\"btn\" data-action=\"clip-clear\">"+DAL.uiLabel("ui_Clear_board_734150f","Clear board")+"</button><button class=\"btn primary\" data-action=\"close-modal\">"+DAL.uiLabel("ui_Done_11a6767","Done")+"</button>")
   });
 };
 
@@ -516,16 +529,17 @@ DAL.panelOpen = function(key, fallback){
 
 DAL.togglePanel = function(key, el){
   if(!DAL.state.panels) DAL.state.panels = {};
-  var open = !DAL.panelOpen(key);
-  DAL.state.panels[key] = open;
-  DAL.saveState(true);
   var panel = el && el.closest('.panel');
   if(!panel) return;
+  var head = panel.querySelector('.panel-head');
+  var open = !(head ? head.getAttribute('aria-expanded')==='true' : panel.classList.contains('open'));
+  DAL.state.panels[key] = open;
+  DAL.saveState(true);
   var body = panel.querySelector('.panel-body');
   panel.classList.toggle('open', open);
-  var head = panel.querySelector('.panel-head');
   if(head) head.setAttribute('aria-expanded', open ? 'true' : 'false');
   if(!body) return;
+  body.inert = !open;
   if(open){
     body.hidden = false;
     body.style.height = '0px';
@@ -534,8 +548,8 @@ DAL.togglePanel = function(key, el){
     var done = function(){ body.style.height = ''; body.removeEventListener('transitionend', done); };
     body.addEventListener('transitionend', done);
   } else {
-    body.style.height = body.scrollHeight + 'px';
-    requestAnimationFrame(function(){ body.style.height = '0px'; });
+    body.hidden = true;
+    body.style.height = '';
   }
 };
 

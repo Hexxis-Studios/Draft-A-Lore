@@ -16,6 +16,8 @@ import mimetypes
 import os
 import shutil
 import sys
+import subprocess
+import re
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(BASE, 'src')
@@ -114,7 +116,14 @@ def render_html(include_web_metadata=True):
     logo = data_uri(os.path.join(ASSETS, 'logo.png'))
     if logo:
         runtime_assets['logo'] = logo
-    asset_js = 'window.DAL_ASSETS=' + json.dumps(runtime_assets, separators=(',', ':')) + ';'
+    policy_source = read_file(os.path.join(BASE, 'privacy-policy.html'))
+    policy_match = re.search(r'<main>([\s\S]*?)</main>', policy_source)
+    if not policy_match or 'Optional dictation and read aloud' not in policy_match.group(1):
+        raise ValueError('The complete public privacy policy must be included in the offline app.')
+    policy_content = policy_match.group(1)
+    if re.search(r'<(?:script|iframe|object|embed)\b|\son\w+\s*=|javascript:', policy_content, re.I):
+        raise ValueError('Privacy policy content must not include active embedded content.')
+    asset_js = 'window.DAL_ASSETS=' + json.dumps(runtime_assets, separators=(',', ':')) + ';\nwindow.DAL_PRIVACY_CONTENT=' + json.dumps(policy_content, ensure_ascii=False) + ';'
 
     core_js = read_file(os.path.join(SRC, 'core.js'))
     interaction_js = read_file(os.path.join(SRC, 'interaction.js'))
@@ -123,24 +132,57 @@ def render_html(include_web_metadata=True):
     world_js = read_file(os.path.join(SRC, 'world-tools.js'))
     continuity_js = read_file(os.path.join(SRC, 'continuity-tools.js'))
     encyclopedia_js = read_file(os.path.join(SRC, 'encyclopedia-tools.js'))
+    world_analysis_js = read_file(os.path.join(SRC, 'world-analysis.js'))
     analytics_js = read_file(os.path.join(SRC, 'analytics-tools.js'))
     publishing_js = read_file(os.path.join(SRC, 'publishing-tools.js'))
     sync_js = read_file(os.path.join(SRC, 'sync-tools.js'))
     writer_js = read_file(os.path.join(SRC, 'writer-tools.js'))
+    voice_js = read_file(os.path.join(SRC, 'voice-tools.js'))
     rpg_js = read_file(os.path.join(SRC, 'rpg-engine.js'))
     adventure_js = read_file(os.path.join(SRC, 'adventure-tools.js'))
     assets_audio_js = read_file(os.path.join(SRC, 'assets-audio.js'))
+    native_narration_js = read_file(os.path.join(SRC, 'native-narration.js'))
+    native_export_js = read_file(os.path.join(SRC, 'native-export.js'))
+    locale_vendor_js = read_file(os.path.join(BASE, 'node_modules', 'i18next', 'dist', 'umd', 'i18next.min.js')) + '\n' + read_file(os.path.join(BASE, 'node_modules', 'i18next-icu', 'i18nextICU.min.js'))
+    locale_licenses = []
+    for package, license_name in [('i18next', 'LICENSE'), ('i18next-icu', 'LICENSE'), ('intl-messageformat', 'LICENSE.md'), ('@formatjs/fast-memoize', 'LICENSE.md'), ('@formatjs/icu-messageformat-parser', 'LICENSE.md'), ('@formatjs/icu-skeleton-parser', 'LICENSE.md')]:
+        license_path = os.path.join(BASE, 'node_modules', package, license_name)
+        with open(license_path, encoding='utf-8') as license_file:
+            locale_licenses.append(package + '\n' + license_file.read())
+    locale_vendor_js = '/*! Bundled localization library licenses\n' + '\n\n'.join(locale_licenses).replace('*/', '* /') + '\n*/\n' + locale_vendor_js
+    localization_js = read_file(os.path.join(SRC, 'localization.js'))
+    with open(os.path.join(SRC, 'locales', 'catalog.json'), encoding='utf-8') as catalog_file:
+        locale_catalog = json.load(catalog_file)
+    with open(os.path.join(SRC, 'locales', 'en.json'), encoding='utf-8') as english_file:
+        english_resource = json.load(english_file)
+    locale_bundles = {}
+    for code, entry in locale_catalog.items():
+        if not entry.get('released'):
+            continue
+        if code != 'en' and not (entry.get('humanReviewedBy') and entry.get('reviewedAt') and all(entry.get('verifiedLayouts', {}).get(platform) for platform in ('web', 'desktop', 'android'))):
+            raise ValueError('Locale cannot ship without human review and platform verification: ' + code)
+        with open(os.path.join(SRC, 'locales', code + '.json'), encoding='utf-8') as resource_file:
+            resource = json.load(resource_file)
+        if set(resource) != set(english_resource) or any(not isinstance(value, str) or not value.strip() for value in resource.values()):
+            raise ValueError('Locale has missing, extra, or blank translations: ' + code)
+        locale_bundles[code] = json.dumps(resource, ensure_ascii=False, separators=(',', ':'))
+    subprocess.run(['node', os.path.join(BASE, 'scripts', 'validate-locales.cjs')], check=True)
+    localization_js = 'var DAL_LOCALE_CATALOG=' + json.dumps(locale_catalog, ensure_ascii=False) + ';\nvar DAL_LOCALE_BUNDLES=' + json.dumps(locale_bundles, ensure_ascii=False) + ';\n' + localization_js
     assets_ui_js = read_file(os.path.join(SRC, 'assets-ui.js'))
     library_js = read_file(os.path.join(SRC, 'library.js'))
     bundle_js = read_file(os.path.join(SRC, 'bundle.js'))
+    navigation_js = read_file(os.path.join(SRC, 'navigation-tools.js'))
+    google_backup_js = read_file(os.path.join(SRC, 'google-backup.js'))
+    google_auth_js = read_file(os.path.join(SRC, 'google-backup-auth.js'))
+    google_backup_ui_js = read_file(os.path.join(SRC, 'google-backup-ui.js'))
 
     # rpg-engine defines DAL.rpg, which the adventure tools call while rendering,
     # so it has to be in place before adventure-tools.js runs. interaction.js
     # extends the DAL namespace core.js creates and is used by every view.
     # The asset files come last: assets-ui and library decorate DAL.handleClick
     # and DAL.renderPlaytest, so the functions they wrap must already exist.
-    all_js = '\n\n'.join([asset_js, core_js, interaction_js, views_js, story_js, world_js, continuity_js, encyclopedia_js, analytics_js, publishing_js, sync_js, writer_js,
-                          rpg_js, adventure_js, assets_audio_js, assets_ui_js, library_js, bundle_js])
+    all_js = '\n\n'.join([locale_vendor_js, asset_js, core_js, localization_js, native_export_js, interaction_js, views_js, story_js, world_js, continuity_js, encyclopedia_js, world_analysis_js, analytics_js, publishing_js, sync_js, writer_js,
+                          rpg_js, adventure_js, native_narration_js, assets_audio_js, assets_ui_js, library_js, bundle_js, voice_js, navigation_js, google_backup_js, google_auth_js, google_backup_ui_js])
 
     # The export code emits an HTML document containing a literal '</script>'.
     # Left as-is, that string closes the inline <script> block of this build and
@@ -179,7 +221,7 @@ def render_html(include_web_metadata=True):
     return f'''<!DOCTYPE html>
 <!--
   Draft A Lore v1.0.0 — created by Daymien Vanhorn
-  https://github.com/Hexxis-cmd/Draft-A-Lore
+  https://github.com/Hexxis-Studios/Draft-A-Lore
   Copyright 2026 Daymien Vanhorn. Free for noncommercial use under the PolyForm
   Noncommercial License 1.0.0 plus supplemental terms (LICENSE.md). Credit to the
   original author must remain visible in any distributed version. Commercial use
