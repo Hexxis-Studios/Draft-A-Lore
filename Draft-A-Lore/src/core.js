@@ -2175,7 +2175,7 @@ DAL.buildShell = function(){
         '<button type="button" class="nav-item" data-nav="dashboard" data-action="nav-dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span class="nav-label">Dashboard</span></button>'+
         '<button type="button" class="nav-item" data-nav="projects" data-action="nav-projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="nav-label">Projects</span></button>'+
         '<button type="button" class="nav-item" data-nav="library" data-action="nav-library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h4v16H4z"/><path d="M10 4h4v16h-4z"/><path d="M17.5 4.5l3.2.8-3.4 14.2-3.2-.8z"/></svg><span class="nav-label">Library</span></button>'+
-        '<button type="button" class="nav-item" data-nav="settings" data-action="nav-settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="nav-label">Settings</span></button>'+
+        '<button type="button" class="nav-item" data-nav="hexispace" data-action="nav-hexispace" aria-label="Open hexispace.com in your browser" title="hexispace.com — opens in your browser"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3h7v7"/><path d="M10 14 21 3"/><path d="M19 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"/></svg><span class="nav-label">hexispace.com</span></button>' +        '<button type="button" class="nav-item" data-nav="settings" data-action="nav-settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="nav-label">Settings</span></button>'+
       '</nav>'+
     '</aside>'+
     '<div class="main">'+
@@ -2532,7 +2532,19 @@ DAL.toggleMenu = function(trigger, key){
   document.addEventListener('click', DAL._menuOutsideHandler, true);
 };
 
-DAL.runAction = function(action, el, e){
+DAL.HEXISPACE_URL = 'https://hexispace.com/draftalore/me';
+DAL.openHexiSpace = function(){
+  var capacitor=window.Capacitor;
+  if(capacitor&&typeof capacitor.getPlatform==='function'&&capacitor.getPlatform()==='android'){
+    /* Capacitor routes external top-level URLs to Android ACTION_VIEW, which
+       opens the user's selected browser without navigating the app WebView. */
+    window.location.assign(DAL.HEXISPACE_URL);
+    return;
+  }
+  var tab=window.open(DAL.HEXISPACE_URL,'_blank');
+  if(tab){try{tab.opener=null;}catch(e){}}
+  else DAL.toast('HexiSpace could not open. Allow pop-ups for Draft A Lore, then try again.','error');
+};DAL.runAction = function(action, el, e){
   if(action === 'open-menu'){ DAL.toggleMenu(el, el.getAttribute('data-menu')); return; }
   if(action === 'menu'){
     var real = el.getAttribute('data-do');
@@ -2548,6 +2560,7 @@ DAL.runAction = function(action, el, e){
   }
   if(action === 'nav-dashboard') DAL.navigate('dashboard');
   else if(action === 'nav-projects') DAL.navigate('projects');
+  else if(action === 'nav-hexispace') DAL.openHexiSpace();
   else if(action === 'nav-settings') DAL.navigate('settings');
   else if(action === 'nav-library') DAL.navigate('library');
   else if(action === 'toggle-sidebar'){
