@@ -14,7 +14,7 @@ function api(native=true){
 
 test('injected Android bridge without registerPlugin exports bounded ordered binary chunks',async()=>{
   const qa=api(),bytes=Buffer.alloc(600000);for(let index=0;index<bytes.length;index++)bytes[index]=index%251;
-  assert.equal(await qa.DAL.saveExportBlob('world.dalz',new Blob([bytes],{type:'application/zip'})),true);
+  assert.equal(await qa.DAL.saveExportBlob('world.zip',new Blob([bytes],{type:'application/zip'})),true);
   assert.deepEqual(Buffer.concat(qa.chunks),bytes);assert.ok(qa.chunks.every(chunk=>chunk.length<=256*1024));assert.deepEqual(qa.calls.filter(call=>call[0]==='append').map(call=>call[1]),[0,262144,524288]);assert.equal(qa.calls.at(-1)[0],'save');assert.equal(qa.DAL._nativeExportBusy,false);
 });
 
@@ -41,7 +41,7 @@ test('a second native export cannot replace the first pending Save File picker',
 });
 
 test('oversized Android exports fail before transfer or picker creation',async()=>{
-  const qa=api();assert.equal(await qa.DAL.saveExportBlob('large.dalz',{size:256*1024*1024+1}),false);assert.equal(qa.calls.length,0);
+  const qa=api();assert.equal(await qa.DAL.saveExportBlob('large.zip',{size:256*1024*1024+1}),false);assert.equal(qa.calls.length,0);
 });
 
 test('browser exports retain the download path and release object URLs',async()=>{

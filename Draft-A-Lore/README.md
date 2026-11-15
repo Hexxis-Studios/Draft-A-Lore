@@ -25,7 +25,7 @@ Get the newest files from the [latest GitHub release](https://github.com/Hexxis-
 
 1. Extract the complete `DraftALore-Windows.zip` into a folder you control. Keep `DraftALore.exe` and `DraftALore.html` together.
 2. Open `DraftALore.exe`. To add shortcuts, run `Install-DraftALore.bat`; the shortcuts launch the app through its launcher so the optional desktop backup bridge remains available.
-3. Before updating or removing the app, export a `.dalz` project backup. Extract the newer ZIP into the same app folder and replace the old app files to keep the launch location stable.
+3. Before updating or removing the app, export a `.zip` project backup. Extract the newer ZIP into the same app folder and replace the old app files to keep the launch location stable.
 4. To remove the Windows app, delete its Desktop or Start Menu shortcut, then delete the app folder after confirming your projects are backed up. Also remove any project files you exported if you no longer want them.
 
 ## Start a project
@@ -33,7 +33,7 @@ Get the newest files from the [latest GitHub release](https://github.com/Hexxis-
 1. Open Draft A Lore and choose **New Project**.
 2. Pick **Novel**, **RPG Adventure**, or **Novel + RPG**. Every project can still use the complete tool set.
 3. Name the project, then begin in **Manuscript**, **Mind Map**, or **Story Graph**.
-4. Use **File → Portable project bundle (.dalz)** to make a complete backup.
+4. Use **File → Portable project ZIP file (.zip)** to make a complete backup.
 
 On a phone, use the top-left menu button to open the main navigation or project sections. Chapters also open in their own side drawer, leaving the manuscript room for writing.
 
@@ -80,15 +80,17 @@ On a phone, use the top-left menu button to open the main navigation or project 
 
 Draft A Lore stores work locally and does not need an account. It does not sync automatically.
 
-- Export a `.dalz` bundle to move a complete project between phone, tablet, browser, and PC. Chapter order, IDs, links, RPG data, annotations, art, and audio stay with the project.
-- Import that bundle on the other device through **File → Import Project**.
+- Export a `.zip` file to move a complete project between phone, tablet, browser, and PC. Chapter order, IDs, links, RPG data, annotations, art, and audio stay with the project.
+- Import that ZIP file on the other device through **File → Import Project**.
 - On supported browsers and Android, **Device Sync** can maintain either a one-device backup or a conflict-checked shared copy in a folder you choose. It keeps a readable `project.json`, chapter text files, and project assets together.
 - Use **Settings → Storage & Recovery** to download, restore, or remove preserved recovery copies. They are kept until you remove them; the app does not prune recovery data automatically.
 - Keep at least one backup somewhere other than the device you write on.
 
-Browser data may be separate by browser and profile. Clearing browser data, clearing Android app storage, uninstalling the app, or losing the device can remove projects that were not exported. Export a `.dalz` backup before changing devices or browser profiles.
+Browser data may be separate by browser and profile. Clearing browser data, clearing Android app storage, uninstalling the app, or losing the device can remove projects that were not exported. Export a `.zip` backup before changing devices or browser profiles.
 
 ### Optional Google Drive backup
+
+Google Drive backup is available in the Android app, the Windows launcher, and the supported hosted web app. It is not available when you open the standalone HTML file directly; use a portable `.zip` export there.
 Google backup is off until you connect an account. When you choose **Back up this project**, Draft A Lore uploads a separate project snapshot, including its attachments and linked World Bible, to the private app-data area in that Google account. It cannot browse your normal Drive files. Backups are manual snapshots, not live sync; restoring creates a separate local project. You can remove stored copies from Google Drive under **Settings → Manage apps → Draft A Lore → Delete hidden app data**. See the [Privacy Policy](privacy-policy.html) for the details.
 
 ## Privacy and permissions

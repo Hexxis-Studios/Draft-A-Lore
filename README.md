@@ -14,6 +14,20 @@ Get the newest files from the [latest GitHub release](https://github.com/Hexxis-
 | Android | `DraftALore.apk` | Open the APK on your phone or tablet. Android may ask you to allow installations from your browser or file manager. |
 | Web browser | `DraftALore.html` | Open the single HTML file in a modern browser. Nothing else needs to be installed. |
 
+## What you need
+
+- **Windows:** Windows 10 or 11. The launcher works best with a current Chrome, Edge, Brave, or Vivaldi browser; if none is found, it opens your default browser.
+- **Android:** Android 7.0 (API 24) or newer.
+- **Browser:** A current Chrome, Edge, Firefox, or Safari release with JavaScript and site storage enabled. Some optional tools depend on browser support.
+- An internet connection is not needed for local writing. Google Drive backup, online fonts, and any online speech service you choose do need a connection.
+
+## Windows install, update, and remove
+
+1. Extract the complete `DraftALore-Windows.zip` into a folder you control. Keep `DraftALore.exe` and `DraftALore.html` together.
+2. Open `DraftALore.exe`. To add shortcuts, run `Install-DraftALore.bat`; the shortcuts launch the app through its launcher so the optional desktop backup bridge remains available.
+3. Before updating or removing the app, export a `.dalz` project backup. Extract the newer ZIP into the same app folder and replace the old app files to keep the launch location stable.
+4. To remove the Windows app, delete its Desktop or Start Menu shortcut, then delete the app folder after confirming your projects are backed up. Also remove any project files you exported if you no longer want them.
+
 ## Start a project
 
 1. Open Draft A Lore and choose **New Project**.
@@ -39,8 +53,19 @@ On a phone, use the top-left menu button to open the main navigation or project 
 - Build character profiles and relationship maps.
 - Track plot threads, timelines, lore, locations, factions, and research.
 - Create editable mind maps with connected ideas.
+- Link several books or campaigns to one local **World Bible** of shared characters, lore, timeline events, and glossary terms.
+- Run the offline **Continuity Checker** across prose, project records, RPG tables, and a linked World Bible; review, dismiss, or mark intentional findings.
+- Use the **Living Encyclopedia** to review recurring people, places, objects, events, and facts found while you write.
+- Compare chapter POV and pacing signals with transparent targets blended from up to five project genres.
 - Upload cover art and assign illustrations to specific book pages.
 - Search the whole project and restore earlier snapshots.
+
+### Design and publish books
+
+- Set trim size, margins, gutter, typography, indentation, drop capitals, page numbering, and chapter behavior.
+- Preview the cover and pages in responsive, Android phone, Android tablet, Kindle, iPad, paperback, and hardcover frames.
+- Run a publication check before exporting.
+- Export a structured EPUB 3 book or use the print-formatted PDF workflow.
 
 ### Build and test RPG adventures
 
@@ -53,14 +78,20 @@ On a phone, use the top-left menu button to open the main navigation or project 
 
 ## Back up or move a project
 
-Draft A Lore stores work locally. It does not use an account or automatic cloud backup.
+Draft A Lore stores work locally and does not need an account. It does not sync automatically.
 
 - Export a `.dalz` bundle to move a complete project between phone, tablet, browser, and PC. Chapter order, IDs, links, RPG data, annotations, art, and audio stay with the project.
 - Import that bundle on the other device through **File → Import Project**.
-- On supported browsers and Android, **Link Folder** can keep a readable `project.json`, chapter text files, and project assets in a folder you choose.
+- On supported browsers and Android, **Device Sync** can maintain either a one-device backup or a conflict-checked shared copy in a folder you choose. It keeps a readable `project.json`, chapter text files, and project assets together.
+- Use **Settings → Storage & Recovery** to download, restore, or remove preserved recovery copies. They are kept until you remove them; the app does not prune recovery data automatically.
 - Keep at least one backup somewhere other than the device you write on.
 
-Clearing browser data, clearing Android app storage, uninstalling the app, or losing the device can remove projects that were not exported.
+Browser data may be separate by browser and profile. Clearing browser data, clearing Android app storage, uninstalling the app, or losing the device can remove projects that were not exported. Export a `.dalz` backup before changing devices or browser profiles.
+
+### Optional Google Drive backup
+
+Google Drive backup is available in the Android app, the Windows launcher, and the supported hosted web app. It is not available when you open the standalone HTML file directly; use a portable `.dalz` export there.
+Google backup is off until you connect an account. When you choose **Back up this project**, Draft A Lore uploads a separate project snapshot, including its attachments and linked World Bible, to the private app-data area in that Google account. It cannot browse your normal Drive files. Backups are manual snapshots, not live sync; restoring creates a separate local project. You can remove stored copies from Google Drive under **Settings → Manage apps → Draft A Lore → Delete hidden app data**. See the [Privacy Policy](privacy-policy.html) for the details.
 
 ## Privacy and permissions
 

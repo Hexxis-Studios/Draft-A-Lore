@@ -100,3 +100,17 @@ test('folder copy lock remains held until durable import finishes',async()=>{
   const DAL=api(),local=DAL.defaultProject('Original','novel'),handle={},remote={project:JSON.parse(JSON.stringify(local)),data:{}};DAL.state.projects[local.id]=local;DAL.folderHandles[local.id]=handle;DAL.readAssetsFolder=async()=>0;let finish;DAL.finishImportedProject=()=>new Promise(resolve=>{finish=resolve;});
   const operation=DAL.importRemoteFolderCopy(local,remote,handle);for(let turn=0;turn<10&&!finish;turn++)await Promise.resolve();assert.equal(DAL._folderRestoreBusy,true);await assert.rejects(DAL.importRemoteFolderCopy(local,remote,handle),/restore operation/);finish('Completed');assert.equal(await operation,'Completed');assert.equal(DAL._folderRestoreBusy,false);
 });
+
+test('folder sync retains Unicode names and avoids duplicate character, lore and plot paths',async()=>{
+  const DAL=api(),p=DAL.defaultProject('World','novel');p.chapters=[];
+  p.characters=[{name:'暗黑编年史',backstory:'one'},{name:'暗黑编年史',backstory:'two'}];
+  p.lore={entries:[{folder:'世界',title:'Сага о Севере',content:'first'},{folder:'世界',title:'Сага о Севере',content:'second'}]};
+  p.plots=[{title:'Café Ñandú',description:'plot one'},{title:'Café Ñandú',description:'plot two'}];
+  DAL.currentProjectId=p.id;DAL.state.projects[p.id]=p;DAL.folderHandles[p.id]={};DAL.prepareFolderSync=async()=>true;DAL.finishFolderSync=()=>{};
+  const written=new Map();DAL.getDir=async(parent,name)=>({path:(parent.path||'')+'/'+name});DAL.writeFile=async(dir,name,value)=>{const key=(dir.path||'')+'/'+name;assert.equal(written.has(key),false,'duplicate '+key);written.set(key,value);};
+  assert.equal(await DAL.syncFolder(),true);
+  assert.equal(written.get('/characters/01-暗黑编年史.txt'),'one');assert.equal(written.get('/characters/02-暗黑编年史.txt'),'two');
+  assert.equal(written.get('/lore/世界/01-сага_о_севере.txt'),'first');assert.equal(written.get('/lore/世界/02-сага_о_севере.txt'),'second');
+  assert.equal(written.get('/plots/01-café_ñandú.txt'),'plot one');assert.equal(written.get('/plots/02-café_ñandú.txt'),'plot two');
+});
+test('filenames avoid empty and Windows reserved names',()=>{const DAL=api();assert.equal(DAL.sanitizeFilename('CON'),'_con');assert.equal(DAL.sanitizeFilename('???'),'untitled');assert.equal(DAL.sanitizeFilename('A Story!'),'a_story_');});

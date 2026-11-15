@@ -29,4 +29,12 @@ public class DraftALoreUnitTest {
         assertEquals("Documents", FolderSyncPlugin.folderNameFromDocumentId("primary:Documents"));
         assertEquals("Android folder", FolderSyncPlugin.folderNameFromDocumentId(""));
     }
+    @org.junit.Test
+    public void exportFilenamesRejectControlsAndSeparators() {
+        org.junit.Assert.assertTrue(FileExportPlugin.isSafeFilename("Chapter 1.epub"));
+        org.junit.Assert.assertFalse(FileExportPlugin.isSafeFilename("chapter\nname.epub"));
+        org.junit.Assert.assertFalse(FileExportPlugin.isSafeFilename("folder/file.epub"));
+        org.junit.Assert.assertFalse(FileExportPlugin.isSafeFilename("folder\\file.epub"));
+        org.junit.Assert.assertFalse(FileExportPlugin.isSafeFilename(""));
+    }
 }

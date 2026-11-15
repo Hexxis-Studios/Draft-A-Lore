@@ -21,6 +21,14 @@ function bundleApi() {
   return sandbox.DAL;
 }
 
+test('new project exports use a standard ZIP filename and keep old extension import compatibility',async()=>{
+  const DAL=bundleApi(),project={id:'p',name:'A Story'};let saved;
+  DAL.state={projects:{p:project}};DAL.toast=()=>{};DAL.projectBundleBytes=async()=>new Uint8Array([80,75,3,4]);
+  DAL.sanitizeFilename=name=>name;DAL.download=async(filename,data,mime)=>{saved={filename,data:Array.from(data),mime};return true;};
+  assert.equal(await DAL.exportProjectBundle('p'),true);assert.equal(saved.filename,'A Story.zip');assert.equal(saved.mime,'application/zip');
+  const source=fs.readFileSync(path.join(__dirname,'../src/bundle.js'),'utf8');
+  assert.match(source,/input\.accept = '\.zip,\.dalz,application\/zip/);
+});
 test('project ZIP creation and reading round-trip exact bytes', async () => {
   const DAL = bundleApi();
   const source = new TextEncoder().encode('A portable project ✓');
@@ -107,7 +115,7 @@ test('bundle import rejects ambiguous project records before adopting a project'
     {name:'another/project.json',data:new TextEncoder().encode('{}')}
   ]);
   assert.equal(await DAL.importProjectBundle(new Blob([bytes])),false);
-  assert.equal(adopted,0);assert.match(message,/multiple project.json/);
+  assert.equal(adopted,0);assert.match(message,/more than one project/);
 });
 
 test('successful bundle import commits one project after assets and durable save',async()=>{

@@ -337,8 +337,8 @@ DAL.showClipboardBoard = function(){
           '<span class="u-hint-faint">'+DAL.formatDate(c.ts)+'</span>' +
         '</div>' +
         '<div class="clip-entry-actions">' +
-          '<button class="btn sm" data-action="clip-paste" data-clip="'+c.id+("\">"+DAL.uiLabel("menu_edit_paste","Paste")+"</button>") +
-          '<button class="btn sm icon" data-action="clip-remove" data-clip="'+c.id+("\" aria-label=\""+DAL.uiLabel("ui_Remove_from_board_1c6124d","Remove from board")+"\">✕</button>") +
+          '<button class="btn sm" data-action="clip-paste" data-clip="'+DAL.escapeHtml(c.id)+("\">"+DAL.uiLabel("menu_edit_paste","Paste")+"</button>") +
+          '<button class="btn sm icon" data-action="clip-remove" data-clip="'+DAL.escapeHtml(c.id)+("\" aria-label=\""+DAL.uiLabel("ui_Remove_from_board_1c6124d","Remove from board")+"\">✕</button>") +
         '</div></div>';
     }).join('') + '</div>';
   }

@@ -79,7 +79,7 @@ test('Google backup uses immutable private-folder uploads and transfers exact by
   });
   const bytes=new Blob(['full project']);await api.upload('Book',bytes,'project');
   const metadata=JSON.parse(calls[0].options.body);
-  assert.deepEqual(metadata.parents,['appDataFolder']);assert.equal(metadata.appProperties.draftalore,'bundle-v1');
+  assert.deepEqual(metadata.parents,['appDataFolder']);assert.equal(metadata.appProperties.draftalore,'bundle-v1');assert.match(metadata.name,/\.zip$/);
   assert.equal(calls[0].options.method,'POST');assert.equal(calls[1].options.method,'PUT');
   assert.equal(await calls[1].options.body.text(),await bytes.text());assert.equal(calls[1].options.redirect,'error');
 });

@@ -49,19 +49,26 @@
     if(!current())return null;
     var instance;
     try{instance=makeWorker();}catch(error){DAL._worldAnalysisNotice='Background scanning could not start. Manual scanning remains available.';await later();return foreground();}
-    var result=await new Promise(function(resolve,reject){
-      var settled=false,timer;
-      function finish(error,value){
-        if(settled)return;settled=true;clearTimeout(timer);instance.worker.terminate();URL.revokeObjectURL(instance.url);if(active&&active.request===request)active=null;
-        if(error)reject(error);else resolve(value);
-      }
-      active={request:request,cancel:function(){finish(null,null);}};
-      timer=setTimeout(function(){finish(new Error('World analysis took too long. Your writing is unchanged; retry the manual scanner.'));},60000);
-      instance.worker.onmessage=function(event){var data=event.data;if(data&&data.error)finish(new Error(data.error));else finish(null,data);};
-      instance.worker.onerror=function(){finish(new Error('World analysis could not finish. Your writing is unchanged.'));};
-      instance.worker.onmessageerror=function(){finish(new Error('The scan result could not be read. Your writing is unchanged.'));};
-      try{instance.worker.postMessage({project:payload,bible:bibleCopy,continuity:!!options.continuity,encyclopedia:!!options.encyclopedia});}catch(error){finish(error);}
-    });
+    var result;
+    try{
+      result=await new Promise(function(resolve,reject){
+        var settled=false,timer;
+        function finish(error,value){
+          if(settled)return;settled=true;clearTimeout(timer);instance.worker.terminate();URL.revokeObjectURL(instance.url);if(active&&active.request===request)active=null;
+          if(error)reject(error);else resolve(value);
+        }
+        active={request:request,cancel:function(){finish(null,null);}};
+        timer=setTimeout(function(){finish(new Error('World analysis took too long. Your writing is unchanged; retry the manual scanner.'));},60000);
+        instance.worker.onmessage=function(event){var data=event.data;if(data&&data.error)finish(new Error(data.error));else finish(null,data);};
+        instance.worker.onerror=function(){finish(new Error('Background analysis could not finish.'));};
+        instance.worker.onmessageerror=function(){finish(new Error('The scan result could not be read.'));};
+        try{instance.worker.postMessage({project:payload,bible:bibleCopy,continuity:!!options.continuity,encyclopedia:!!options.encyclopedia});}catch(error){finish(error);}
+      });
+    }catch(error){
+      if(!options.manual||!current())throw error;
+      DAL._worldAnalysisNotice='Background analysis was unavailable; the requested scan ran locally on this device.';
+      await later();result=foreground();
+    }
     if(!result||!current())return null;
     if(result.report){DAL._continuityReports=DAL._continuityReports||{};DAL._continuityReports[proj.id]=result.report;}
     if(result.encyclopedia)proj.encyclopedia=result.encyclopedia;

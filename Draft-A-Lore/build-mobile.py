@@ -23,18 +23,18 @@ def main() -> None:
         shutil.rmtree(WWW)
     WWW.mkdir()
 
-    (WWW / "index.html").write_text(render_html(include_web_metadata=False), encoding="utf-8")
+    (WWW / "index.html").write_text(render_html(include_web_metadata=False), encoding="utf-8", newline="\n")
 
     staged = sorted(path.relative_to(WWW).as_posix() for path in WWW.rglob("*") if path.is_file())
     print(f"Staged {len(staged)} offline web assets in {WWW}")
 
     # Gradle packages this mirror as the Capacitor WebView runtime.
-    if ANDROID_ASSETS.parent.is_dir():
-        if ANDROID_ASSETS.exists():
-            shutil.rmtree(ANDROID_ASSETS)
-        shutil.copytree(WWW, ANDROID_ASSETS)
-        shutil.copyfile(ROOT / "capacitor.config.json", ANDROID_ASSETS.parent / "capacitor.config.json")
-        print(f"Mirrored them into {ANDROID_ASSETS} for the Android build")
+    ANDROID_ASSETS.parent.mkdir(parents=True, exist_ok=True)
+    if ANDROID_ASSETS.exists():
+        shutil.rmtree(ANDROID_ASSETS)
+    shutil.copytree(WWW, ANDROID_ASSETS)
+    shutil.copyfile(ROOT / "capacitor.config.json", ANDROID_ASSETS.parent / "capacitor.config.json")
+    print(f"Mirrored them into {ANDROID_ASSETS} for the Android build")
 
 
 if __name__ == "__main__":

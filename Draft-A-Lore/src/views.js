@@ -75,7 +75,7 @@ DAL.renderDashboardBar = function(layout, organizing){
 
 DAL.renderDashboardCard = function(card, size, body, opts){
   var cls = 'dash-cell ' + size.w + (size.h === 'tall' ? ' tall' : '');
-  var html = '<section class="' + cls + '" data-card="' + card.id + '" aria-label="' + DAL.escapeHtml(card.label) + '">';
+  var html = '<section class="' + cls + '" data-card="' +DAL.escapeHtml(card.id)+ '" aria-label="' + DAL.escapeHtml(card.label) + '">';
   if(opts.organizing){
     html += DAL.renderCardOrganizeControls(card, size, opts);
   }
@@ -93,27 +93,27 @@ DAL.renderCardOrganizeControls = function(card, size, opts){
   var html = '<header class="dash-card-organize">';
   html += '<span class="dash-card-name">' + DAL.escapeHtml(card.label) + '</span>';
   html += '<div class="dash-card-tools">';
-  html += '<button class="dash-tool" data-action="dash-move" data-card="' + card.id + '" data-dir="-1"' +
+  html += '<button class="dash-tool" data-action="dash-move" data-card="' +DAL.escapeHtml(card.id)+ '" data-dir="-1"' +
     (opts.first ? ' disabled' : '') + ' aria-label="Move ' + DAL.escapeHtml(card.label) + (" up\" title=\""+DAL.uiLabel("ui_Move_up_c66feb5","Move up")+"\">") +
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg></button>';
-  html += '<button class="dash-tool" data-action="dash-move" data-card="' + card.id + '" data-dir="1"' +
+  html += '<button class="dash-tool" data-action="dash-move" data-card="' +DAL.escapeHtml(card.id)+ '" data-dir="1"' +
     (opts.last ? ' disabled' : '') + ' aria-label="Move ' + DAL.escapeHtml(card.label) + (" down\" title=\""+DAL.uiLabel("ui_Move_down_40bb50d","Move down")+"\">") +
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg></button>';
 
   if(!card.alwaysFull){
     html += '<span class="dash-tool-sep"></span>';
-    html += '<button class="dash-tool text' + (size.w === 'half' ? ' active' : '') + '" data-action="dash-width" data-card="' + card.id + '" data-w="half"' +
+    html += '<button class="dash-tool text' + (size.w === 'half' ? ' active' : '') + '" data-action="dash-width" data-card="' +DAL.escapeHtml(card.id)+ '" data-w="half"' +
       ' aria-pressed="' + (size.w === 'half') + ("\" title=\""+DAL.uiLabel("ui_Half_width_9a031c6","Half width")+"\">"+DAL.uiLabel("ui_Half_8082c15","Half")+"</button>");
-    html += '<button class="dash-tool text' + (size.w === 'full' ? ' active' : '') + '" data-action="dash-width" data-card="' + card.id + '" data-w="full"' +
+    html += '<button class="dash-tool text' + (size.w === 'full' ? ' active' : '') + '" data-action="dash-width" data-card="' +DAL.escapeHtml(card.id)+ '" data-w="full"' +
       ' aria-pressed="' + (size.w === 'full') + ("\" title=\""+DAL.uiLabel("ui_Full_width_d34008d","Full width")+"\">"+DAL.uiLabel("ui_Full_008dacb","Full")+"</button>");
   }
   if(card.tall){
     html += '<span class="dash-tool-sep"></span>';
-    html += '<button class="dash-tool text' + (size.h === 'tall' ? ' active' : '') + '" data-action="dash-height" data-card="' + card.id + '"' +
+    html += '<button class="dash-tool text' + (size.h === 'tall' ? ' active' : '') + '" data-action="dash-height" data-card="' +DAL.escapeHtml(card.id)+ '"' +
       ' aria-pressed="' + (size.h === 'tall') + ("\" title=\""+DAL.uiLabel("ui_Toggle_taller_card_a0e37df","Toggle taller card")+"\">"+DAL.uiLabel("ui_Tall_0eeb780","Tall")+"</button>");
   }
   html += '<span class="dash-tool-sep"></span>';
-  html += '<button class="dash-tool" data-action="dash-hide" data-card="' + card.id + '" aria-label="Hide ' + DAL.escapeHtml(card.label) + ("\" title=\""+DAL.uiLabel("ui_Hide_this_card_a1119dc","Hide this card")+"\">") +
+  html += '<button class="dash-tool" data-action="dash-hide" data-card="' +DAL.escapeHtml(card.id)+ '" aria-label="Hide ' + DAL.escapeHtml(card.label) + ("\" title=\""+DAL.uiLabel("ui_Hide_this_card_a1119dc","Hide this card")+"\">") +
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-10-8-10-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 8 10 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="2" y1="2" x2="22" y2="22"/></svg></button>';
   html += '</div></header>';
   return html;
@@ -130,7 +130,7 @@ DAL.renderHiddenCardTray = function(layout){
     // tray reads the same every time instead of shuffling as you work.
     DAL.DASHBOARD_CARDS.forEach(function(card){
       if(layout.hidden.indexOf(card.id) === -1) return;
-      html += '<button class="dash-hidden-chip" data-action="dash-show" data-card="' + card.id + '">' +
+      html += '<button class="dash-hidden-chip" data-action="dash-show" data-card="' +DAL.escapeHtml(card.id)+ '">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
         DAL.escapeHtml(card.label) + '</button>';
     });
@@ -288,7 +288,7 @@ DAL.renderProjectGoalRow = function(proj, st){
   var html = '<div class="pg-row' + (st.done ? ' done' : '') + (st.overdue ? ' overdue' : '') + '">';
 
   html += '<div class="pg-head">' +
-    '<button class="pg-name" data-action="open-project" data-pid="' + proj.id + '">' + DAL.escapeHtml(proj.name) + '</button>' +
+    '<button class="pg-name" data-action="open-project" data-pid="' +DAL.escapeHtml(proj.id)+ '">' + DAL.escapeHtml(proj.name) + '</button>' +
     (st.done ? '<span class="badge success">'+goalText('goalReached','Reached')+'</span>' : '') +
     (st.overdue ? '<span class="badge warning">'+goalText('goalOverdue','Past deadline')+'</span>' : '') +
   '</div>';
@@ -296,11 +296,11 @@ DAL.renderProjectGoalRow = function(proj, st){
   html += '<div class="pg-fields">' +
     '<label class="pg-field"><span class="pg-field-label">'+goalText('goalTargetWords','Target words')+'</span>' +
       '<input type="number" class="pg-input" min="0" step="1000" value="' + (st.target || '') + '" placeholder="0" ' +
-        'data-project-goal="target" data-pid="' + proj.id + '" aria-label="' + goalText('goalTargetLabel','Target word count for '+proj.name,{name:proj.name}) + '">' +
+        'data-project-goal="target" data-pid="' +DAL.escapeHtml(proj.id)+ '" aria-label="' + goalText('goalTargetLabel','Target word count for '+proj.name,{name:proj.name}) + '">' +
     '</label>' +
     '<label class="pg-field"><span class="pg-field-label">'+goalText('goalDeadline','Deadline')+'</span>' +
       '<input type="date" class="pg-input" value="' + DAL.escapeHtml(st.deadline) + '" ' +
-        'data-project-goal="deadline" data-pid="' + proj.id + '" aria-label="' + goalText('goalDeadlineLabel','Deadline for '+proj.name,{name:proj.name}) + '">' +
+        'data-project-goal="deadline" data-pid="' +DAL.escapeHtml(proj.id)+ '" aria-label="' + goalText('goalDeadlineLabel','Deadline for '+proj.name,{name:proj.name}) + '">' +
     '</label>' +
   '</div>';
 
@@ -369,7 +369,7 @@ DAL.dashboardCardBody.wordGraph = function(){
   html += '<div class="chart-controls" role="group" aria-label="Chart range">';
   DAL.ANALYTICS_RANGES.forEach(function(r){
     var on = r.id === data.range.id;
-    html += '<button class="chart-range' + (on ? ' active' : '') + '" data-action="analytics-range" data-range="' + r.id + '" aria-pressed="' + on + '">' + r.label + '</button>';
+    html += '<button class="chart-range' + (on ? ' active' : '') + '" data-action="analytics-range" data-range="' +DAL.escapeHtml(r.id)+ '" aria-pressed="' + on + '">' + r.label + '</button>';
   });
   html += '</div>';
 
@@ -637,7 +637,7 @@ DAL.renderProjects = function(){
         '<span class="badge accent">'+typeLabel+'</span>'+
         '<span class="badge">'+text('status_'+p.status,p.status)+'</span>'+
       '</div>'+
-      '<div style="font-size:var(--ts-xs);color:var(--c-text-muted)">'+text('manuscriptWords',DAL.formatNumber(wc.manuscript)+' manuscript '+(wc.manuscript===1?'word':'words'),{count:wc.manuscript})+'</div>'+
+      '<div style="font-size:var(--ts-xs);color:var(--c-text-muted)">'+(p.type==='rpg'?text('words',DAL.formatNumber(wc.manuscript)+' '+(wc.manuscript===1?'word':'words'),{count:wc.manuscript}):text('manuscriptWords',DAL.formatNumber(wc.manuscript)+' manuscript '+(wc.manuscript===1?'word':'words'),{count:wc.manuscript}))+'</div>'+
       '<div style="font-size:var(--ts-xs);color:var(--c-text-faint);margin-top:4px">'+text('editedAt','Edited '+DAL.formatDate(p.updatedAt),{date:DAL.formatDate(p.updatedAt)})+'</div>'+
       '<div style="display:flex;gap:4px;margin-top:8px">'+
         '<button class="btn sm" data-action="export-project" data-pid="'+pid+'" aria-label="'+text('exportProjectNamed','Export '+p.name,{name:p.name})+'">'+text('exportProject','Export project')+'</button>'+
@@ -702,7 +702,7 @@ DAL.showProjectSettingsModal = function(pid){
     '<div class="form-group"><label class="form-label">'+text('folderConnection','Folder Connection')+'</label>'+
     '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
       '<button class="btn sm" data-action="link-folder" data-pid="'+DAL.escapeHtml(pid)+'">'+text('linkFolder','Link Folder')+'</button>'+
-      '<button class="btn sm" data-action="save-project-bundle" data-pid="'+DAL.escapeHtml(pid)+'">'+text('saveBundle','Save bundle (.dalz)')+'</button>'+
+      '<button class="btn sm" data-action="save-project-bundle" data-pid="'+DAL.escapeHtml(pid)+'">'+text('saveBundle','Export project ZIP')+'</button>'+
       '<span style="font-size:var(--ts-xs);color:var(--c-text-faint)" role="status">'+(p.linkedFolderName?DAL.escapeHtml(p.linkedFolderName):text('notLinked','Not linked'))+'</span>'+
     '</div></div>'+
     '<div class="form-group"><label class="form-label">'+text('cover','Cover')+'</label>'+
@@ -899,7 +899,7 @@ DAL.renderSettings = function(){
   DAL.THEMES.forEach(function(t){
     var active = DAL.state.appTheme === t.id;
     // Swatch colours come from the theme's own palette tokens in styles.css.
-    html += '<div class="card theme-option'+(active?' active':' hoverable')+'" data-action="set-theme" data-theme="'+t.id+'" data-swatch="'+t.id+'" role="button" tabindex="0" aria-pressed="'+(active?'true':'false')+'">'+
+    html += '<div class="card theme-option'+(active?' active':' hoverable')+'" data-action="set-theme" data-theme="'+DAL.escapeHtml(t.id)+'" data-swatch="'+DAL.escapeHtml(t.id)+'" role="button" tabindex="0" aria-pressed="'+(active?'true':'false')+'">'+
       '<div class="theme-option-head">'+
         '<span class="theme-chip theme-chip-bg" aria-hidden="true"></span>'+
         '<span class="theme-chip theme-chip-grad" aria-hidden="true"></span>'+
@@ -1016,7 +1016,7 @@ DAL.renderLibrary = function(){
   projects.forEach(function(p, i){
     var color = colors[i % colors.length];
     var author = p.cover.author || (DAL.state.autoFillAuthor ? DAL.state.authorName : '');
-    html += '<div class="book-spine" data-action="open-reader" data-pid="'+p.id+'" style="background:linear-gradient(135deg,'+color+','+color+'88);color:#fff">'+
+    html += '<div class="book-spine" data-action="open-reader" data-pid="'+DAL.escapeHtml(p.id)+'" style="background:linear-gradient(135deg,'+color+','+color+'88);color:#fff">'+
       '<div class="book-spine-title">'+DAL.escapeHtml(p.cover.title||p.name)+'</div>'+
       (author ? '<div class="book-spine-author">'+DAL.escapeHtml(author)+'</div>' : '')+
     '</div>';
@@ -1155,7 +1155,7 @@ DAL.handleClick = function(action, el, e){
     return;
   }
 
-  if(action === 'backup-workspace'){ if(DAL.currentTool==='manuscript'&&DAL.saveChapterContent)DAL.saveChapterContent();DAL.downloadJSON('draft-a-lore-workspace-backup-'+DAL.todayKey()+'.json', DAL.state).then(function(saved){if(saved)DAL.toast((DAL.i18n?DAL.i18n.text("ui_Workspace_data_export_completed_Keep_a_pro_1fe6974","Workspace data export completed. Keep a project bundle for portable media."):"Workspace data export completed. Keep a project bundle for portable media."),'success');}); return; }
+  if(action === 'backup-workspace'){ if(DAL.currentTool==='manuscript'&&DAL.saveChapterContent)DAL.saveChapterContent();DAL.downloadJSON('draft-a-lore-workspace-backup-'+DAL.todayKey()+'.json', DAL.state).then(function(saved){if(saved)DAL.toast((DAL.i18n?DAL.i18n.text("ui_Workspace_data_export_completed_Keep_a_pro_1fe6974","Workspace data export completed. Keep a project ZIP file for portable media."):"Workspace data export completed. Keep a project ZIP file for portable media."),'success');}); return; }
 
   if(action === 'storage-center'){ DAL.showStorageCenter(); return; }
   if(action === 'download-recovery'){

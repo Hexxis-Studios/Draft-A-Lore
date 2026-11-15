@@ -122,7 +122,7 @@ DAL = DAL || {};
   };
   DAL.GoogleBackupClient.prototype.upload=async function(name,blob,projectId){
     if(!(blob instanceof Blob)||!blob.size||blob.size>MAX_BYTES)throw new Error('Backup must be between 1 byte and 512 MB.');
-    var metadata={name:String(name||'Project').slice(0,150)+'.dalz',mimeType:'application/zip',parents:['appDataFolder'],appProperties:{draftalore:'bundle-v1',projectId:String(projectId||'').slice(0,120)}};
+    var metadata={name:String(name||'Project').slice(0,150)+'.zip',mimeType:'application/zip',parents:['appDataFolder'],appProperties:{draftalore:'bundle-v1',projectId:String(projectId||'').slice(0,120)}};
     var opened=await this.request('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id,name,size,createdTime,appProperties',{
       method:'POST',headers:{'Content-Type':'application/json; charset=UTF-8','X-Upload-Content-Type':'application/zip','X-Upload-Content-Length':String(blob.size)},body:JSON.stringify(metadata)
     });
@@ -156,7 +156,7 @@ DAL = DAL || {};
     var expected=Number(metadata.size);
     if(!Number.isSafeInteger(expected)||expected<=0||expected>MAX_BYTES)throw new Error('This backup exceeds the supported size or is empty.');
     var blob=await this.request(API+'/'+id+'?alt=media',null,false,async function(response){
-      if(!response.body||!response.body.getReader)throw new Error('This browser cannot safely download cloud backups. Use a local project bundle instead.');
+      if(!response.body||!response.body.getReader)throw new Error('This browser cannot safely download cloud backups. Use a local project ZIP file instead.');
       var reader=response.body.getReader(),parts=[],total=0,complete=false;
       try{
         while(true){

@@ -76,6 +76,6 @@ DAL = DAL || {};
     if(platform==='android')return client.connectNative(nativePlugin());
     if(platform==='desktop')return client.connectNative(desktopPlugin());
     if(platform==='web')return client.connect(WEB_CLIENT);
-    return Promise.reject(new Error('Google sign-in cannot run from a standalone HTML file or an unregistered website. Use the Windows launcher, Android app, or official hosted web app. Local project bundles work here without an account.'));
+    return Promise.reject(new Error('Google sign-in cannot run from a standalone HTML file or an unregistered website. Use the Windows launcher, Android app, or official hosted web app. Local project ZIP files work here without an account.'));
   };
 })();

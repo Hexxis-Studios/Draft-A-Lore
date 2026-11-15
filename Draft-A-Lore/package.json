@@ -41,6 +41,7 @@
     "uuid": "11.1.1"
   },
   "devDependencies": {
+    "@xmldom/xmldom": "0.9.12",
     "acorn": "8.18.0"
   }
 }

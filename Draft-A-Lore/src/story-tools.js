@@ -81,14 +81,14 @@ DAL.renderWorkspace = function(proj){
     '</div>'+
     '<div class="workspace-project-row">'+
       ("<input class=\"form-input project-name-input\" id=\"projNameInput\" aria-label=\""+DAL.uiLabel("ui_Project_name_2549819","Project name")+"\" value=\"")+DAL.escapeHtml(proj.name)+'">'+
-      ("<select class=\"form-select project-status-select\" aria-label=\""+DAL.uiLabel("ui_Project_status_8526e22","Project status")+"\" data-action=\"change-status\" data-pid=\"")+proj.id+'">'+
+      ("<select class=\"form-select project-status-select\" aria-label=\""+DAL.uiLabel("ui_Project_status_8526e22","Project status")+"\" data-action=\"change-status\" data-pid=\"")+DAL.escapeHtml(proj.id)+'">'+
         ['development','drafting','proofreading','completed','published'].map(function(s){ return '<option value="'+s+'"'+(proj.status===s?' selected':'')+'>'+s.charAt(0).toUpperCase()+s.slice(1)+'</option>'; }).join('')+
       '</select>'+
       '<div class="workspace-project-meta">'+
         '<span><strong>'+wc.manuscript+'</strong> / <strong>'+wc.supplementary+'</strong> / <strong>'+wc.total+("</strong>"+DAL.uiLabel("ui_words_8772742"," words")+"</span>")+
         ("<span>"+DAL.uiLabel("ui_Today__627ac69","Today: ")+"<strong class=\"accent-text\">")+(daily.manuscript+daily.supplementary)+'</strong></span>'+
         '<div class="sync-dot '+(DAL.folderHandles[proj.id]?'linked':'unlinked')+'" title="'+(DAL.folderHandles[proj.id]?'Folder linked':'No folder linked')+'"></div>'+
-        '<button class="btn sm ws-folder-btn" data-action="link-folder" data-pid="'+proj.id+'">'+(DAL.folderHandles[proj.id]?'Change Folder':'Link Folder')+'</button>'+
+        '<button class="btn sm ws-folder-btn" data-action="link-folder" data-pid="'+DAL.escapeHtml(proj.id)+'">'+(DAL.folderHandles[proj.id]?'Change Folder':'Link Folder')+'</button>'+
       '</div>'+
     '</div></div>';
 
@@ -381,7 +381,7 @@ DAL.renderCharacters = function(proj){
   html += '<div class="char-grid">';
   proj.characters.forEach(function(c){
     var initials = (c.name||'?').split(' ').map(function(w){ return w[0]; }).join('').substring(0,2).toUpperCase();
-    html += '<div class="char-card" data-action="select-character" data-cid="'+c.id+'" data-sel="character:'+c.id+'" data-ctx="character" data-ctx-id="'+c.id+'">'+
+    html += '<div class="char-card" data-action="select-character" data-cid="'+DAL.escapeHtml(c.id)+'" data-sel="character:'+DAL.escapeHtml(c.id)+'" data-ctx="character" data-ctx-id="'+DAL.escapeHtml(c.id)+'">'+
       '<div class="char-portrait">'+(c.image?'<img src="'+c.image+'">':DAL.escapeHtml(initials))+'</div>'+
       '<div class="char-name">'+DAL.escapeHtml(c.name)+'</div>'+
       '<div class="char-role">'+DAL.escapeHtml(c.role||'')+'</div>'+(c.deceased?("<span class=\"badge deceased-badge\">"+DAL.uiLabel("ui_Killed_b3ce8f0","Killed")+"</span>"):'')+
@@ -397,9 +397,9 @@ DAL.renderCharacterDetail = function(proj, ch){
   html += ("<div style=\"margin-bottom:16px\"><button class=\"btn sm\" data-action=\"back-to-characters\">"+DAL.uiLabel("ui__Back_aceb696","← Back")+"</button></div>");
   html += '<div style="display:flex;gap:16px;margin-bottom:16px;align-items:flex-start">';
   html += '<div class="char-portrait" style="width:96px;height:96px;flex-shrink:0;font-size:32px;border-radius:var(--radius-lg)">'+(ch.image?'<img src="'+ch.image+'">':DAL.escapeHtml((ch.name||'?').charAt(0).toUpperCase()))+'</div>';
-  html += '<div style="flex:1"><input class="form-input" id="charName" data-char-field="name" value="'+DAL.escapeHtml(ch.name||'')+("\" placeholder=\""+DAL.uiLabel("ui_Character_name_faf3e90","Character name")+"\" aria-label=\""+DAL.uiLabel("ui_Character_name_faf3e90","Character name")+"\" style=\"font-size:var(--ts-lg);font-weight:700;margin-bottom:4px\"><label class=\"u-hint\" style=\"display:inline-flex;align-items:center;gap:6px;margin-top:6px\"><input type=\"checkbox\" data-action=\"toggle-character-deceased\" data-cid=\"")+ch.id+'"'+(ch.deceased?' checked':'')+(">"+DAL.uiLabel("ui_Killed_deceased_7ac0aa7"," Killed / deceased")+"</label>")+(ch.deceased?("<label class=\"form-label\" style=\"margin-top:8px\">"+DAL.uiLabel("ui_Death_occurs_in_3af3820","Death occurs in")+"</label><select class=\"form-select\" data-char-field=\"deathChapterId\"><option value=\"\">"+DAL.uiLabel("ui_Not_anchored_to_a_chapter_c5a2cb9","Not anchored to a chapter")+"</option>")+(proj.chapters||[]).map(function(chapter){return '<option value="'+chapter.id+'"'+(ch.deathChapterId===chapter.id?' selected':'')+'>'+DAL.escapeHtml(chapter.title)+'</option>';}).join('')+'</select>':'')+'</div></div>';
+  html += '<div style="flex:1"><input class="form-input" id="charName" data-char-field="name" value="'+DAL.escapeHtml(ch.name||'')+("\" placeholder=\""+DAL.uiLabel("ui_Character_name_faf3e90","Character name")+"\" aria-label=\""+DAL.uiLabel("ui_Character_name_faf3e90","Character name")+"\" style=\"font-size:var(--ts-lg);font-weight:700;margin-bottom:4px\"><label class=\"u-hint\" style=\"display:inline-flex;align-items:center;gap:6px;margin-top:6px\"><input type=\"checkbox\" data-action=\"toggle-character-deceased\" data-cid=\"")+DAL.escapeHtml(ch.id)+'"'+(ch.deceased?' checked':'')+(">"+DAL.uiLabel("ui_Killed_deceased_7ac0aa7"," Killed / deceased")+"</label>")+(ch.deceased?("<label class=\"form-label\" style=\"margin-top:8px\">"+DAL.uiLabel("ui_Death_occurs_in_3af3820","Death occurs in")+"</label><select class=\"form-select\" data-char-field=\"deathChapterId\"><option value=\"\">"+DAL.uiLabel("ui_Not_anchored_to_a_chapter_c5a2cb9","Not anchored to a chapter")+"</option>")+(proj.chapters||[]).map(function(chapter){return '<option value="'+DAL.escapeHtml(chapter.id)+'"'+(ch.deathChapterId===chapter.id?' selected':'')+'>'+DAL.escapeHtml(chapter.title)+'</option>';}).join('')+'</select>':'')+'</div></div>';
 
-  html += '<div style="margin-bottom:12px"><input type="file" id="charPortrait" accept="image/*" style="display:none"><button class="btn sm" data-action="upload-portrait" data-cid="'+ch.id+("\">"+DAL.uiLabel("ui_Upload_Portrait_e4998c8","Upload Portrait")+"</button> ")+(ch.image?'<button class="btn sm danger" data-action="remove-portrait" data-cid="'+ch.id+("\">"+DAL.uiLabel("remove","Remove")+"</button>"):'')+'</div>';
+  html += '<div style="margin-bottom:12px"><input type="file" id="charPortrait" accept="image/*" style="display:none"><button class="btn sm" data-action="upload-portrait" data-cid="'+DAL.escapeHtml(ch.id)+("\">"+DAL.uiLabel("ui_Upload_Portrait_e4998c8","Upload Portrait")+"</button> ")+(ch.image?'<button class="btn sm danger" data-action="remove-portrait" data-cid="'+DAL.escapeHtml(ch.id)+("\">"+DAL.uiLabel("remove","Remove")+"</button>"):'')+'</div>';
 
   html += '<div class="form-row" style="margin-bottom:12px">'+
     ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldField_role","Role")+"</label><input class=\"form-input\" data-char-field=\"role\" value=\"")+DAL.escapeHtml(ch.role||'')+("\" placeholder=\""+DAL.uiLabel("ui_Protagonist_af8b33e","Protagonist")+"\"></div>")+
@@ -416,21 +416,21 @@ DAL.renderCharacterDetail = function(proj, ch){
   ch.customFields.forEach(function(cf, i){
     cf.type = cf.type || 'text';
     var value = cf.type === 'boolean' ? '<label class="u-hint"><input type="checkbox" data-cf-value="'+i+'"'+(cf.value===true||cf.value==='true'?' checked':'')+(">"+DAL.uiLabel("ui_Yes_043e8d9"," Yes")+"</label>") : '<input class="form-input" type="'+(cf.type==='number'?'number':'text')+'" value="'+DAL.escapeHtml(cf.value===undefined?'':String(cf.value))+'" data-cf-value="'+i+("\" placeholder=\""+DAL.uiLabel("ui_Value_8e37953","Value")+"\">");
-    html += '<div class="custom-field-row"><input class="form-input" value="'+DAL.escapeHtml(cf.label||'')+'" data-cf-label="'+i+("\" placeholder=\""+DAL.uiLabel("ui_Field_name_2f5574b","Field name")+"\"><select class=\"form-select\" data-cf-type=\"")+i+'"><option value="text"'+(cf.type==='text'?' selected':'')+(">"+DAL.uiLabel("ui_Text_71988c4","Text")+"</option><option value=\"number\"")+(cf.type==='number'?' selected':'')+(">"+DAL.uiLabel("ui_Number_bd82cf1","Number")+"</option><option value=\"boolean\"")+(cf.type==='boolean'?' selected':'')+(">"+DAL.uiLabel("ui_Yes_No_c00e655","Yes / No")+"</option></select>")+value+'<div class="custom-field-actions"><button class="btn sm" data-action="move-custom-field" data-cid="'+ch.id+'" data-cf-index="'+i+("\" data-dir=\"-1\" aria-label=\""+DAL.uiLabel("ui_Move_field_up_8e4d5e3","Move field up")+"\">↑</button><button class=\"btn sm\" data-action=\"move-custom-field\" data-cid=\"")+ch.id+'" data-cf-index="'+i+("\" data-dir=\"1\" aria-label=\""+DAL.uiLabel("ui_Move_field_down_9f04291","Move field down")+"\">↓</button><button class=\"btn sm danger\" data-action=\"delete-custom-field\" data-cid=\"")+ch.id+'" data-cf-index="'+i+("\" aria-label=\""+DAL.uiLabel("ui_Delete_field_0a73a60","Delete field")+"\">×</button></div></div>");
+    html += '<div class="custom-field-row"><input class="form-input" value="'+DAL.escapeHtml(cf.label||'')+'" data-cf-label="'+i+("\" placeholder=\""+DAL.uiLabel("ui_Field_name_2f5574b","Field name")+"\"><select class=\"form-select\" data-cf-type=\"")+i+'"><option value="text"'+(cf.type==='text'?' selected':'')+(">"+DAL.uiLabel("ui_Text_71988c4","Text")+"</option><option value=\"number\"")+(cf.type==='number'?' selected':'')+(">"+DAL.uiLabel("ui_Number_bd82cf1","Number")+"</option><option value=\"boolean\"")+(cf.type==='boolean'?' selected':'')+(">"+DAL.uiLabel("ui_Yes_No_c00e655","Yes / No")+"</option></select>")+value+'<div class="custom-field-actions"><button class="btn sm" data-action="move-custom-field" data-cid="'+DAL.escapeHtml(ch.id)+'" data-cf-index="'+i+("\" data-dir=\"-1\" aria-label=\""+DAL.uiLabel("ui_Move_field_up_8e4d5e3","Move field up")+"\">↑</button><button class=\"btn sm\" data-action=\"move-custom-field\" data-cid=\"")+DAL.escapeHtml(ch.id)+'" data-cf-index="'+i+("\" data-dir=\"1\" aria-label=\""+DAL.uiLabel("ui_Move_field_down_9f04291","Move field down")+"\">↓</button><button class=\"btn sm danger\" data-action=\"delete-custom-field\" data-cid=\"")+DAL.escapeHtml(ch.id)+'" data-cf-index="'+i+("\" aria-label=\""+DAL.uiLabel("ui_Delete_field_0a73a60","Delete field")+"\">×</button></div></div>");
   });
-  html += '</div><button class="btn sm" data-action="add-custom-field" data-cid="'+ch.id+("\">"+DAL.uiLabel("ui__Add_Custom_Field_5d91221","+ Add Custom Field")+"</button></div>");
+  html += '</div><button class="btn sm" data-action="add-custom-field" data-cid="'+DAL.escapeHtml(ch.id)+("\">"+DAL.uiLabel("ui__Add_Custom_Field_5d91221","+ Add Custom Field")+"</button></div>");
 
   html += ("<div class=\"form-group\" style=\"margin-top:12px\"><label class=\"form-label\">"+DAL.uiLabel("worldField_tags","Tags")+"</label><input class=\"form-input\" data-char-field=\"tags\" value=\"")+DAL.escapeHtml((ch.tags||[]).join(', '))+("\" placeholder=\""+DAL.uiLabel("ui_comma_separated_tags_a4bb43c","comma, separated, tags")+"\"></div>");
 
   html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Linked_Plot_Threads_a4592dc","Linked Plot Threads")+"</label><div style=\"display:flex;flex-wrap:wrap;gap:4px\">");
   (proj.plots||[]).forEach(function(p){
     var sel = (ch.linkedPlotIds||[]).indexOf(p.id) >= 0;
-    html += '<span class="chip'+(sel?' selected':'')+'" data-action="toggle-char-plot" data-cid="'+ch.id+'" data-pid="'+p.id+'">'+DAL.escapeHtml(p.title)+'</span>';
+    html += '<span class="chip'+(sel?' selected':'')+'" data-action="toggle-char-plot" data-cid="'+DAL.escapeHtml(ch.id)+'" data-pid="'+DAL.escapeHtml(p.id)+'">'+DAL.escapeHtml(p.title)+'</span>';
   });
   if(!proj.plots||!proj.plots.length) html += ("<span style=\"font-size:var(--ts-xs);color:var(--c-text-faint)\">"+DAL.uiLabel("ui_No_plot_threads_yet_1b51720","No plot threads yet")+"</span>");
   html += '</div></div>';
 
-  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px"><span style="font-size:var(--ts-xs);color:var(--c-text-faint)">'+charWC+' words in this character sheet</span><button class="btn sm danger" data-action="delete-character" data-cid="'+ch.id+("\">"+DAL.uiLabel("ui_Delete_Character_ee2425c","Delete Character")+"</button></div>");
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px"><span style="font-size:var(--ts-xs);color:var(--c-text-faint)">'+charWC+' words in this character sheet</span><button class="btn sm danger" data-action="delete-character" data-cid="'+DAL.escapeHtml(ch.id)+("\">"+DAL.uiLabel("ui_Delete_Character_ee2425c","Delete Character")+"</button></div>");
   html += '</div>';
   return html;
 };
@@ -452,14 +452,14 @@ DAL.renderRelationshipMap = function(proj){
   var html = ("<div class=\"section-header\"><div class=\"section-title\">"+DAL.uiLabel("tool_relationships","Relationship Map")+"</div><button class=\"btn primary\" data-action=\"add-relationship\">"+DAL.uiLabel("ui__Add_Relationship_f92b6f9","+ Add Relationship")+"</button></div>");
   html += ("<div style=\"margin-bottom:12px\"><label class=\"form-label\">"+DAL.uiLabel("ui_Center_on_character_6494b29","Center on character")+"</label><select class=\"form-select\" id=\"relCenterSelect\" style=\"width:auto;display:inline-block\">");
   proj.characters.forEach(function(c){
-    html += '<option value="'+c.id+'"'+(c.id===center.id?' selected':'')+'>'+DAL.escapeHtml(c.name)+'</option>';
+    html += '<option value="'+DAL.escapeHtml(c.id)+'"'+(c.id===center.id?' selected':'')+'>'+DAL.escapeHtml(c.name)+'</option>';
   });
   html += '</select></div>';
 
   html += '<div class="rel-map-container" id="relMapContainer">';
   html += '<svg class="rel-svg" id="relSvg"></svg>';
 
-  html += '<div class="rel-node center" id="relCenterNode">'+
+  html += '<div class="rel-node center" id="relCenterNode" data-center-id="'+DAL.escapeHtml(center.id)+'">'+
     '<div style="font-weight:700">'+DAL.escapeHtml(center.name)+'</div>'+
     '<div style="font-size:var(--ts-xs);color:var(--c-text-muted)">'+DAL.escapeHtml(center.role||'')+'</div></div>';
 
@@ -471,7 +471,7 @@ DAL.renderRelationshipMap = function(proj){
     var y = 50 + Math.sin(angle) * 35;
     var colorMap = { family:'var(--c-warning)', enemy:'var(--c-danger)', ally:'var(--c-info)', friend:'var(--c-success)', rival:'var(--c-warning)' };
     var color = colorMap[item.rel.category] || 'var(--c-border)';
-    html += '<div class="rel-node connected" data-action="rel-center-on" data-cid="'+item.char.id+'" style="position:absolute;left:'+x+'%;top:'+y+'%;transform:translate(-50%,-50%);border-color:'+color+'">'+
+    html += '<div class="rel-node connected" data-rel-id="'+DAL.escapeHtml(item.rel.id)+'" data-action="rel-center-on" data-cid="'+DAL.escapeHtml(item.char.id)+'" style="position:absolute;left:'+x+'%;top:'+y+'%;transform:translate(-50%,-50%);border-color:'+color+'">'+
       '<div style="font-weight:600;font-size:var(--ts-sm)">'+DAL.escapeHtml(item.char.name)+'</div>'+
       '<div style="font-size:var(--ts-xs);color:var(--c-text-muted)">'+DAL.escapeHtml(item.rel.type||'')+'</div></div>';
   });
@@ -486,21 +486,33 @@ DAL.renderRelationshipMap = function(proj){
     proj.relationships.forEach(function(rel){
       var from=proj.characters.find(function(ch){return ch.id===rel.fromCharId;});
       var to=proj.characters.find(function(ch){return ch.id===rel.toCharId;});
-      html += '<div class="relationship-row"><div><strong>'+DAL.escapeHtml((from&&from.name)||'Missing character')+' → '+DAL.escapeHtml((to&&to.name)||'Missing character')+'</strong><span>'+DAL.escapeHtml(rel.type||'Relationship')+(rel.description?' · '+DAL.escapeHtml(rel.description):'')+'</span></div><button class="btn sm" data-action="relationship-edit" data-rid="'+rel.id+("\">"+DAL.uiLabel("menuEdit","Edit")+"</button><button class=\"btn sm danger\" data-action=\"delete-relationship\" data-rid=\"")+rel.id+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></div>");
+      html += '<div class="relationship-row"><div><strong>'+DAL.escapeHtml((from&&from.name)||'Missing character')+' → '+DAL.escapeHtml((to&&to.name)||'Missing character')+'</strong><span>'+DAL.escapeHtml(rel.type||'Relationship')+(rel.description?' · '+DAL.escapeHtml(rel.description):'')+'</span></div><button class="btn sm" data-action="relationship-edit" data-rid="'+DAL.escapeHtml(rel.id)+("\">"+DAL.uiLabel("menuEdit","Edit")+"</button><button class=\"btn sm danger\" data-action=\"delete-relationship\" data-rid=\"")+DAL.escapeHtml(rel.id)+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></div>");
     });
     html += '</div>';
   }
   return html;
 };
 
+DAL.drawRelationshipLines=function(proj){
+  var container=document.getElementById('relMapContainer'),svg=document.getElementById('relSvg'),center=document.getElementById('relCenterNode');
+  if(!container||!svg||!center||!proj)return;
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+  var bounds=container.getBoundingClientRect(),cr=center.getBoundingClientRect();
+  svg.setAttribute('viewBox','0 0 '+Math.max(1,Math.round(bounds.width))+' '+Math.max(1,Math.round(bounds.height)));
+  var x1=cr.left-bounds.left+cr.width/2,y1=cr.top-bounds.top+cr.height/2;
+  var colors={family:'var(--c-warning)',enemy:'var(--c-danger)',ally:'var(--c-info)',friend:'var(--c-success)',rival:'var(--c-warning)'};
+  Array.prototype.forEach.call(container.querySelectorAll('.rel-node.connected[data-rel-id]'),function(node){
+    var rel=(proj.relationships||[]).find(function(item){return item.id===node.getAttribute('data-rel-id');});if(!rel)return;
+    var r=node.getBoundingClientRect(),path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d','M'+x1+','+y1+' L'+(r.left-bounds.left+r.width/2)+','+(r.top-bounds.top+r.height/2));
+    path.setAttribute('fill','none');path.setAttribute('stroke',colors[rel.category]||'var(--c-border)');path.setAttribute('stroke-width','2.5');path.setAttribute('stroke-linecap','round');svg.appendChild(path);
+  });
+};
 DAL.initRelMap = function(proj){
-  var sel = document.getElementById('relCenterSelect');
-  if(sel){
-    sel.addEventListener('change', function(){
-      DAL._relCenter = sel.value;
-      DAL.render();
-    });
-  }
+  var sel=document.getElementById('relCenterSelect');
+  if(sel)sel.onchange=function(){DAL._relCenter=sel.value;DAL.render();};
+  DAL.drawRelationshipLines(proj);
+  if(!DAL._relResizeHandler&&window.addEventListener){DAL._relResizeHandler=function(){if(DAL.currentTool==='relationships')DAL.drawRelationshipLines(DAL.state.projects[DAL.currentProjectId]);};window.addEventListener('resize',DAL._relResizeHandler);}
 };
 
 DAL.openRelationshipEditor = function(proj, rel){
@@ -508,7 +520,7 @@ DAL.openRelationshipEditor = function(proj, rel){
   if(!proj.characters.some(function(c){return c.id===fromId;})) fromId=proj.characters[0].id;
   var toId=(rel&&rel.toCharId)||(proj.characters.find(function(c){return c.id!==fromId;})||{}).id||fromId;
   var relTypes=['Parent','Child','Sibling','Spouse/Partner','Extended Family','Friend','Rival','Enemy','Acquaintance','Mentor','Protégé','Ally','Colleague','Unknown/Mystery','Complicated'];
-  function charOptions(selected){return proj.characters.map(function(c){return '<option value="'+c.id+'"'+(c.id===selected?' selected':'')+'>'+DAL.escapeHtml(c.name)+'</option>';}).join('');}
+  function charOptions(selected){return proj.characters.map(function(c){return '<option value="'+DAL.escapeHtml(c.id)+'"'+(c.id===selected?' selected':'')+'>'+DAL.escapeHtml(c.name)+'</option>';}).join('');}
   var html='<div class="form-group"><label class="form-label" for="relFrom">From Character</label><select class="form-select" id="relFrom">'+charOptions(fromId)+'</select></div><div class="form-group"><label class="form-label" for="relTo">To Character</label><select class="form-select" id="relTo">'+charOptions(toId)+'</select></div><div class="form-group"><label class="form-label" for="relType">Relationship Type</label><select class="form-select" id="relType">';
   relTypes.forEach(function(t){html+='<option value="'+t+'"'+(rel&&rel.type===t?' selected':'')+'>'+t+'</option>';});
   html+='</select></div><div class="form-group"><label class="form-label" for="relDesc">Description (optional)</label><input class="form-input" id="relDesc" value="'+DAL.escapeHtml((rel&&rel.description)||'')+'" placeholder="Why are they connected?"></div>';
@@ -532,7 +544,7 @@ DAL.renderPlotThreads = function(proj){
   if(main.length){
     main.forEach(function(p){
       var stale = (now - (p.lastTouched||p.createdAt||0)) > 30*86400000;
-      html += '<div class="plot-card" data-action="select-plot" data-pid="'+p.id+'">'+
+      html += '<div class="plot-card" data-action="select-plot" data-pid="'+DAL.escapeHtml(p.id)+'">'+
         '<div class="plot-status-dot '+p.status+'"></div>'+
         '<div style="flex:1"><div style="font-weight:600">'+DAL.escapeHtml(p.title)+'</div></div>'+
         (stale?("<span class=\"stale-warning\">"+DAL.uiLabel("ui__stale_dc137cd","⚠ stale")+"</span>"):'')+
@@ -547,7 +559,7 @@ DAL.renderPlotThreads = function(proj){
   if(sub.length){
     sub.forEach(function(p){
       var stale = (now - (p.lastTouched||p.createdAt||0)) > 30*86400000;
-      html += '<div class="plot-card" data-action="select-plot" data-pid="'+p.id+'">'+
+      html += '<div class="plot-card" data-action="select-plot" data-pid="'+DAL.escapeHtml(p.id)+'">'+
         '<div class="plot-status-dot '+p.status+'"></div>'+
         '<div style="flex:1"><div style="font-weight:600">'+DAL.escapeHtml(p.title)+'</div></div>'+
         (stale?("<span class=\"stale-warning\">"+DAL.uiLabel("ui__stale_dc137cd","⚠ stale")+"</span>"):'')+
@@ -573,14 +585,14 @@ DAL.renderPlotDetail = function(proj, p){
       ['planted','developing','climax','resolved','dormant'].map(function(s){ return '<option value="'+s+'"'+(p.status===s?' selected':'')+'>'+s.charAt(0).toUpperCase()+s.slice(1)+'</option>'; }).join('')+
     '</select></div></div>';
   html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Description_526e008","Description")+"</label><textarea class=\"form-textarea\" id=\"plotDesc\" placeholder=\""+DAL.uiLabel("ui_Describe_this_plot_thread__196963d","Describe this plot thread...")+"\">")+DAL.escapeHtml(p.description||'')+'</textarea></div>';
-  var plotChapterOptions=("<option value=\"\">"+DAL.uiLabel("ui_Not_anchored_e9aca7e","Not anchored")+"</option>")+(proj.chapters||[]).map(function(chapter){return '<option value="'+chapter.id+'"'+(p.introducedChapterId===chapter.id?' selected':'')+'>'+DAL.escapeHtml(chapter.title)+'</option>';}).join('');
-  var resolutionOptions=("<option value=\"\">"+DAL.uiLabel("ui_Not_anchored_e9aca7e","Not anchored")+"</option>")+(proj.chapters||[]).map(function(chapter){return '<option value="'+chapter.id+'"'+(p.resolvedChapterId===chapter.id?' selected':'')+'>'+DAL.escapeHtml(chapter.title)+'</option>';}).join('');
+  var plotChapterOptions=("<option value=\"\">"+DAL.uiLabel("ui_Not_anchored_e9aca7e","Not anchored")+"</option>")+(proj.chapters||[]).map(function(chapter){return '<option value="'+DAL.escapeHtml(chapter.id)+'"'+(p.introducedChapterId===chapter.id?' selected':'')+'>'+DAL.escapeHtml(chapter.title)+'</option>';}).join('');
+  var resolutionOptions=("<option value=\"\">"+DAL.uiLabel("ui_Not_anchored_e9aca7e","Not anchored")+"</option>")+(proj.chapters||[]).map(function(chapter){return '<option value="'+DAL.escapeHtml(chapter.id)+'"'+(p.resolvedChapterId===chapter.id?' selected':'')+'>'+DAL.escapeHtml(chapter.title)+'</option>';}).join('');
   html += ("<div class=\"writer-form-grid\"><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Introduced_in_5c7ae80","Introduced in")+"</label><select class=\"form-select\" id=\"plotIntroducedChapter\">")+plotChapterOptions+("</select></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Resolved_in_f5fdff4","Resolved in")+"</label><select class=\"form-select\" id=\"plotResolvedChapter\">")+resolutionOptions+'</select></div></div>';
 
   html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Linked_Chapters_4fbc716","Linked Chapters")+"</label><div style=\"display:flex;flex-wrap:wrap;gap:4px\">");
   (proj.chapters||[]).forEach(function(ch){
     var sel = (p.linkedChapterIds||[]).indexOf(ch.id) >= 0;
-    html += '<span class="chip'+(sel?' selected':'')+'" data-action="toggle-plot-chapter" data-pid="'+p.id+'" data-chid="'+ch.id+'">'+DAL.escapeHtml(ch.title)+'</span>';
+    html += '<span class="chip'+(sel?' selected':'')+'" data-action="toggle-plot-chapter" data-pid="'+DAL.escapeHtml(p.id)+'" data-chid="'+DAL.escapeHtml(ch.id)+'">'+DAL.escapeHtml(ch.title)+'</span>';
   });
   if(!proj.chapters||!proj.chapters.length) html += ("<span style=\"font-size:var(--ts-xs);color:var(--c-text-faint)\">"+DAL.uiLabel("noChapters","No chapters yet")+"</span>");
   html += '</div></div>';
@@ -588,7 +600,7 @@ DAL.renderPlotDetail = function(proj, p){
   html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Linked_Characters_632d3a5","Linked Characters")+"</label><div style=\"display:flex;flex-wrap:wrap;gap:4px\">");
   (proj.characters||[]).forEach(function(c){
     var sel = (p.linkedCharacterIds||[]).indexOf(c.id) >= 0;
-    html += '<span class="chip'+(sel?' selected':'')+'" data-action="toggle-plot-char" data-pid="'+p.id+'" data-cid="'+c.id+'">'+DAL.escapeHtml(c.name)+'</span>';
+    html += '<span class="chip'+(sel?' selected':'')+'" data-action="toggle-plot-char" data-pid="'+DAL.escapeHtml(p.id)+'" data-cid="'+DAL.escapeHtml(c.id)+'">'+DAL.escapeHtml(c.name)+'</span>';
   });
   if(!proj.characters||!proj.characters.length) html += ("<span style=\"font-size:var(--ts-xs);color:var(--c-text-faint)\">"+DAL.uiLabel("ui_No_characters_yet_cc52c8c","No characters yet")+"</span>");
   html += '</div></div>';
@@ -596,7 +608,7 @@ DAL.renderPlotDetail = function(proj, p){
   if(stale) html += ("<div class=\"stale-warning\" style=\"margin-bottom:12px\">"+DAL.uiLabel("ui__This_plot_thread_hasn_t_been_touched_in_3_a9f283f","⚠ This plot thread hasn't been touched in 30+ days")+"</div>");
   html += '<div style="font-size:var(--ts-xs);color:var(--c-text-faint);margin-bottom:12px">Last touched: '+DAL.formatDate(p.lastTouched||p.createdAt)+'</div>';
 
-  html += '<div style="display:flex;gap:8px"><button class="btn sm" data-action="mark-reviewed" data-pid="'+p.id+("\">"+DAL.uiLabel("ui_Mark_Reviewed_58f088c","Mark Reviewed")+"</button><button class=\"btn sm danger\" data-action=\"delete-plot\" data-pid=\"")+p.id+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></div>");
+  html += '<div style="display:flex;gap:8px"><button class="btn sm" data-action="mark-reviewed" data-pid="'+DAL.escapeHtml(p.id)+("\">"+DAL.uiLabel("ui_Mark_Reviewed_58f088c","Mark Reviewed")+"</button><button class=\"btn sm danger\" data-action=\"delete-plot\" data-pid=\"")+DAL.escapeHtml(p.id)+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></div>");
   html += '</div>';
   return html;
 };
@@ -611,16 +623,16 @@ DAL.renderTimeline = function(proj){
     ("<p class=\"writer-muted\">"+DAL.uiLabel("ui_Use_real_dates_fictional_dates_ages_or_era_fc372f6","Use real dates, fictional dates, ages, or eras. Sort order keeps non-calendar events in the sequence you intend.")+"</p><div class=\"split-view\"><div class=\"list-pane\">");
   if(!events.length) html += ("<div class=\"empty-state\"><h3>"+DAL.uiLabel("ui_No_Timeline_Events_d362909","No Timeline Events")+"</h3><p>"+DAL.uiLabel("ui_Add_the_first_event_in_your_story_or_world_32f31e1","Add the first event in your story or world history.")+"</p></div>");
   events.forEach(function(event){
-    html += '<button class="card hoverable'+(selected&&selected.id===event.id?' is-selected':'')+'" style="display:block;width:100%;text-align:left;margin-bottom:8px" data-action="timeline-select" data-event-id="'+event.id+'"><div class="comment-meta">'+DAL.escapeHtml(event.date||'Undated')+' · order '+DAL.escapeHtml(String(event.order||0))+'</div><strong>'+DAL.escapeHtml(event.title||'Untitled event')+'</strong>'+(event.location?'<div class="writer-muted">'+DAL.escapeHtml(event.location)+'</div>':'')+'</button>';
+    html += '<button class="card hoverable'+(selected&&selected.id===event.id?' is-selected':'')+'" style="display:block;width:100%;text-align:left;margin-bottom:8px" data-action="timeline-select" data-event-id="'+DAL.escapeHtml(event.id)+'"><div class="comment-meta">'+DAL.escapeHtml(event.date||'Undated')+' · order '+DAL.escapeHtml(String(event.order||0))+'</div><strong>'+DAL.escapeHtml(event.title||'Untitled event')+'</strong>'+(event.location?'<div class="writer-muted">'+DAL.escapeHtml(event.location)+'</div>':'')+'</button>';
   });
   html += '</div><div class="detail-pane">';
   if(!selected){
     if(events.length) html += ("<div class=\"empty-state\"><h3>"+DAL.uiLabel("ui_Select_an_Event_604bd99","Select an Event")+"</h3><p>"+DAL.uiLabel("ui_Choose_an_event_to_edit_its_date_links_and_1124d42","Choose an event to edit its date, links, and notes.")+"</p></div>");
   } else {
-    var charOptions = (proj.characters||[]).map(function(ch){return '<option value="'+ch.id+'"'+((selected.characterIds||[]).indexOf(ch.id)>=0?' selected':'')+'>'+DAL.escapeHtml(ch.name)+'</option>';}).join('');
-    var plotOptions = (proj.plots||[]).map(function(plot){return '<option value="'+plot.id+'"'+((selected.plotIds||[]).indexOf(plot.id)>=0?' selected':'')+'>'+DAL.escapeHtml(plot.title)+'</option>';}).join('');
-    var chapterOptions = ("<option value=\"\">"+DAL.uiLabel("ui_None_dc937b5","None")+"</option>")+(proj.chapters||[]).map(function(ch){return '<option value="'+ch.id+'"'+(selected.chapterId===ch.id?' selected':'')+'>'+DAL.escapeHtml(ch.title)+'</option>';}).join('');
-    html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Event_title_8ec4602","Event title")+"</label><input class=\"form-input\" data-timeline-field=\"title\" value=\"")+DAL.escapeHtml(selected.title||'')+("\"></div><div class=\"writer-form-grid\"><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldField_date","Date / era")+"</label><input class=\"form-input\" data-timeline-field=\"date\" value=\"")+DAL.escapeHtml(selected.date||'')+("\" placeholder=\""+DAL.uiLabel("ui_14_Frostfall_Year_302_c06419c","14 Frostfall, Year 302")+"\"></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldField_order","Sort order")+"</label><input class=\"form-input\" type=\"number\" step=\"1\" data-timeline-field=\"order\" value=\"")+DAL.escapeHtml(String(selected.order||0))+("\"></div></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldField_location","Location")+"</label><input class=\"form-input\" data-timeline-field=\"location\" value=\"")+DAL.escapeHtml(selected.location||'')+("\"></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldField_summary","Summary")+"</label><textarea class=\"form-textarea\" data-timeline-field=\"summary\">")+DAL.escapeHtml(selected.summary||'')+("</textarea></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldField_tags","Tags")+"</label><input class=\"form-input\" data-timeline-field=\"tags\" value=\"")+DAL.escapeHtml((selected.tags||[]).join(', '))+("\"></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("linkChapter","Chapter")+"</label><select class=\"form-select\" data-timeline-field=\"chapterId\">")+chapterOptions+("</select></div><div class=\"writer-form-grid\"><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldSection_characters","Characters")+"</label><select class=\"form-select\" multiple size=\"")+Math.min(6,Math.max(2,(proj.characters||[]).length))+'" data-timeline-field="characterIds">'+charOptions+("</select></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Plot_threads_fb443ac","Plot threads")+"</label><select class=\"form-select\" multiple size=\"")+Math.min(6,Math.max(2,(proj.plots||[]).length))+'" data-timeline-field="plotIds">'+plotOptions+'</select></div></div><button class="btn danger" data-action="timeline-delete" data-event-id="'+selected.id+("\">"+DAL.uiLabel("ui_Delete_Event_bea8ce4","Delete Event")+"</button>");
+    var charOptions = (proj.characters||[]).map(function(ch){return '<option value="'+DAL.escapeHtml(ch.id)+'"'+((selected.characterIds||[]).indexOf(ch.id)>=0?' selected':'')+'>'+DAL.escapeHtml(ch.name)+'</option>';}).join('');
+    var plotOptions = (proj.plots||[]).map(function(plot){return '<option value="'+DAL.escapeHtml(plot.id)+'"'+((selected.plotIds||[]).indexOf(plot.id)>=0?' selected':'')+'>'+DAL.escapeHtml(plot.title)+'</option>';}).join('');
+    var chapterOptions = ("<option value=\"\">"+DAL.uiLabel("ui_None_dc937b5","None")+"</option>")+(proj.chapters||[]).map(function(ch){return '<option value="'+DAL.escapeHtml(ch.id)+'"'+(selected.chapterId===ch.id?' selected':'')+'>'+DAL.escapeHtml(ch.title)+'</option>';}).join('');
+    html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Event_title_8ec4602","Event title")+"</label><input class=\"form-input\" data-timeline-field=\"title\" value=\"")+DAL.escapeHtml(selected.title||'')+("\"></div><div class=\"writer-form-grid\"><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldField_date","Date / era")+"</label><input class=\"form-input\" data-timeline-field=\"date\" value=\"")+DAL.escapeHtml(selected.date||'')+("\" placeholder=\""+DAL.uiLabel("ui_14_Frostfall_Year_302_c06419c","14 Frostfall, Year 302")+"\"></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldField_order","Sort order")+"</label><input class=\"form-input\" type=\"number\" step=\"1\" data-timeline-field=\"order\" value=\"")+DAL.escapeHtml(String(selected.order||0))+("\"></div></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldField_location","Location")+"</label><input class=\"form-input\" data-timeline-field=\"location\" value=\"")+DAL.escapeHtml(selected.location||'')+("\"></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldField_summary","Summary")+"</label><textarea class=\"form-textarea\" data-timeline-field=\"summary\">")+DAL.escapeHtml(selected.summary||'')+("</textarea></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldField_tags","Tags")+"</label><input class=\"form-input\" data-timeline-field=\"tags\" value=\"")+DAL.escapeHtml((selected.tags||[]).join(', '))+("\"></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("linkChapter","Chapter")+"</label><select class=\"form-select\" data-timeline-field=\"chapterId\">")+chapterOptions+("</select></div><div class=\"writer-form-grid\"><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("worldSection_characters","Characters")+"</label><select class=\"form-select\" multiple size=\"")+Math.min(6,Math.max(2,(proj.characters||[]).length))+'" data-timeline-field="characterIds">'+charOptions+("</select></div><div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Plot_threads_fb443ac","Plot threads")+"</label><select class=\"form-select\" multiple size=\"")+Math.min(6,Math.max(2,(proj.plots||[]).length))+'" data-timeline-field="plotIds">'+plotOptions+'</select></div></div><button class="btn danger" data-action="timeline-delete" data-event-id="'+DAL.escapeHtml(selected.id)+("\">"+DAL.uiLabel("ui_Delete_Event_bea8ce4","Delete Event")+"</button>");
   }
   return html+'</div></div>';
 };
@@ -641,7 +653,7 @@ DAL.renderLoreNotebook = function(proj){
     html += '<div class="lore-folder'+active+'" data-action="select-lore-folder" data-folder="'+DAL.escapeHtml(f)+'">'+DAL.escapeHtml(f)+' ('+count+')</div>';
     // Show entries in this folder
     proj.lore.entries.filter(function(e){ return e.folder === f; }).forEach(function(e){
-      html += '<div class="lore-entry-item" data-action="select-lore-entry" data-eid="'+e.id+'">'+DAL.escapeHtml(e.title)+'</div>';
+      html += '<div class="lore-entry-item" data-action="select-lore-entry" data-eid="'+DAL.escapeHtml(e.id)+'">'+DAL.escapeHtml(e.title)+'</div>';
     });
   });
   html += ("<div style=\"padding:8px 12px\"><button class=\"btn sm\" data-action=\"add-lore-folder\">"+DAL.uiLabel("ui__Folder_ac9c97a","+ Folder")+"</button></div>");
@@ -654,7 +666,7 @@ DAL.renderLoreNotebook = function(proj){
     html += ("<div class=\"empty-state\"><h3>"+DAL.uiLabel("ui_No_Entries_ebb426d","No Entries")+"</h3><p>"+DAL.uiLabel("ui_Add_lore_entries_to_this_category__e4add37","Add lore entries to this category.")+"</p><button class=\"btn primary\" data-action=\"add-lore-entry\">"+DAL.uiLabel("ui_Add_Entry_b65440d","Add Entry")+"</button></div>");
   } else {
     entries.forEach(function(e){
-      html += '<div class="card hoverable" style="margin-bottom:8px;cursor:pointer" data-action="select-lore-entry" data-eid="'+e.id+'"><div style="font-weight:600">'+DAL.escapeHtml(e.title)+'</div><div style="font-size:var(--ts-xs);color:var(--c-text-muted);margin-top:2px">'+(e.tags||[]).join(', ')+'</div><div style="font-size:var(--ts-xs);color:var(--c-text-faint);margin-top:2px">'+DAL.formatDate(e.updatedAt)+'</div></div>';
+      html += '<div class="card hoverable" style="margin-bottom:8px;cursor:pointer" data-action="select-lore-entry" data-eid="'+DAL.escapeHtml(e.id)+'"><div style="font-weight:600">'+DAL.escapeHtml(e.title)+'</div><div style="font-size:var(--ts-xs);color:var(--c-text-muted);margin-top:2px">'+DAL.escapeHtml((e.tags||[]).join(', '))+'</div><div style="font-size:var(--ts-xs);color:var(--c-text-faint);margin-top:2px">'+DAL.formatDate(e.updatedAt)+'</div></div>';
     });
   }
   html += '</div></div>';
@@ -676,19 +688,19 @@ DAL.renderLoreDetail = function(proj, entry){
   html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Linked_Characters_632d3a5","Linked Characters")+"</label><div style=\"display:flex;flex-wrap:wrap;gap:4px\">");
   (proj.characters||[]).forEach(function(c){
     var sel = (entry.linkedCharIds||[]).indexOf(c.id) >= 0;
-    html += '<span class="chip'+(sel?' selected':'')+'" data-action="toggle-lore-char" data-eid="'+entry.id+'" data-cid="'+c.id+'">'+DAL.escapeHtml(c.name)+'</span>';
+    html += '<span class="chip'+(sel?' selected':'')+'" data-action="toggle-lore-char" data-eid="'+DAL.escapeHtml(entry.id)+'" data-cid="'+DAL.escapeHtml(c.id)+'">'+DAL.escapeHtml(c.name)+'</span>';
   });
   html += '</div></div>';
 
   html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Linked_Plot_Threads_a4592dc","Linked Plot Threads")+"</label><div style=\"display:flex;flex-wrap:wrap;gap:4px\">");
   (proj.plots||[]).forEach(function(p){
     var sel = (entry.linkedPlotIds||[]).indexOf(p.id) >= 0;
-    html += '<span class="chip'+(sel?' selected':'')+'" data-action="toggle-lore-plot" data-eid="'+entry.id+'" data-pid="'+p.id+'">'+DAL.escapeHtml(p.title)+'</span>';
+    html += '<span class="chip'+(sel?' selected':'')+'" data-action="toggle-lore-plot" data-eid="'+DAL.escapeHtml(entry.id)+'" data-pid="'+DAL.escapeHtml(p.id)+'">'+DAL.escapeHtml(p.title)+'</span>';
   });
   html += '</div></div>';
 
   html += '<div style="font-size:var(--ts-xs);color:var(--c-text-faint);margin-top:12px">Last edited: '+DAL.formatDate(entry.updatedAt)+'</div>';
-  html += '<button class="btn sm danger" style="margin-top:12px" data-action="delete-lore-entry" data-eid="'+entry.id+("\">"+DAL.uiLabel("ui_Delete_Entry_41bb004","Delete Entry")+"</button>");
+  html += '<button class="btn sm danger" style="margin-top:12px" data-action="delete-lore-entry" data-eid="'+DAL.escapeHtml(entry.id)+("\">"+DAL.uiLabel("ui_Delete_Entry_41bb004","Delete Entry")+"</button>");
   html += '</div>';
   return html;
 };
@@ -780,7 +792,10 @@ DAL.renderMindMap = function(proj){
     var source = DAL.connectMode&&n.id===DAL.selectedNodeId ? ' connect-source' : '';
     var label = n.label || 'Idea';
     var color = /^#[0-9a-f]{6}$/i.test(n.color||'') ? n.color : '#a855f7';
-    html += '<div class="canvas-node mind-node'+sel+source+'" data-action="mm-select" data-nid="'+n.id+'" data-sel="mind-node:'+n.id+'" data-ctx="mind-node" data-ctx-id="'+n.id+'" tabindex="0" role="button" aria-label="Mind map idea '+DAL.escapeHtml(label)+'. Use arrow keys to move." style="left:'+(n.x||0)+'px;top:'+(n.y||0)+'px;--mind-color:'+color+'">'+
+    var x = Number(n.x), y = Number(n.y);
+    if(!Number.isFinite(x)) x = 0;
+    if(!Number.isFinite(y)) y = 0;
+    html += '<div class="canvas-node mind-node'+sel+source+'" data-action="mm-select" data-nid="'+DAL.escapeHtml(n.id)+'" data-sel="mind-node:'+DAL.escapeHtml(n.id)+'" data-ctx="mind-node" data-ctx-id="'+DAL.escapeHtml(n.id)+'" tabindex="0" role="button" aria-label="Mind map idea '+DAL.escapeHtml(label)+'. Use arrow keys to move." style="left:'+x+'px;top:'+y+'px;--mind-color:'+color+'">'+
       '<div class="canvas-node-title">'+DAL.escapeHtml(label)+'</div>'+
       (n.description?'<div class="canvas-node-preview">'+DAL.escapeHtml(n.description)+'</div>':'')+
       (n.type?'<div class="canvas-node-badge">'+DAL.escapeHtml(n.type)+'</div>':'')+
@@ -852,6 +867,31 @@ DAL.canvasData = function(proj){
   if(DAL.canvasBoard() === 'storygraph') return DAL.ensureAdventure(proj);
   if(!proj.mindmap) proj.mindmap = { nodes: [], edges: [] };
   return proj.mindmap;
+};
+DAL.mindMapNodePosition=function(proj,container){
+  var view=DAL.canvasView(proj),zoom=Math.max(0.1,Number(view.zoom)||1);
+  if(!container&&DAL.canvasEls){var elements=DAL.canvasEls();container=elements&&elements.container;}
+  var width=container&&container.clientWidth||800,height=container&&container.clientHeight||600;
+  var left=container&&container.scrollLeft||0,top=container&&container.scrollTop||0;
+  var visibleLeft=left/zoom,visibleTop=top/zoom,visibleRight=(left+width)/zoom,visibleBottom=(top+height)/zoom;
+  var centerX=(left+width/2)/zoom,centerY=(top+height/2)/zoom,cardWidth=Math.min(220,(visibleRight-visibleLeft)-16),cardHeight=Math.min(120,(visibleBottom-visibleTop)-16);
+  var offsets=[[0,0],[112,0],[-112,0],[0,150],[0,-150],[112,150],[-112,150],[112,-150],[-112,-150],[224,0],[-224,0],[0,300],[0,-300]];
+  var nodes=(proj.mindmap&&proj.mindmap.nodes)||[];
+  for(var i=0;i<offsets.length;i++){
+    var x=Math.max(8,Math.min(2420,Math.round(centerX-cardWidth/2+offsets[i][0]))),y=Math.max(8,Math.min(1540,Math.round(centerY-cardHeight/2+offsets[i][1])));
+    var visible=x>=visibleLeft&&y>=visibleTop&&x+cardWidth<=visibleRight&&y+cardHeight<=visibleBottom;
+    var occupied=nodes.some(function(node){return Math.abs((Number(node.x)||0)-x)<240&&Math.abs((Number(node.y)||0)-y)<135;});
+    if(visible&&!occupied)return{x:x,y:y};
+  }
+  return{x:Math.max(8,Math.min(2420,Math.round(centerX-cardWidth/2))),y:Math.max(8,Math.min(1540,Math.round(centerY-cardHeight/2)))};
+};
+DAL.revealMindMapNode=function(id){
+  var proj=DAL.state.projects[DAL.currentProjectId],node=DAL.mindMapNode(proj,id),elements=DAL.canvasEls&&DAL.canvasEls();
+  if(!proj||!node||!elements)return false;
+  var c=elements.container,v=DAL.canvasView(proj),z=Math.max(0.1,Number(v.zoom)||1);
+  c.scrollLeft=Math.max(0,Math.min(c.scrollWidth-c.clientWidth,(Number(node.x)||0)*z+110*z-c.clientWidth/2));
+  c.scrollTop=Math.max(0,Math.min(c.scrollHeight-c.clientHeight,(Number(node.y)||0)*z+60*z-c.clientHeight/2));
+  v.scrollX=c.scrollLeft;v.scrollY=c.scrollTop;DAL.saveState();return true;
 };
 
 DAL.applyCanvasView = function(proj){
@@ -925,7 +965,7 @@ DAL.resetCanvasView = function(proj){
     var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     nodes.forEach(function(n){
       var nx = n.x || 0, ny = n.y || 0;
-      var nodeEl = els.stage.querySelector('[data-nid="'+n.id+'"]');
+      var nodeEl = Array.from(els.stage.querySelectorAll('[data-nid]')).find(function(element){ return element.getAttribute('data-nid') === String(n.id); });
       var nw = nodeEl ? nodeEl.offsetWidth : 160, nh = nodeEl ? nodeEl.offsetHeight : 90;
       if(nx < minX) minX = nx;
       if(ny < minY) minY = ny;
@@ -1015,7 +1055,7 @@ DAL.drawCanvasEdges = function(proj, data){
   } else {
     (data.edges||[]).forEach(function(edge){
       var from = find(edge.from), to = find(edge.to);
-      if(from && to) parts.push(curve(from, to, 'data-action="mm-delete-edge" data-eid="'+edge.id+'" style="pointer-events:stroke;cursor:pointer"'));
+      if(from && to) parts.push(curve(from, to, 'data-action="mm-delete-edge" data-eid="'+DAL.escapeHtml(edge.id)+'" style="pointer-events:stroke;cursor:pointer"'));
     });
   }
   els.svg.innerHTML = parts.join('');
@@ -1194,8 +1234,8 @@ DAL.exportGroups = function(proj){
 
   groups.push({
     title: 'Whole project',
-    note: 'A bundle is the portable backup: project data, readable companion files, and every project asset. JSON contains project data only.',
-    items: [{ action: 'export-json', label: 'Project data (.json)' }, { action: 'export-project-bundle', label: 'Save project bundle (.dalz)' }]
+    note: 'A ZIP is the portable backup: it includes project data and every project asset. JSON contains project data only.',
+    items: [{ action: 'export-json', label: 'Project data (.json)' }, { action: 'export-project-bundle', label: 'Export project ZIP' }]
   });
   if(hasProse){
     groups.push({
@@ -1247,13 +1287,13 @@ DAL.renderExportGroups = function(proj){
     if(g.note) h += '<p class="export-group-note">' + DAL.escapeHtml(g.note) + '</p>';
     if(g.title === 'Manuscript' && DAL.writerExportControls) h += DAL.writerExportControls(proj);
     if(g.select){
-      h += '<select class="form-select export-group-select" id="' + g.select.id + '">';
+      h += '<select class="form-select export-group-select" id="' +DAL.escapeHtml(g.select.id)+ '">';
       g.select.options.forEach(function(o){ h += '<option value="' + o.value + '">' + DAL.escapeHtml(o.label) + '</option>'; });
       h += '</select>';
     }
     h += '<div class="export-group-actions">';
     g.items.forEach(function(it){
-      h += '<button class="btn' + (it.small ? ' sm' : '') + '" data-action="' + it.action + '" data-pid="' + proj.id + '">' + DAL.escapeHtml(it.label) + '</button>';
+      h += '<button class="btn' + (it.small ? ' sm' : '') + '" data-action="' + it.action + '" data-pid="' +DAL.escapeHtml(proj.id)+ '">' + DAL.escapeHtml(it.label) + '</button>';
     });
     return h + '</div></div>';
   }).join('');
@@ -1280,16 +1320,16 @@ DAL.renderStoryExport = function(proj){
     ("<div class=\"form-row\"><select class=\"form-select\" id=\"transferType\"><option value=\"character\">"+DAL.uiLabel("linkCharacter","Character")+"</option><option value=\"lore\">"+DAL.uiLabel("ui_Lore_Entry_e977faf","Lore Entry")+"</option><option value=\"plot\">"+DAL.uiLabel("ui_Plot_Thread_c5f1496","Plot Thread")+"</option></select>")+
     '<select class="form-select" id="transferItem"></select><select class="form-select" id="transferDest">';
   DAL.state.projectOrder.forEach(function(pid){
-    if(pid !== proj.id){ var p = DAL.state.projects[pid]; if(p) html += '<option value="'+pid+'">'+DAL.escapeHtml(p.name)+'</option>'; }
+    if(pid !== proj.id){ var p = DAL.state.projects[pid]; if(p) html += '<option value="'+DAL.escapeHtml(pid)+'">'+DAL.escapeHtml(p.name)+'</option>'; }
   });
-  html += '</select></div><button class="btn primary" style="margin-top:8px" data-action="transfer-item" data-pid="'+proj.id+("\">"+DAL.uiLabel("ui_Transfer_dde8bef","Transfer")+"</button></div>");
+  html += '</select></div><button class="btn primary" style="margin-top:8px" data-action="transfer-item" data-pid="'+DAL.escapeHtml(proj.id)+("\">"+DAL.uiLabel("ui_Transfer_dde8bef","Transfer")+"</button></div>");
 
   html += ("<div class=\"card\"><div style=\"font-weight:600;margin-bottom:8px\">"+DAL.uiLabel("ui_Version_Snapshots_5e0e682","Version Snapshots")+"</div>");
-  html += '<button class="btn sm" data-action="save-version" data-pid="'+proj.id+("\">"+DAL.uiLabel("ui_Save_Version_Now_374a742","Save Version Now")+"</button>");
+  html += '<button class="btn sm" data-action="save-version" data-pid="'+DAL.escapeHtml(proj.id)+("\">"+DAL.uiLabel("ui_Save_Version_Now_374a742","Save Version Now")+"</button>");
   if(proj.versions && proj.versions.length){
     html += '<div style="margin-top:8px;max-height:200px;overflow-y:auto">';
     proj.versions.forEach(function(v, i){
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--c-divider)"><span style="font-size:var(--ts-xs)">'+DAL.formatTimestamp(v.ts)+(v.auto?' (auto)':'')+' — '+v.snapWords+' words</span><button class="btn sm" data-action="restore-version" data-pid="'+proj.id+'" data-idx="'+i+("\">"+DAL.uiLabel("ui_Restore_a76e13b","Restore")+"</button></div>");
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--c-divider)"><span style="font-size:var(--ts-xs)">'+DAL.formatTimestamp(v.ts)+(v.auto?' (auto)':'')+' — '+v.snapWords+' words</span><button class="btn sm" data-action="restore-version" data-pid="'+DAL.escapeHtml(proj.id)+'" data-idx="'+i+("\">"+DAL.uiLabel("ui_Restore_a76e13b","Restore")+"</button></div>");
     });
     html += '</div>';
   } else {
@@ -1774,9 +1814,9 @@ DAL.handleStoryClick = function(action, el, e){
   if(action === 'mm-add-node'){
     var proj20 = DAL.state.projects[DAL.currentProjectId];
     DAL.pushHistory();
-    var node = { id: DAL.uid('mm'), label: 'New Idea', type: 'idea', description:'', tags:[], color:'#a855f7', x: 400, y: 300 };
+    var position=DAL.mindMapNodePosition(proj20),node = { id: DAL.uid('mm'), label: 'New Idea', type: 'idea', description:'', tags:[], color:'#a855f7', x: position.x, y: position.y };
     proj20.mindmap.nodes.push(node);
-    DAL.selectedNodeId=node.id;if(DAL.select)DAL.select('mind-node',node.id);proj20.updatedAt=Date.now();DAL.saveState();DAL.render();setTimeout(function(){DAL.showMindMapNodeEditor(node.id);},0);
+    DAL.selectedNodeId=node.id;if(DAL.select)DAL.select('mind-node',node.id);proj20.updatedAt=Date.now();DAL.saveState();DAL.render();setTimeout(function(){DAL.revealMindMapNode(node.id);DAL.showMindMapNodeEditor(node.id);},0);
     return;
   }
 
@@ -1784,7 +1824,7 @@ DAL.handleStoryClick = function(action, el, e){
   if(action === 'mm-edit-node'){DAL.selectedNodeId=el.getAttribute('data-nid');DAL.showMindMapNodeEditor(DAL.selectedNodeId);return;}
   if(action === 'mm-save-node'){var projEdit=DAL.state.projects[DAL.currentProjectId],editNode=DAL.mindMapNode(projEdit,DAL._editingMindNode);if(editNode){var nextLabel=(document.getElementById('mmNodeLabel')||{}).value||'';if(!nextLabel.trim()){DAL.toast((DAL.i18n?DAL.i18n.text("ui_Give_the_idea_a_title_fb8b0ab","Give the idea a title"):"Give the idea a title"),'warning');return;}DAL.pushHistory();editNode.label=nextLabel.trim();editNode.type=((document.getElementById('mmNodeType')||{}).value||'idea').trim()||'idea';editNode.description=((document.getElementById('mmNodeDescription')||{}).value||'').trim();editNode.color=(document.getElementById('mmNodeColor')||{}).value||'#a855f7';editNode.tags=((document.getElementById('mmNodeTags')||{}).value||'').split(',').map(function(tag){return tag.trim();}).filter(Boolean);editNode.updatedAt=Date.now();projEdit.updatedAt=Date.now();DAL.selectedNodeId=editNode.id;DAL.closeModal();DAL.saveState();DAL.render();}return;}
   if(action === 'mm-start-connect'){DAL.connectMode=true;DAL.selectedNodeId=el.getAttribute('data-nid');DAL.render();DAL.toast((DAL.i18n?DAL.i18n.text("ui_Select_another_idea_to_connect_2048d66","Select another idea to connect"):"Select another idea to connect"),'info');return;}
-  if(action === 'mm-add-child'){var projChild=DAL.state.projects[DAL.currentProjectId],parent=DAL.mindMapNode(projChild,el.getAttribute('data-nid'));if(parent){DAL.pushHistory();var child={id:DAL.uid('mm'),label:'New Idea',type:'idea',description:'',tags:[],color:parent.color||'#a855f7',x:Math.min(2480,(parseFloat(parent.x)||0)+220),y:Math.min(1620,(parseFloat(parent.y)||0)+80)};projChild.mindmap.nodes.push(child);DAL.connectMindMapNodes(projChild,parent.id,child.id);DAL.selectedNodeId=child.id;if(DAL.select)DAL.select('mind-node',child.id);projChild.updatedAt=Date.now();DAL.saveState();DAL.render();setTimeout(function(){DAL.showMindMapNodeEditor(child.id);},0);}return;}
+  if(action === 'mm-add-child'){var projChild=DAL.state.projects[DAL.currentProjectId],parent=DAL.mindMapNode(projChild,el.getAttribute('data-nid'));if(parent){DAL.pushHistory();var child={id:DAL.uid('mm'),label:'New Idea',type:'idea',description:'',tags:[],color:parent.color||'#a855f7',x:Math.min(2480,(parseFloat(parent.x)||0)+220),y:Math.min(1620,(parseFloat(parent.y)||0)+80)};projChild.mindmap.nodes.push(child);DAL.connectMindMapNodes(projChild,parent.id,child.id);DAL.selectedNodeId=child.id;if(DAL.select)DAL.select('mind-node',child.id);projChild.updatedAt=Date.now();DAL.saveState();DAL.render();setTimeout(function(){DAL.revealMindMapNode(child.id);DAL.showMindMapNodeEditor(child.id);},0);}return;}
   if(action === 'mm-clear-connections'){var projClear=DAL.state.projects[DAL.currentProjectId],clearId=el.getAttribute('data-nid'),before=projClear.mindmap.edges.length;if(projClear.mindmap.edges.some(function(edge){return edge.from===clearId||edge.to===clearId;})){DAL.pushHistory();projClear.mindmap.edges=projClear.mindmap.edges.filter(function(edge){return edge.from!==clearId&&edge.to!==clearId;});projClear.updatedAt=Date.now();DAL.saveState();DAL.render();DAL.toast((DAL.i18n?DAL.i18n.text("ui_Idea_connections_removed_58bbac0","Idea connections removed"):"Idea connections removed"),'success');}else DAL.toast((DAL.i18n?DAL.i18n.text("ui_This_idea_has_no_connections_4b23b99","This idea has no connections"):"This idea has no connections"),'info');return;}
 
   if(action === 'mm-connect'){
@@ -2064,7 +2104,7 @@ document.addEventListener('change', function(e){
     else if(type === 'plot') items = proj.plots || [];
     var sel = document.getElementById('transferItem');
     if(sel){
-      sel.innerHTML = items.map(function(it){ return '<option value="'+it.id+'">'+DAL.escapeHtml(it.title||it.name)+'</option>'; }).join('');
+      sel.innerHTML = items.map(function(it){ return '<option value="'+DAL.escapeHtml(it.id)+'">'+DAL.escapeHtml(it.title||it.name)+'</option>'; }).join('');
     }
   }
 });
@@ -2247,12 +2287,12 @@ DAL.openFindMatch = function(m){
 
 DAL.showComments = function(){
   var proj=DAL.currentWriterProject(); if(!proj) return; var data=DAL.writerProject(proj), current=DAL.chapterById(proj,DAL.selectedChapterId), h='';
-  h+='<div class="writer-toolbar"><select class="form-select" id="commentChapter">'+(proj.chapters||[]).map(function(c){return '<option value="'+c.id+'"'+(c.id===DAL.selectedChapterId?' selected':'')+'>'+DAL.escapeHtml(c.title)+'</option>';}).join('')+("</select><button class=\"btn primary\" data-action=\"new-comment\">"+DAL.uiLabel("addComment","Add comment")+"</button><span class=\"writer-status\">")+data.comments.filter(function(c){return !c.resolved;}).length+' unresolved</span></div>';
-  h+='<div class="comment-list">'+(data.comments.length?data.comments.slice().reverse().map(function(c){var ch=DAL.chapterById(proj,c.chapterId);return '<div class="comment-item'+(c.resolved?' comment-resolved':'')+'"><strong>'+DAL.escapeHtml(ch?ch.title:'Deleted chapter')+(c.label?' · '+DAL.escapeHtml(c.label):'')+'</strong><div>'+DAL.escapeHtml(c.body||'')+'</div>'+(c.anchor?'<div class="comment-meta">“'+DAL.escapeHtml(c.anchor)+'”</div>':'')+'<div class="comment-meta">'+DAL.formatTimestamp(c.createdAt)+'</div><div class="writer-tool-actions">'+(c.anchor?'<button class="btn sm" data-action="comment-jump" data-comment-id="'+c.id+("\">"+DAL.uiLabel("ui_Jump_to_text_af2b85e","Jump to text")+"</button>"):'')+'<button class="btn sm" data-action="comment-edit" data-comment-id="'+c.id+("\">"+DAL.uiLabel("menuEdit","Edit")+"</button><button class=\"btn sm\" data-action=\"resolve-comment\" data-comment-id=\"")+c.id+'">'+(c.resolved?'Reopen':'Resolve')+'</button><button class="btn sm danger" data-action="delete-comment" data-comment-id="'+c.id+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></div></div>");}).join(''):("<p class=\"writer-muted\">"+DAL.uiLabel("ui_No_annotations_yet_Add_notes_to_keep_revis_5b184f9","No annotations yet. Add notes to keep revision thoughts beside the manuscript.")+"</p>"))+'</div>';
+  h+='<div class="writer-toolbar"><select class="form-select" id="commentChapter">'+(proj.chapters||[]).map(function(c){return '<option value="'+DAL.escapeHtml(c.id)+'"'+(c.id===DAL.selectedChapterId?' selected':'')+'>'+DAL.escapeHtml(c.title)+'</option>';}).join('')+("</select><button class=\"btn primary\" data-action=\"new-comment\">"+DAL.uiLabel("addComment","Add comment")+"</button><span class=\"writer-status\">")+data.comments.filter(function(c){return !c.resolved;}).length+' unresolved</span></div>';
+  h+='<div class="comment-list">'+(data.comments.length?data.comments.slice().reverse().map(function(c){var ch=DAL.chapterById(proj,c.chapterId);return '<div class="comment-item'+(c.resolved?' comment-resolved':'')+'"><strong>'+DAL.escapeHtml(ch?ch.title:'Deleted chapter')+(c.label?' · '+DAL.escapeHtml(c.label):'')+'</strong><div>'+DAL.escapeHtml(c.body||'')+'</div>'+(c.anchor?'<div class="comment-meta">“'+DAL.escapeHtml(c.anchor)+'”</div>':'')+'<div class="comment-meta">'+DAL.formatTimestamp(c.createdAt)+'</div><div class="writer-tool-actions">'+(c.anchor?'<button class="btn sm" data-action="comment-jump" data-comment-id="'+DAL.escapeHtml(c.id)+("\">"+DAL.uiLabel("ui_Jump_to_text_af2b85e","Jump to text")+"</button>"):'')+'<button class="btn sm" data-action="comment-edit" data-comment-id="'+DAL.escapeHtml(c.id)+("\">"+DAL.uiLabel("menuEdit","Edit")+"</button><button class=\"btn sm\" data-action=\"resolve-comment\" data-comment-id=\"")+DAL.escapeHtml(c.id)+'">'+(c.resolved?'Reopen':'Resolve')+'</button><button class="btn sm danger" data-action="delete-comment" data-comment-id="'+DAL.escapeHtml(c.id)+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></div></div>");}).join(''):("<p class=\"writer-muted\">"+DAL.uiLabel("ui_No_annotations_yet_Add_notes_to_keep_revis_5b184f9","No annotations yet. Add notes to keep revision thoughts beside the manuscript.")+"</p>"))+'</div>';
   DAL.modal((DAL.i18n?DAL.i18n.text("ui_Comments_Annotations_5a90bde","Comments & Annotations"):"Comments & Annotations"),h,{wide:true,footer:("<button class=\"btn\" data-action=\"close-modal\">"+DAL.uiLabel("close","Close")+"</button>")});
 };
 DAL.commentEditor = function(existing){
-  var proj=DAL.currentWriterProject(), selection=DAL._writerRange?String(DAL._writerRange):(window.getSelection?String(window.getSelection()):''), labels=['To Revise','Question','Research','Important','D&D / Session','Study Note'], h='<div class="form-group"><label class="form-label">Chapter</label><select class="form-select" id="commentEditChapter">'+(proj.chapters||[]).map(function(c){return '<option value="'+c.id+'"'+((existing?existing.chapterId:DAL.selectedChapterId)===c.id?' selected':'')+'>'+DAL.escapeHtml(c.title)+'</option>';}).join('')+'</select></div><div class="form-group"><label class="form-label">Label</label><select class="form-select" id="commentLabel"><option value="">General</option>'+labels.map(function(label){return '<option value="'+label+'"'+(existing&&existing.label===label?' selected':'')+'>'+label+'</option>';}).join('')+'</select></div><div class="form-group"><label class="form-label">Anchored text (optional)</label><input class="form-input" id="commentAnchor" value="'+DAL.escapeHtml(existing?existing.anchor:(selection||''))+'" placeholder="Selected manuscript text"></div><div class="form-group"><label class="form-label">Note</label><textarea class="form-textarea" id="commentBody" placeholder="Revision note…">'+DAL.escapeHtml(existing?existing.body:'')+'</textarea></div>';
+  var proj=DAL.currentWriterProject(), selection=DAL._writerRange?String(DAL._writerRange):(window.getSelection?String(window.getSelection()):''), labels=['To Revise','Question','Research','Important','D&D / Session','Study Note'], h='<div class="form-group"><label class="form-label">Chapter</label><select class="form-select" id="commentEditChapter">'+(proj.chapters||[]).map(function(c){return '<option value="'+DAL.escapeHtml(c.id)+'"'+((existing?existing.chapterId:DAL.selectedChapterId)===c.id?' selected':'')+'>'+DAL.escapeHtml(c.title)+'</option>';}).join('')+'</select></div><div class="form-group"><label class="form-label">Label</label><select class="form-select" id="commentLabel"><option value="">General</option>'+labels.map(function(label){return '<option value="'+label+'"'+(existing&&existing.label===label?' selected':'')+'>'+label+'</option>';}).join('')+'</select></div><div class="form-group"><label class="form-label">Anchored text (optional)</label><input class="form-input" id="commentAnchor" value="'+DAL.escapeHtml(existing?existing.anchor:(selection||''))+'" placeholder="Selected manuscript text"></div><div class="form-group"><label class="form-label">Note</label><textarea class="form-textarea" id="commentBody" placeholder="Revision note…">'+DAL.escapeHtml(existing?existing.body:'')+'</textarea></div>';
   DAL._editingComment=existing?existing.id:null; DAL.modal(existing?'Edit Comment':'Add Comment',h,{footer:'<button class="btn" data-action="show-comments">Cancel</button><button class="btn primary" data-action="save-comment">Save</button>'});
 };
 
@@ -2491,9 +2531,9 @@ DAL.showReadability = function(){
 
 DAL.BEAT_TEMPLATES={three:[['Setup','Introduce the ordinary world and story promise.'],['Inciting incident','Disrupt the status quo.'],['First turning point','Commit to the central conflict.'],['Midpoint','Raise stakes with a reversal or revelation.'],['Second turning point','Force the final choice.'],['Climax','Confront the central conflict.'],['Resolution','Show the changed world.']],cat:[['Opening Image','A snapshot of the protagonist before change.'],['Theme Stated','A question or lesson is voiced.'],['Setup','Introduce stakes, wants, and flaws.'],['Catalyst','A life-changing event lands.'],['Debate','Hesitation before commitment.'],['Break into Two','Enter the new world.'],['B Story','Introduce the relationship thread.'],['Midpoint','A false victory or defeat.'],['All Is Lost','The lowest point.'],['Finale','Prove the theme through action.'],['Final Image','Mirror the opening image after change.']],hero:[['Ordinary World','Establish the familiar life.'],['Call to Adventure','Present the disruptive invitation.'],['Refusal of the Call','Show resistance or fear.'],['Meeting the Mentor','Gain guidance or a tool.'],['Crossing the Threshold','Enter the unfamiliar world.'],['Tests, Allies, Enemies','Learn the new rules.'],['Ordeal','Face the central fear.'],['Reward','Claim insight or treasure.'],['Road Back','Turn toward home.'],['Resurrection','Pass a final, transforming test.'],['Return with the Elixir','Bring change back to the world.']]};
 DAL.showBeats = function(){var proj=DAL.currentWriterProject();if(!proj)return;var d=DAL.writerProject(proj), cur=d.structure,h=("<p class=\"writer-muted\">"+DAL.uiLabel("ui_Choose_a_story_structure_It_creates_a_sepa_fc3a962","Choose a story structure. It creates a separate checklist and never changes your chapters.")+"</p><div class=\"writer-tool-actions\"><button class=\"btn\" data-action=\"apply-beats\" data-template=\"three\">"+DAL.uiLabel("ui_Three_Act_c370107","Three-Act")+"</button><button class=\"btn\" data-action=\"apply-beats\" data-template=\"cat\">"+DAL.uiLabel("ui_Save_the_Cat_4fd7735","Save the Cat")+"</button><button class=\"btn\" data-action=\"apply-beats\" data-template=\"hero\">"+DAL.uiLabel("ui_Hero_s_Journey_ad39fea","Hero’s Journey")+"</button></div>");
- if(cur){h+='<div class="beat-list">'+cur.beats.map(function(b,i){return '<div class="beat-row"><input type="checkbox" data-action="toggle-beat" data-beat-index="'+i+'"'+(b.done?' checked':'')+'><label><strong>'+DAL.escapeHtml(b.title)+'</strong><span class="writer-muted"> '+DAL.escapeHtml(b.note)+'</span></label><select class="form-select" data-action="attach-beat" data-beat-index="'+i+("\"><option value=\"\">"+DAL.uiLabel("ui_Attach_to_chapter__997f604","Attach to chapter…")+"</option>")+(proj.chapters||[]).map(function(c){return '<option value="'+c.id+'"'+(b.chapterId===c.id?' selected':'')+'>'+DAL.escapeHtml(c.title)+'</option>';}).join('')+'</select></div>';}).join('')+'</div>';}
+ if(cur){h+='<div class="beat-list">'+cur.beats.map(function(b,i){return '<div class="beat-row"><input type="checkbox" data-action="toggle-beat" data-beat-index="'+i+'"'+(b.done?' checked':'')+'><label><strong>'+DAL.escapeHtml(b.title)+'</strong><span class="writer-muted"> '+DAL.escapeHtml(b.note)+'</span></label><select class="form-select" data-action="attach-beat" data-beat-index="'+i+("\"><option value=\"\">"+DAL.uiLabel("ui_Attach_to_chapter__997f604","Attach to chapter…")+"</option>")+(proj.chapters||[]).map(function(c){return '<option value="'+DAL.escapeHtml(c.id)+'"'+(b.chapterId===c.id?' selected':'')+'>'+DAL.escapeHtml(c.title)+'</option>';}).join('')+'</select></div>';}).join('')+'</div>';}
  DAL.modal((DAL.i18n?DAL.i18n.text("ui_Story_Structure_Templates_26ddd97","Story Structure Templates"):"Story Structure Templates"),h,{wide:true,footer:("<button class=\"btn\" data-action=\"close-modal\">"+DAL.uiLabel("ui_Done_11a6767","Done")+"</button>")});};
-DAL.showCorkboard=function(){var proj=DAL.currentWriterProject();if(!proj)return;var h=("<p class=\"writer-muted\">"+DAL.uiLabel("ui_Drag_cards_to_reorder_Titles_synopsis_and__68b2f73","Drag cards to reorder. Titles, synopsis, and status save as you edit.")+"</p><div class=\"corkboard\" data-drop=\"chapter\" data-sort-item=\"[data-drag=\"chapter\"]\">")+(proj.chapters||[]).map(function(c){var syn=c.synopsis||'';return '<article class="cork-card" data-drag="chapter:'+c.id+'" data-drag-label="'+DAL.escapeHtml(c.title)+'"><span class="cork-grip" data-drag-handle=".cork-grip">⋮⋮</span><input class="form-input" data-cork-field="title" data-cork-id="'+c.id+'" value="'+DAL.escapeHtml(c.title)+("\" aria-label=\""+DAL.uiLabel("ui_Chapter_title_2c8cec3","Chapter title")+"\"><textarea class=\"form-textarea\" data-cork-field=\"synopsis\" data-cork-id=\"")+c.id+("\" placeholder=\""+DAL.uiLabel("ui_Synopsis_8eb3755","Synopsis")+"\">")+DAL.escapeHtml(syn)+'</textarea><select class="form-select" data-cork-field="status" data-cork-id="'+c.id+'"><option value="draft"'+((c.status||'draft')==='draft'?' selected':'')+(">"+DAL.uiLabel("ui_Draft_ebf12ef","Draft")+"</option><option value=\"revising\"")+(c.status==='revising'?' selected':'')+(">"+DAL.uiLabel("ui_Revising_c8f3fff","Revising")+"</option><option value=\"complete\"")+(c.status==='complete'?' selected':'')+(">"+DAL.uiLabel("ui_Complete_143b270","Complete")+"</option></select><div class=\"cork-meta\"><span>")+DAL.countWords(c.contentHTML)+' words</span><span>'+DAL.escapeHtml(c.status||'draft')+'</span></div></article>';}).join('')+'</div>';DAL.modal((DAL.i18n?DAL.i18n.text("menu_show_corkboard","Corkboard"):"Corkboard"),h,{wide:true,footer:("<button class=\"btn primary\" data-action=\"close-modal\">"+DAL.uiLabel("ui_Done_11a6767","Done")+"</button>")});};
+DAL.showCorkboard=function(){var proj=DAL.currentWriterProject();if(!proj)return;var h=("<p class=\"writer-muted\">"+DAL.uiLabel("ui_Drag_cards_to_reorder_Titles_synopsis_and__68b2f73","Drag cards to reorder. Titles, synopsis, and status save as you edit.")+"</p><div class=\"corkboard\" data-drop=\"chapter\" data-sort-item=\"[data-drag=\"chapter\"]\">")+(proj.chapters||[]).map(function(c){var syn=c.synopsis||'';return '<article class="cork-card" data-drag="chapter:'+DAL.escapeHtml(c.id)+'" data-drag-label="'+DAL.escapeHtml(c.title)+'"><span class="cork-grip" data-drag-handle=".cork-grip">⋮⋮</span><input class="form-input" data-cork-field="title" data-cork-id="'+DAL.escapeHtml(c.id)+'" value="'+DAL.escapeHtml(c.title)+("\" aria-label=\""+DAL.uiLabel("ui_Chapter_title_2c8cec3","Chapter title")+"\"><textarea class=\"form-textarea\" data-cork-field=\"synopsis\" data-cork-id=\"")+DAL.escapeHtml(c.id)+("\" placeholder=\""+DAL.uiLabel("ui_Synopsis_8eb3755","Synopsis")+"\">")+DAL.escapeHtml(syn)+'</textarea><select class="form-select" data-cork-field="status" data-cork-id="'+DAL.escapeHtml(c.id)+'"><option value="draft"'+((c.status||'draft')==='draft'?' selected':'')+(">"+DAL.uiLabel("ui_Draft_ebf12ef","Draft")+"</option><option value=\"revising\"")+(c.status==='revising'?' selected':'')+(">"+DAL.uiLabel("ui_Revising_c8f3fff","Revising")+"</option><option value=\"complete\"")+(c.status==='complete'?' selected':'')+(">"+DAL.uiLabel("ui_Complete_143b270","Complete")+"</option></select><div class=\"cork-meta\"><span>")+DAL.countWords(c.contentHTML)+' words</span><span>'+DAL.escapeHtml(c.status||'draft')+'</span></div></article>';}).join('')+'</div>';DAL.modal((DAL.i18n?DAL.i18n.text("menu_show_corkboard","Corkboard"):"Corkboard"),h,{wide:true,footer:("<button class=\"btn primary\" data-action=\"close-modal\">"+DAL.uiLabel("ui_Done_11a6767","Done")+"</button>")});};
 
 DAL.makeSnapshot=function(proj,name){var wc=DAL.getProjectWordCount(proj),snap=DAL.snapshotProject(proj);proj.versions=proj.versions||[];proj.versions.push({ts:Date.now(),auto:false,name:name||'',snapWords:wc.total,data:snap});DAL.trimVersions(proj);DAL.saveState();};
 DAL.showVersions=function(){var proj=DAL.currentWriterProject();if(!proj)return;var h=("<div class=\"writer-toolbar\"><input class=\"form-input\" id=\"snapshotName\" placeholder=\""+DAL.uiLabel("ui_Optional_snapshot_name_280810e","Optional snapshot name")+"\"><button class=\"btn primary\" data-action=\"take-snapshot\">"+DAL.uiLabel("ui_Take_snapshot_2c86d50","Take snapshot")+"</button></div><div class=\"version-list\">")+((proj.versions||[]).slice().reverse().map(function(v,ri){var i=proj.versions.length-1-ri;return '<div class="version-item"><strong>'+DAL.escapeHtml(v.name||((v.auto?'Auto snapshot':'Untitled snapshot')))+'</strong><div class="comment-meta">'+DAL.formatTimestamp(v.ts)+' · '+v.snapWords+' words</div><div class="writer-tool-actions"><button class="btn sm" data-action="preview-version" data-version-index="'+i+("\">"+DAL.uiLabel("ui_Preview_324b134","Preview")+"</button><button class=\"btn sm\" data-action=\"compare-version\" data-version-index=\"")+i+("\">"+DAL.uiLabel("ui_Compare_e888155","Compare")+"</button><button class=\"btn sm danger\" data-action=\"confirm-restore-version\" data-version-index=\"")+i+("\">"+DAL.uiLabel("ui_Restore_project_d162a6c","Restore project")+"</button></div></div>");}).join('')||("<p class=\"writer-muted\">"+DAL.uiLabel("ui_No_snapshots_yet__dce32a8","No snapshots yet.")+"</p>"))+'</div>';DAL.modal((DAL.i18n?DAL.i18n.text("ui_Version_History_2eba52c","Version History"):"Version History"),h,{wide:true,footer:("<button class=\"btn\" data-action=\"close-modal\">"+DAL.uiLabel("close","Close")+"</button>")});};
@@ -2502,7 +2542,7 @@ DAL.restoreVersionConfirm=function(i){var p=DAL.currentWriterProject();DAL.modal
 DAL.compareVersion=function(i){
   var p=DAL.currentWriterProject(),v=p&&p.versions&&p.versions[i];if(!v)return;
   var old=(v.data&&v.data.chapters)||[], current=p.chapters||[], ids={}; old.forEach(function(ch){ids[ch.id]=true;}); current.forEach(function(ch){ids[ch.id]=true;});
-  var rows=Object.keys(ids).map(function(id){var before=old.find(function(ch){return ch.id===id;}),now=current.find(function(ch){return ch.id===id;}),beforeWords=before?DAL.countWords(before.contentHTML):0,nowWords=now?DAL.countWords(now.contentHTML):0,status=!before?'Added since snapshot':!now?'Removed since snapshot':(before.title===now.title&&before.contentHTML===now.contentHTML?'Unchanged':'Changed'),title=(now||before).title;return '<div class="version-item"><strong>'+DAL.escapeHtml(title)+'</strong><div class="comment-meta">'+status+' · '+beforeWords+' → '+nowWords+' words'+(beforeWords===nowWords?'':' ('+(nowWords-beforeWords>0?'+':'')+(nowWords-beforeWords)+')')+'</div>'+(before?'<button class="btn sm" data-action="restore-version-chapter-confirm" data-version-index="'+i+'" data-chapter-id="'+before.id+'">Restore this chapter</button>':'')+'</div>';}).join('');
+  var rows=Object.keys(ids).map(function(id){var before=old.find(function(ch){return ch.id===id;}),now=current.find(function(ch){return ch.id===id;}),beforeWords=before?DAL.countWords(before.contentHTML):0,nowWords=now?DAL.countWords(now.contentHTML):0,status=!before?'Added since snapshot':!now?'Removed since snapshot':(before.title===now.title&&before.contentHTML===now.contentHTML?'Unchanged':'Changed'),title=(now||before).title;return '<div class="version-item"><strong>'+DAL.escapeHtml(title)+'</strong><div class="comment-meta">'+status+' · '+beforeWords+' → '+nowWords+' words'+(beforeWords===nowWords?'':' ('+(nowWords-beforeWords>0?'+':'')+(nowWords-beforeWords)+')')+'</div>'+(before?'<button class="btn sm" data-action="restore-version-chapter-confirm" data-version-index="'+i+'" data-chapter-id="'+DAL.escapeHtml(before.id)+'">Restore this chapter</button>':'')+'</div>';}).join('');
   DAL.modal((DAL.i18n?DAL.i18n.text("ui_Compare_Snapshot_ff03366","Compare Snapshot"):"Compare Snapshot"),'<p class="writer-muted">'+DAL.formatTimestamp(v.ts)+' compared with the current project. Exact content and title changes are detected.</p><div class="version-list">'+(rows||'<p>No chapters in either version.</p>')+'</div>',{wide:true,footer:'<button class="btn" data-action="show-versions">Back</button>'});
 };
 DAL.restoreVersionChapter=function(versionIndex,chapterId){

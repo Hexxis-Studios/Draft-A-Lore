@@ -53,14 +53,14 @@
       var sounds = ((p.assets && p.assets.sounds) || []).length;
       if(sounds) counts.push(sounds + ' sound' + (sounds === 1 ? '' : 's'));
 
-      html += '<div class="book-spine" data-action="'+(primary === 'play' ? 'open-player' : 'open-reader')+'" data-pid="'+p.id+'" style="background:linear-gradient(135deg,'+color+','+color+'88);color:#fff">'+
+      html += '<div class="book-spine" data-action="'+(primary === 'play' ? 'open-player' : 'open-reader')+'" data-pid="'+DAL.escapeHtml(p.id)+'" style="background:linear-gradient(135deg,'+color+','+color+'88);color:#fff">'+
         '<div class="book-spine-kind">'+(primary === 'play' ? 'Adventure' : 'Book')+'</div>'+
         '<div class="book-spine-title">'+DAL.escapeHtml((p.cover && p.cover.title) || p.name)+'</div>'+
         (author ? '<div class="book-spine-author">'+DAL.escapeHtml(author)+'</div>' : '')+
         (counts.length ? '<div class="book-spine-meta">'+DAL.escapeHtml(counts.join(' \u00b7 '))+'</div>' : '')+
         '<div class="book-spine-actions">'+
-          (entry.modes.indexOf('read') >= 0 ? '<button class="btn sm" data-action="open-reader" data-pid="'+p.id+("\">"+DAL.uiLabel("ui_Read_9b9a8d0","Read")+"</button>") : '')+
-          (entry.modes.indexOf('play') >= 0 ? '<button class="btn sm" data-action="open-player" data-pid="'+p.id+("\">"+DAL.uiLabel("ui_Play_436e610","Play")+"</button>") : '')+
+          (entry.modes.indexOf('read') >= 0 ? '<button class="btn sm" data-action="open-reader" data-pid="'+DAL.escapeHtml(p.id)+("\">"+DAL.uiLabel("ui_Read_9b9a8d0","Read")+"</button>") : '')+
+          (entry.modes.indexOf('play') >= 0 ? '<button class="btn sm" data-action="open-player" data-pid="'+DAL.escapeHtml(p.id)+("\">"+DAL.uiLabel("ui_Play_436e610","Play")+"</button>") : '')+
         '</div>'+
       '</div>';
     });
@@ -296,8 +296,8 @@
     function label(key,fallback){return DAL.escapeHtml(DAL.importText(key,fallback));}
     var canFolder = typeof window.showDirectoryPicker === 'function';
     var body = '<p>'+label('importProjectHelp','Bring in a project someone shared with you.')+'</p>'+
-      '<div class="import-choice"><button class="btn block primary" data-action="import-project-bundle">'+label('chooseBundle','Choose a project bundle (.dalz or .zip)')+'</button>'+
-      '<span class="asset-note">'+label('bundleImportHelp','Recommended. A bundle includes project.json, readable companion files, and the complete Assets/ folder.')+'</span></div>'+
+      '<div class="import-choice"><button class="btn block primary" data-action="import-project-bundle">'+label('chooseBundle','Choose a project ZIP (.zip)')+'</button>'+
+      '<span class="asset-note">'+label('bundleImportHelp','A project ZIP includes your project and all artwork and audio files.')+'</span></div>'+
       '<div class="import-choice">'+
         '<button class="btn block" data-action="import-project-file">'+label('chooseProjectFile','Choose a project file (.json)')+'</button>'+
         '<span class="asset-note">'+label('jsonImportHelp','Artwork and audio come across only if they were embedded in the file.')+'</span>'+
@@ -308,7 +308,7 @@
         '<span class="asset-note">'+label('folderImportHelp','Reads project.json plus the whole Assets/ folder beside it, so images and sound arrive too.')+'</span>'+
       '</div>';
     } else {
-      body += '<p class="asset-note">'+label('folderImportUnavailable','Folder import needs a desktop Chromium browser. A project bundle works in this browser.')+'</p>';
+      body += '<p class="asset-note">'+label('folderImportUnavailable','Folder import needs a desktop Chromium browser. A project ZIP works in this browser.')+'</p>';
     }
     DAL.modal(DAL.importText('importProject','Import Project'), body);
   };
@@ -480,7 +480,7 @@
       var proj=DAL.adoptImportedProject(data,true);
       var result=await DAL.finishImportedProject(proj);
       var external=DAL.allAssets(proj).filter(function(asset){return !asset.inline;});
-      if(external.length)DAL.toast(DAL.importText('jsonExternalMedia','This JSON refers to '+external.length+' separately stored media file'+(external.length===1?'':'s')+'. Use the original project bundle or folder to transfer all artwork and audio.',{count:external.length}),'warning');
+      if(external.length)DAL.toast(DAL.importText('jsonExternalMedia','This JSON refers to '+external.length+' separately stored media file'+(external.length===1?'':'s')+'. Use the original project ZIP or folder to transfer all artwork and audio.',{count:external.length}),'warning');
       return result;
     }catch(error){DAL.toast(DAL.importText('projectFileImportFailed','Could not import that file: '+(error&&error.message||'unknown error'),{reason:error&&error.message||'unknown error'}),'error');return false;}
   };

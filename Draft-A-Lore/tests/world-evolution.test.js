@@ -125,6 +125,13 @@ test('cancelling analysis terminates the worker without changing writing or deci
   assert.equal(await result,null);assert.equal(project.encyclopedia,previous);assert.equal(workers[0].terminated,true);assert.equal(blobs.size,0);
 });
 
+test('manual world scans fall back locally when a WebView worker fails and release resources',async()=>{
+  const {DAL,sandbox,workers,blobs}=backgroundApi(),project=DAL.defaultProject('Book','novel');
+  project.chapters=[{id:'c',title:'Chapter 1',order:0,contentHTML:'Mira crossed the bridge. Mira returned.'}];DAL.state.projects[project.id]=project;
+  sandbox.Worker=class FailedWorker{constructor(url){this.url=url;workers.push(this);}terminate(){this.terminated=true;}postMessage(){this.onerror(new Error('Worker blocked'));}};
+  const result=await DAL.analyzeWorldAsync(project,{continuity:true,manual:true});
+  assert.equal(result.foreground,true);assert.ok(result.report);assert.equal(workers[0].terminated,true);assert.equal(blobs.size,0);
+});
 test('missing worker support does not run automatic analysis on the typing thread',async()=>{
   const {DAL,load}=api(),project=DAL.defaultProject('Book','novel');DAL.state.projects[project.id]=project;let scans=0;DAL.runContinuity=()=>{scans++;return {issues:[]};};load('world-analysis.js');
   assert.equal(await DAL.analyzeWorldAsync(project,{continuity:true}),null);assert.equal(scans,0);

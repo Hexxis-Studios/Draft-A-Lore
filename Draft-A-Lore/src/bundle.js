@@ -1,6 +1,6 @@
-/* Cross-browser project bundles.
+/* Portable ZIP archives.
 
-   A .dalz file is an ordinary ZIP archive containing the same readable project
+   A project ZIP is an ordinary archive containing the same readable project
    layout a linked folder uses. Keeping the ZIP code here lets the offline app
    move a complete project in browsers that cannot offer a directory picker. */
 
@@ -63,25 +63,25 @@
   /* STORE-only ZIPs are deliberately simple and work with the archive tools
      already present on Windows, macOS and common Unix installations. */
   DAL.makeZip = function(files){
-    if(!Array.isArray(files)||files.length>MAX_ENTRIES) throw new Error('This project has too many files for a ZIP bundle.');
+    if(!Array.isArray(files)||files.length>MAX_ENTRIES) throw new Error('This project has too many files for a ZIP archive.');
     var now = new Date(), time = dosTime(now), date = dosDate(now), localSize = 0, centralSize = 0, offset = 0;
     var names=Object.create(null);
     var entries = (files || []).map(function(file){
       var name = bytes(file.name), data = file.data instanceof Uint8Array ? file.data : new Uint8Array(file.data);
       var normalized=String(file.name).replace(/\\/g,'/');
       if(unsafePath(normalized)) throw new Error('Cannot export an unsafe file path.');
-      if(names[normalized]) throw new Error('Cannot export duplicate file paths. Rename the conflicting assets before saving a bundle.');
+      if(names[normalized]) throw new Error('Cannot export duplicate file paths. Rename the conflicting assets before saving the ZIP file.');
       names[normalized]=true;
-      if(!name.length||name.length>65535) throw new Error('A bundle filename is empty or too long.');
-      if(data.length>MAX_ENTRY_BYTES) throw new Error('A bundle file exceeds the 512 MB safety limit.');
-      if(localSize+centralSize+76+name.length*2+data.length+22>MAX_ARCHIVE_BYTES) throw new Error('This bundle exceeds the 512 MB safety limit.');
+      if(!name.length||name.length>65535) throw new Error('A ZIP entry name is empty or too long.');
+      if(data.length>MAX_ENTRY_BYTES) throw new Error('A file in the ZIP exceeds the 512 MB safety limit.');
+      if(localSize+centralSize+76+name.length*2+data.length+22>MAX_ARCHIVE_BYTES) throw new Error('The ZIP file exceeds the 512 MB safety limit.');
       var entry = { name: name, data: data, crc: crc32(data), time: time, date: date, offset: offset };
       offset += 30 + name.length + data.length;
       localSize += 30 + name.length + data.length;
       centralSize += 46 + name.length;
       return entry;
     });
-    if(entries.length > 65535) throw new Error('This project has too many files for a ZIP bundle.');
+    if(entries.length > 65535) throw new Error('This project has too many files for a ZIP archive.');
     var out = new Uint8Array(localSize + centralSize + 22), at = 0, centralAt, i, e;
     for(i=0; i<entries.length; i++){
       e = entries[i];
@@ -115,12 +115,12 @@
      available; our own output stays STORE-only to keep bundle creation small. */
   DAL.readZip = function(input){
     var data = input instanceof Uint8Array ? input : new Uint8Array(input);
-    if(data.length > MAX_ARCHIVE_BYTES) throw new Error('That bundle is larger than the 512 MB safety limit.');
+    if(data.length > MAX_ARCHIVE_BYTES) throw new Error('That ZIP file is larger than the 512 MB safety limit.');
     var end = findEndRecord(data), count = get16(data, end+10), at = get32(data, end+16), entries = [], i;
     if(get16(data, end+4) || get16(data, end+6) || count === 0xffff || get32(data, end+12) === 0xffffffff || at === 0xffffffff){
-      throw new Error('ZIP64 bundles are not supported.');
+      throw new Error('ZIP64 archives are not supported.');
     }
-    if(count > MAX_ENTRIES) throw new Error('That bundle contains too many files.');
+    if(count > MAX_ENTRIES) throw new Error('That ZIP file contains too many files.');
     var unpackedTotal = 0, seenNames = Object.create(null);
     for(i=0; i<count; i++){
       if(get32(data, at) !== 0x02014b50) throw new Error('The ZIP directory is damaged.');
@@ -128,13 +128,13 @@
       var nameLength = get16(data, at+28), extraLength = get16(data, at+30), commentLength = get16(data, at+32), localOffset = get32(data, at+42);
       if(at + 46 + nameLength + extraLength + commentLength > data.length) throw new Error('The ZIP directory is truncated.');
       var entryName = text(data.slice(at+46, at+46+nameLength)).replace(/\\/g, '/');
-      if(unsafePath(entryName)) throw new Error('The bundle contains an unsafe file path.');
-      if(seenNames[entryName]) throw new Error('The bundle contains duplicate file paths.');
+      if(unsafePath(entryName)) throw new Error('The ZIP file contains an unsafe file path.');
+      if(seenNames[entryName]) throw new Error('The ZIP file contains duplicate file paths.');
       seenNames[entryName] = true;
-      if(flags & 1) throw new Error('Encrypted ZIP bundles are not supported.');
+      if(flags & 1) throw new Error('Encrypted ZIP files are not supported.');
       if(size > MAX_ENTRY_BYTES) throw new Error('The ZIP entry “'+entryName+'” is larger than the safety limit.');
       unpackedTotal += size;
-      if(unpackedTotal > MAX_UNPACKED_BYTES) throw new Error('The expanded bundle is larger than the 1 GB safety limit.');
+      if(unpackedTotal > MAX_UNPACKED_BYTES) throw new Error('The expanded ZIP is larger than the 1 GB safety limit.');
       if(method === 8 && compressed && size / compressed > 200) throw new Error('The ZIP entry “'+entryName+'” has an unsafe compression ratio.');
       entries.push({ name: entryName, flags: flags, method: method, compressed: compressed, size: size, crc:get32(data, at+16), offset: localOffset });
       at += 46 + nameLength + extraLength + commentLength;
@@ -185,7 +185,7 @@
   }
 
   DAL.projectTextFiles = function(proj,linkedBible){
-    if(!proj) throw new Error('Open a project before saving a bundle.');
+    if(!proj) throw new Error('Open a project before saving its ZIP file.');
     var snapshot = DAL.clone(proj), files = [];
     delete snapshot.folderHandle;
     var portable={project:snapshot};
@@ -323,18 +323,18 @@
 
   DAL.exportProjectBundle = function(projectId){
     var proj = DAL.state.projects[projectId || DAL.currentProjectId];
-    if(!proj){ DAL.toast((DAL.i18n?DAL.i18n.text("ui_Open_a_project_before_saving_a_bundle__fec49f1","Open a project before saving a bundle."):"Open a project before saving a bundle."), 'error'); return Promise.resolve(false); }
-    DAL.toast((DAL.i18n?DAL.i18n.text("ui_Packing_project_bundle__dc6e043","Packing project bundle…"):"Packing project bundle…"), 'info');
+    if(!proj){ DAL.toast((DAL.i18n?DAL.i18n.text("ui_Open_a_project_before_saving_a_bundle__fec49f1","Open a project before saving its ZIP file."):"Open a project before saving its ZIP file."), 'error'); return Promise.resolve(false); }
+    DAL.toast((DAL.i18n?DAL.i18n.text("ui_Packing_project_bundle__dc6e043","Preparing project ZIP…"):"Preparing project ZIP…"), 'info');
     return DAL.projectBundleBytes(proj).then(async function(data){
-      if(!await DAL.download(DAL.sanitizeFilename(proj.name)+'.dalz',data,'application/zip'))return false;
-      DAL.toast('Project bundle export completed for “'+proj.name+'”. Check the saved file.','success');
+      if(!await DAL.download(DAL.sanitizeFilename(proj.name)+'.zip',data,'application/zip'))return false;
+      DAL.toast('Project ZIP export completed for “'+proj.name+'”. Check the saved file.','success');
       return true;
-    }).catch(function(err){ DAL.toast('Could not save project bundle: '+err.message, 'error'); return false; });
+    }).catch(function(err){ DAL.toast('Could not save project ZIP: '+err.message, 'error'); return false; });
   };
 
   function bundleProjectEntry(zip){
     var entries=zip.entries.filter(function(item){return /(^|\/)project\.json$/.test(item.name);});
-    if(entries.length>1)throw new Error('That archive contains multiple project.json files. Import one project bundle at a time.');
+    if(entries.length>1)throw new Error('That ZIP file contains more than one project. Import one project ZIP at a time.');
     return entries[0]||null;
   }
 
@@ -344,17 +344,17 @@
   DAL.importProjectBundle = function(file){
     if(!file) return Promise.resolve(false);
     if(DAL._folderRestoreBusy||DAL._workspaceRestoreBusy||DAL._bundleImportBusy){DAL.toast('Wait for the current import or restore to finish.','info');return Promise.resolve(false);}
-    if(file.size > MAX_ARCHIVE_BYTES){ DAL.toast(DAL.importText('bundleImportTooLarge','That bundle is larger than the 512 MB safety limit.'), 'error'); return Promise.resolve(false); }
+    if(file.size > MAX_ARCHIVE_BYTES){ DAL.toast(DAL.importText('bundleImportTooLarge','That ZIP file is larger than the 512 MB safety limit.'), 'error'); return Promise.resolve(false); }
     var workspace=DAL.state;
     DAL._bundleImportBusy=true;
-    DAL.toast(DAL.importText('readingProjectBundle','Reading project bundle…'), 'info');
+    DAL.toast(DAL.importText('readingProjectBundle','Reading project ZIP…'), 'info');
     return file.arrayBuffer().then(function(buffer){
       var zip = DAL.readZip(buffer), projectEntry = bundleProjectEntry(zip);
-      if(!projectEntry) throw new Error(DAL.importText('bundleProjectMissing','That archive has no project.json.'));
+      if(!projectEntry) throw new Error(DAL.importText('bundleProjectMissing','That ZIP file does not contain a Draft A Lore project.'));
       var root = projectEntry.name.slice(0, -'project.json'.length);
       return zip.read(projectEntry).then(function(raw){
         var data;
-        try{ data = JSON.parse(text(raw)); }catch(err){ throw new Error(DAL.importText('bundleProjectInvalid','project.json is not valid JSON.')); }
+        try{ data = JSON.parse(text(raw)); }catch(err){ throw new Error(DAL.importText('bundleProjectInvalid','The project data in that ZIP file is damaged.')); }
         var proj = DAL.adoptImportedProject(data, true), jobs = [];
         DAL.ASSET_FOLDERS.forEach(function(folder){
           var prefix = root+'Assets/'+folder.dir+'/';
@@ -382,14 +382,14 @@
           });
         });
       });
-    }).catch(function(err){ DAL.toast(DAL.importText('bundleImportFailed','Could not import that bundle: '+(err&&err.message||'unknown error'),{reason:err&&err.message||'unknown error'}), 'error'); return false; }).finally(function(){DAL._bundleImportBusy=false;});
+    }).catch(function(err){ DAL.toast(DAL.importText('bundleImportFailed','Could not import that ZIP file: '+(err&&err.message||'unknown error'),{reason:err&&err.message||'unknown error'}), 'error'); return false; }).finally(function(){DAL._bundleImportBusy=false;});
   };
 
   DAL.chooseProjectBundle = function(){
     var input = document.getElementById('projectBundleImportInput');
     if(!input){
       input = document.createElement('input'); input.type = 'file'; input.id = 'projectBundleImportInput';
-      input.accept = '.dalz,.zip,application/zip,application/x-zip-compressed'; input.hidden = true;
+      input.accept = '.zip,.dalz,application/zip,application/x-zip-compressed'; input.hidden = true;
       document.body.appendChild(input);
       input.addEventListener('change', function(){ var file = input.files && input.files[0]; input.value = ''; if(file) DAL.importProjectBundle(file); });
     }
@@ -400,7 +400,7 @@
     if(!after || !after.parentNode || after.parentNode.querySelector('[data-action="save-project-bundle"]')) return;
     var button = document.createElement('button');
     button.className = 'btn sm bundle-save-button'; button.setAttribute('data-action', 'save-project-bundle'); button.setAttribute('data-pid', projectId || DAL.currentProjectId || '');
-    button.textContent = 'Save bundle (.dalz)'; after.parentNode.insertBefore(button, after.nextSibling);
+    button.textContent = 'Export project ZIP'; after.parentNode.insertBefore(button, after.nextSibling);
   }
 
   DAL.registerAfterRender(function(){

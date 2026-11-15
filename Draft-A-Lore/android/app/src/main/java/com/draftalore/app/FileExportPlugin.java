@@ -37,6 +37,15 @@ public class FileExportPlugin extends Plugin {
     private PluginCall pendingPicker;
     private Runnable expiry;
 
+    static boolean isSafeFilename(String name) {
+        if (name == null || name.isEmpty() || name.length() > 200) return false;
+        for (int i = 0; i < name.length(); i++) {
+            char ch = name.charAt(i);
+            if (ch == '/' || ch == '\\' || Character.isISOControl(ch)) return false;
+        }
+        return true;
+    }
+
     @PluginMethod
     public void begin(PluginCall call) {
         io.execute(() -> {
@@ -44,7 +53,7 @@ public class FileExportPlugin extends Plugin {
             Integer size = call.getInt("size");
             String name = call.getString("filename", "");
             String type = call.getString("mime", "application/octet-stream");
-            if (size == null || size < 0 || size > MAX_BYTES || name.isEmpty() || name.length() > 200 || name.matches(".*[\\\\/\\p{Cntrl}].*")) {
+            if (size == null || size < 0 || size > MAX_BYTES || !isSafeFilename(name)) {
                 call.reject("Choose a valid filename and an export no larger than 256 MB."); return;
             }
             if (!type.matches("[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+")) type = "application/octet-stream";

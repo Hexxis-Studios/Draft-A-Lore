@@ -55,11 +55,11 @@
       html += '<div class="asset-sound-list">';
       list.forEach(function(a){
         var src = DAL.assetSrc(proj, a.id);
-        html += '<div class="asset-sound" data-drag="asset:'+a.id+'" data-ctx="asset" data-ctx-id="'+a.id+'">'+
+        html += '<div class="asset-sound" data-drag="asset:'+DAL.escapeHtml(a.id)+'" data-ctx="asset" data-ctx-id="'+DAL.escapeHtml(a.id)+'">'+
           '<div class="asset-sound-head">'+
             '<span class="asset-sound-name" title="'+DAL.escapeHtml(a.name)+'">'+DAL.escapeHtml(a.name)+'</span>'+
             '<span class="asset-meta">'+DAL.formatBytes(a.size)+(a.duration ? ' \u00b7 '+DAL.formatDuration(a.duration) : '')+'</span>'+
-            '<button class="btn sm danger" data-action="asset-delete" data-aid="'+a.id+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button>")+
+            '<button class="btn sm danger" data-action="asset-delete" data-aid="'+DAL.escapeHtml(a.id)+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button>")+
           '</div>'+
           (src ? '<audio class="asset-audio" controls preload="none" src="'+src+'"></audio>'
                : ("<div class=\"asset-missing\">"+DAL.uiLabel("ui_Stored_bytes_could_not_be_read_Re_import_t_f73dcea","Stored bytes could not be read. Re-import this file.")+"</div>"))+
@@ -70,13 +70,13 @@
       html += '<div class="asset-grid">';
       list.forEach(function(a){
         var src = DAL.assetSrc(proj, a.id);
-        html += '<figure class="asset-card'+(activeKey === 'svgs' ? ' svg' : '')+'" data-drag="asset:'+a.id+'" data-ctx="asset" data-ctx-id="'+a.id+'">'+
+        html += '<figure class="asset-card'+(activeKey === 'svgs' ? ' svg' : '')+'" data-drag="asset:'+DAL.escapeHtml(a.id)+'" data-ctx="asset" data-ctx-id="'+DAL.escapeHtml(a.id)+'">'+
           '<div class="asset-thumb">'+(src ? '<img src="'+src+'" alt="'+DAL.escapeHtml(a.name)+'" loading="lazy">' : ("<span class=\"asset-missing\">"+DAL.uiLabel("ui_Missing_bytes_b5531a8","Missing bytes")+"</span>"))+'</div>'+
           '<figcaption>'+
             '<span class="asset-name" title="'+DAL.escapeHtml(a.name)+'">'+DAL.escapeHtml(a.name)+'</span>'+
             '<span class="asset-meta">'+DAL.formatBytes(a.size)+'</span>'+
           '</figcaption>'+
-          '<button class="btn sm danger asset-card-del" data-action="asset-delete" data-aid="'+a.id+("\" title=\""+DAL.uiLabel("ui_Delete_asset_49c2e3f","Delete asset")+"\">×</button>")+
+          '<button class="btn sm danger asset-card-del" data-action="asset-delete" data-aid="'+DAL.escapeHtml(a.id)+("\" title=\""+DAL.uiLabel("ui_Delete_asset_49c2e3f","Delete asset")+"\">×</button>")+
         '</figure>';
       });
       html += '</div>';

@@ -76,7 +76,13 @@ DAL.formatDate = function(ts){
   return d.toLocaleDateString();
 };
 DAL.todayKey = function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
-DAL.sanitizeFilename = function(name){ return (name||'untitled').replace(/[^a-z0-9_-]/gi,'_').replace(/_+/g,'_').toLowerCase().substring(0,60); };
+DAL.sanitizeFilename = function(name){
+  var text = String(name || 'untitled').normalize('NFKC').replace(/[^\p{L}\p{N}_-]/gu,'_').replace(/_+/g,'_').toLowerCase();
+  text = Array.from(text).slice(0,60).join('');
+  if(!text || /^_+$/.test(text)) text = 'untitled';
+  if(/^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(text)) text = '_'+text;
+  return text;
+};
 DAL.download = function(filename, content, mime){
   var blob = new Blob([content], {type: mime||'text/plain'});
   if(DAL.saveExportBlob)return DAL.saveExportBlob(filename,blob);
@@ -301,6 +307,31 @@ DAL.normalizeProject = function(project, sanitize){
       });
     });
     if(sanitize) p.adventure.items.forEach(function(item){ if(item && typeof item === 'object') item.imageDataUrl = DAL.safeImportedImage(item.imageDataUrl); });
+  }
+  // Snapshots may originate in shared files, including files imported by older
+  // versions. Sanitize them before preview, comparison, undo, or restoration.
+  {
+    function protectSnapshot(snapshot){
+      function cleanImage(image){ if(image && typeof image === 'object'){ image.dataUrl = DAL.safeImportedImage(image.dataUrl); image.src = DAL.safeImportedImage(image.src); } }
+      if(Array.isArray(snapshot.chapters)) snapshot.chapters.forEach(function(chapter){
+        if(!chapter || typeof chapter !== 'object') return;
+        chapter.contentHTML = DAL.sanitizeRichHTML(chapter.contentHTML);
+        if(sanitize && Array.isArray(chapter.images)) chapter.images.forEach(cleanImage);
+      });
+      if(!sanitize) return;
+      if(snapshot.cover && typeof snapshot.cover === 'object') snapshot.cover.imageDataUrl = DAL.safeImportedImage(snapshot.cover.imageDataUrl);
+      if(Array.isArray(snapshot.images)) snapshot.images.forEach(cleanImage);
+      if(Array.isArray(snapshot.characters)) snapshot.characters.forEach(function(character){ if(character && typeof character === 'object') character.image = DAL.safeImportedImage(character.image); });
+      var adventure = snapshot.adventure;
+      if(adventure && typeof adventure === 'object'){
+        if(Array.isArray(adventure.items)) adventure.items.forEach(function(item){ if(item && typeof item === 'object') item.imageDataUrl = DAL.safeImportedImage(item.imageDataUrl); });
+        if(Array.isArray(adventure.nodes)) adventure.nodes.forEach(function(node){ if(node && Array.isArray(node.images)) node.images.forEach(cleanImage); });
+      }
+    }
+    p.versions.forEach(function(version){
+      if(version.data && typeof version.data === 'object' && !Array.isArray(version.data)) protectSnapshot(version.data);
+    });
+    ['history','redoStack'].forEach(function(key){ p[key].forEach(protectSnapshot); });
   }
   p.schemaVersion = DAL.SCHEMA_VERSION;
   return p;
@@ -753,6 +784,20 @@ DAL.finishStateLoad = function(){
   DAL.state.autosave = (DAL.state.autosave !== false);
 };
 
+DAL.preserveDamagedWorkspace = function(raw){
+  try{
+    var storage = window.localStorage, key = 'draftALoreRecovery-'+Date.now(), suffix = 0;
+    while(storage.getItem(key) !== null) key = 'draftALoreRecovery-'+Date.now()+'-'+(++suffix);
+    storage.setItem(key, raw);
+    if(storage.getItem(key) !== raw) throw new Error('Recovery copy verification failed.');
+    return true;
+  } catch(error){
+    DAL._damagedWorkspaceProtected = true;
+    DAL.storageHealth.lastError = error && error.message ? error.message : String(error);
+    return false;
+  }
+};
+
 DAL.loadState = function(){
   DAL._initStorage();
   var saved = DAL._storage.getItem('draftALore'), localState = null;
@@ -761,16 +806,16 @@ DAL.loadState = function(){
   } catch(e){
     /* Keep the unreadable bytes recoverable. Never silently overwrite the only
        copy of a damaged workspace with a blank default. */
-    try{ if(saved) window.localStorage.setItem('draftALoreRecovery-'+Date.now(), saved); }catch(ignore){}
-    DAL._loadWarning = 'Saved data could not be read. A recovery copy was preserved on this device.';
+    var localPreserved = DAL.preserveDamagedWorkspace(saved);
+    DAL._loadWarning = localPreserved ? 'Saved data could not be read. A recovery copy was preserved on this device.' : 'Saved data could not be read and a recovery copy could not be made. The original is protected; export your work and free device storage before restarting.';
   }
   var localSavedAt = parseInt(DAL._storage.getItem('draftALoreSavedAt'), 10) || 0;
   return DAL.stateDB.get().then(function(record){
     if(record && record.json && (!localState || (record.savedAt || 0) >= localSavedAt)){
       try{ DAL.state = DAL.normalizeWorkspace(JSON.parse(record.json), false); }
       catch(recordError){
-        try{ window.localStorage.setItem('draftALoreRecovery-'+Date.now(), record.json); }catch(ignoreRecordRecovery){}
-        DAL._loadWarning = 'The newest saved workspace was damaged. A recovery copy was preserved and the last readable copy was opened.';
+        var recordPreserved = DAL.preserveDamagedWorkspace(record.json);
+        DAL._loadWarning = recordPreserved ? 'The newest saved workspace was damaged. A recovery copy was preserved and the last readable copy was opened.' : 'The newest saved workspace was damaged and a recovery copy could not be made. The original is protected; export your work and free device storage before restarting.';
         throw recordError;
       }
       DAL.storageHealth.mode = 'indexedDB';
@@ -783,7 +828,10 @@ DAL.loadState = function(){
   }).catch(function(e){
     DAL.state = localState || DAL.defaultState();
     if(!localState) DAL.storageHealth.lastError = e && e.message ? e.message : String(e);
-  }).then(function(){ DAL.finishStateLoad(); return DAL.state; });
+  }).then(function(){
+    if(DAL._damagedWorkspaceProtected) DAL._loadWarning = 'Damaged workspace data could not be copied. Saving is paused to protect the original; export your work and free device storage before restarting.';
+    DAL.finishStateLoad(); return DAL.state;
+  });
 };
 
 DAL.saveState = function(immediate){
@@ -801,6 +849,13 @@ DAL.saveState = function(immediate){
 
 DAL._saveChain = Promise.resolve();
 DAL._doSave = function(){
+  if(DAL._damagedWorkspaceProtected){
+    DAL.storageHealth.persistent = false;
+    DAL.storageHealth.mode = 'memory';
+    DAL.setSaveStatus('memory');
+    DAL.toast('Saving is paused to protect damaged data. Export your work, free device storage, then restart the app.', 'error');
+    return Promise.resolve(false);
+  }
   try{
     DAL.checkVersionSnapshot();
     var toSave = Object.assign({}, DAL.state, { projects:{} });
@@ -1742,9 +1797,9 @@ DAL.linkFolder = async function(projectId){
     DAL.modal((DAL.i18n?DAL.i18n.text("ui_Folder_Sync_Unavailable_b66b532","Folder Sync Unavailable"):"Folder Sync Unavailable"),
       '<p class="folder-sync-note">Linking a folder lets Draft A Lore write your project straight into a folder on your device as plain files, and keep it up to date as you write.</p>'+
       '<p class="folder-sync-note">It relies on the browser\u2019s File System Access API, which today only desktop Chrome, Edge, Brave and Opera provide. This build is running somewhere that does not offer it, so there is no folder picker to open.</p>'+
-      '<p class="folder-sync-note"><strong>Use a project bundle instead.</strong> It writes the same content and assets to one portable file you can save anywhere, including a folder your cloud drive syncs.</p>',
+      '<p class="folder-sync-note"><strong>Use a project ZIP instead.</strong> It writes the same content and assets to one portable file you can save anywhere, including a folder your cloud drive syncs.</p>',
       { footer: '<button class="btn" data-action="close-modal">Close</button>'+
-                '<button class="btn primary" data-action="save-project-bundle" data-pid="'+projectId+'">Save project bundle (.dalz)</button>' });
+                '<button class="btn primary" data-action="save-project-bundle" data-pid="'+DAL.escapeHtml(projectId)+'">Export project ZIP</button>' });
     return;
   }
   try{
@@ -1819,7 +1874,7 @@ DAL.syncFolder = async function(){
       var chDir2 = await DAL.getDir(handle, 'characters');
       for(var j=0; j<proj.characters.length; j++){
         var c = proj.characters[j];
-        await DAL.writeFile(chDir2, DAL.sanitizeFilename(c.name)+'.txt', c.backstory||'');
+        await DAL.writeFile(chDir2, String(j+1).padStart(2,'0')+'-'+DAL.sanitizeFilename(c.name)+'.txt', c.backstory||'');
       }
     }
     if(proj.lore && proj.lore.entries && proj.lore.entries.length){
@@ -1827,14 +1882,14 @@ DAL.syncFolder = async function(){
       for(var k=0; k<proj.lore.entries.length; k++){
         var entry = proj.lore.entries[k];
         var entryDir = await DAL.getDir(loreDir, DAL.sanitizeFilename(entry.folder||'miscellaneous'));
-        await DAL.writeFile(entryDir, DAL.sanitizeFilename(entry.title)+'.txt', entry.content||'');
+        await DAL.writeFile(entryDir, String(k+1).padStart(2,'0')+'-'+DAL.sanitizeFilename(entry.title)+'.txt', entry.content||'');
       }
     }
     if(proj.plots && proj.plots.length){
       var plotDir = await DAL.getDir(handle, 'plots');
       for(var m=0; m<proj.plots.length; m++){
         var p = proj.plots[m];
-        await DAL.writeFile(plotDir, DAL.sanitizeFilename(p.title)+'.txt', p.description||'');
+        await DAL.writeFile(plotDir, String(m+1).padStart(2,'0')+'-'+DAL.sanitizeFilename(p.title)+'.txt', p.description||'');
       }
     }
     if(DAL.syncAssetFolder) await DAL.syncAssetFolder(handle, proj);
@@ -2392,7 +2447,7 @@ DAL.MENUS = {
       { label: 'Manuscript (.md)', labelKey: 'menu_export_manuscript_md',       action: 'export-manuscript-md' },
       { label: 'Manuscript (.html)', labelKey: 'menu_export_manuscript_html',     action: 'export-manuscript-html' },
       { label: 'Word manuscript (.docx)', labelKey: 'menu_export_manuscript_docx', action: 'export-manuscript-docx' },
-      { label: 'Portable project bundle (.dalz)', labelKey: 'menu_save_project_bundle', action: 'save-project-bundle' },
+      { label: 'Portable project ZIP (.zip)', labelKey: 'menu_save_project_bundle', action: 'save-project-bundle' },
       { label: 'All export options…', labelKey: 'menu_export_project',    action: 'export-project' }
     ] },
     { label: 'Whole workspace', labelKey: 'menu_whole_workspace', submenu: [

@@ -95,6 +95,8 @@ test('project cards use real ICU plural counts with readable English failure fal
   const before=JSON.stringify(DAL.state);
   assert.match(DAL.renderProjects(),/1 manuscript word<\/div>/);
   count=1234;assert.match(DAL.renderProjects(),/1,234 manuscript words/);
+  DAL.state.projects.qa.type='rpg';count=3;assert.match(DAL.renderProjects(),/3 words<\/div>/);assert.doesNotMatch(DAL.renderProjects(),/3 manuscript words/);
+  DAL.state.projects.qa.type='dual';count=1234;
   DAL.i18n.lastError=new Error('engine unavailable');assert.match(DAL.renderProjects(),/1,234 manuscript words/);
   assert.ok(!DAL.renderProjects().includes('{count'));assert.equal(JSON.stringify(DAL.state),before);
   DAL.state.projectOrder=[];assert.match(DAL.renderProjects(),/>Import Project<\/button>/);

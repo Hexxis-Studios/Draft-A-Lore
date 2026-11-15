@@ -11,6 +11,7 @@ The same file is copied to releases/ next to the Windows installer, along with
 the .ico the Windows shortcut needs as a real file.
 """
 import base64
+import hashlib
 import json
 import mimetypes
 import os
@@ -52,8 +53,7 @@ def data_uri(path):
 
     A Git LFS pointer stub is treated as absent: it is a small text file
     standing in for the real bytes, and embedding it would produce a valid-
-    looking but broken image. Run `pplx project files hydrate-lfs <path>` to
-    materialize the real asset before building.
+    looking but broken image. Fetch the Git LFS asset before building.
     """
     if not os.path.isfile(path):
         return None
@@ -218,6 +218,15 @@ def render_html(include_web_metadata=True):
 <meta name="apple-mobile-web-app-title" content="Draft A Lore">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">''' if include_web_metadata else ''
 
+    init_js = """if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { DAL.init(); });
+} else {
+    DAL.init();
+}"""
+    def script_hash(content):
+        return base64.b64encode(hashlib.sha256(('\n' + content + '\n').encode('utf-8')).digest()).decode('ascii')
+    script_policy = "script-src 'sha256-" + script_hash(all_js) + "' 'sha256-" + script_hash(init_js) + "' https://accounts.google.com/gsi/client; "
+
     return f'''<!DOCTYPE html>
 <!--
   Draft A Lore v1.0.0 — created by Daymien Vanhorn
@@ -235,7 +244,7 @@ def render_html(include_web_metadata=True):
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0F1116">
 <meta name="application-name" content="Draft A Lore">
-<meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://www.googleapis.com https://accounts.google.com https://oauth2.googleapis.com http://127.0.0.1:*; object-src 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="{script_policy}connect-src 'self' https://www.googleapis.com https://accounts.google.com https://oauth2.googleapis.com http://127.0.0.1:*; object-src 'none'; base-uri 'none'">
 {web_meta}
 <title>Draft A Lore</title>
 {head_links}
@@ -248,11 +257,7 @@ def render_html(include_web_metadata=True):
 {all_js}
 </script>
 <script>
-if (document.readyState === 'loading') {{
-    document.addEventListener('DOMContentLoaded', function() {{ DAL.init(); }});
-}} else {{
-    DAL.init();
-}}
+{init_js}
 </script>
 </body>
 </html>'''
@@ -277,7 +282,7 @@ def build(copy_release=True):
 
     os.makedirs(DIST, exist_ok=True)
     dist_file = os.path.join(DIST, OUTPUT_NAME)
-    with open(dist_file, 'w', encoding='utf-8') as f:
+    with open(dist_file, 'w', encoding='utf-8', newline='\n') as f:
         f.write(html)
     copy_assets(DIST)
     print(f'Built dist/{OUTPUT_NAME} ({len(html):,} bytes)')

@@ -57,6 +57,13 @@ android {
     }
 }
 
+gradle.taskGraph.whenReady { graph ->
+    def packagesRelease = graph.allTasks.any { it.project == project && it.name in ['packageRelease', 'packageReleaseBundle'] }
+    if (packagesRelease && !hasReleaseSigning && project.findProperty('allowUnsigned') != 'true') {
+        throw new GradleException('Release signing is not configured. Configure the existing keystore or explicitly pass -PallowUnsigned=true for an unsigned build.')
+    }
+}
+
 repositories {
     flatDir{
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'

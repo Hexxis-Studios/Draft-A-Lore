@@ -46,9 +46,12 @@ DAL.renderStoryGraph = function(proj){
     var isStart = n.id === adv.startNodeId ? ' start-node' : '';
     var connectSource = DAL.connectMode && n.id === DAL.connectFromNodeId ? ' connect-source' : '';
     var preview = (n.text||'').substring(0,60);
+    var x = Number(n.x), y = Number(n.y);
+    if(!Number.isFinite(x)) x = 0;
+    if(!Number.isFinite(y)) y = 0;
     var choiceCount = (n.choices||[]).length;
     var choiceLabel = choiceCount + (choiceCount === 1 ? ' choice' : ' choices');
-    html += '<div class="canvas-node'+sel+isStart+connectSource+'" data-action="sg-select" data-nid="'+n.id+'" data-sel="rpg-node:'+n.id+'" data-ctx="rpg-node" data-ctx-id="'+n.id+'" data-drop="rpg-item rpg-stat asset" data-asset-bind="node:'+n.id+'" tabindex="0" role="button" aria-label="Scene '+DAL.escapeHtml(n.title||'Untitled')+'. Use arrow keys to move." style="left:'+(n.x||0)+'px;top:'+(n.y||0)+'px">'+
+    html += '<div class="canvas-node'+sel+isStart+connectSource+'" data-action="sg-select" data-nid="'+DAL.escapeHtml(n.id)+'" data-sel="rpg-node:'+DAL.escapeHtml(n.id)+'" data-ctx="rpg-node" data-ctx-id="'+DAL.escapeHtml(n.id)+'" data-drop="rpg-item rpg-stat asset" data-asset-bind="node:'+DAL.escapeHtml(n.id)+'" tabindex="0" role="button" aria-label="Scene '+DAL.escapeHtml(n.title||'Untitled')+'. Use arrow keys to move." style="left:'+x+'px;top:'+y+'px">'+
       '<div class="canvas-node-title">'+DAL.escapeHtml(n.title||'Untitled')+'</div>'+
       '<div class="canvas-node-preview">'+DAL.escapeHtml(preview)+'</div>'+
       '<div class="canvas-node-badge">'+choiceLabel+'</div>'+
@@ -90,31 +93,31 @@ DAL.renderNodeDetail = function(proj, adv, node){
   var html = ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Scene_Title_849b9e2","Scene Title")+"</label><input class=\"form-input\" id=\"nodeTitle\" value=\"")+DAL.escapeHtml(node.title||'')+("\" placeholder=\""+DAL.uiLabel("ui_Scene_title_a614208","Scene title")+"\"></div>");
   html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_What_the_Reader_Sees_e202be4","What the Reader Sees")+"</label><textarea class=\"form-textarea\" id=\"nodeText\" style=\"min-height:100px\" placeholder=\""+DAL.uiLabel("ui_Write_the_scene_text_that_the_reader_will__fcf6042","Write the scene text that the reader will experience...")+"\">")+DAL.escapeHtml(node.text||'')+'</textarea></div>';
 
-  html += '<div class="form-group asset-dropzone" data-drop="asset" data-asset-bind="node:'+node.id+("\"><label class=\"form-label\">"+DAL.uiLabel("ui_Scene_Illustrations_6671d41","Scene Illustrations")+"</label>")+
+  html += '<div class="form-group asset-dropzone" data-drop="asset" data-asset-bind="node:'+DAL.escapeHtml(node.id)+("\"><label class=\"form-label\">"+DAL.uiLabel("ui_Scene_Illustrations_6671d41","Scene Illustrations")+"</label>")+
     ("<p style=\"font-size:var(--ts-xs);color:var(--c-text-muted);margin-bottom:4px\">"+DAL.uiLabel("ui_Add_artwork_that_shows_alongside_this_scen_508b46e","Add artwork that shows alongside this scene in the playthrough, or drag one in from the Assets tool.")+"</p>");
   if(node.images && node.images.length){
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">';
     node.images.forEach(function(img, si){
       html += '<div class="scene-ill-thumb">'+
-        '<img src="'+DAL.imageSrc(proj,img)+'">'+
-        '<button class="chapter-ill-remove" data-action="remove-scene-image" data-nid="'+node.id+'" data-img-idx="'+si+'">&times;</button>'+
+        '<img src="'+DAL.escapeHtml(DAL.imageSrc(proj,img))+'">'+
+        '<button class="chapter-ill-remove" data-action="remove-scene-image" data-nid="'+DAL.escapeHtml(node.id)+'" data-img-idx="'+si+'">&times;</button>'+
         '</div>';
     });
     html += '</div>';
   }
-  html += '<button class="btn sm" data-action="upload-scene-image" data-nid="'+node.id+("\">"+DAL.uiLabel("ui__Add_Scene_Image_42d00a1","+ Add Scene Image")+"</button>");
+  html += '<button class="btn sm" data-action="upload-scene-image" data-nid="'+DAL.escapeHtml(node.id)+("\">"+DAL.uiLabel("ui__Add_Scene_Image_42d00a1","+ Add Scene Image")+"</button>");
   html += '<input type="file" id="sceneImageInput" accept="image/*" style="display:none">';
   html += '</div>';
 
-  html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Start_Node_9681e48","Start Node")+"</label><div style=\"display:flex;align-items:center;gap:8px\"><input type=\"checkbox\" id=\"nodeIsStart\" ")+(adv.startNodeId===node.id?'checked':'')+' data-action="sg-set-start" data-nid="'+node.id+("\"><label for=\"nodeIsStart\" style=\"font-size:var(--ts-sm);cursor:pointer\">"+DAL.uiLabel("ui_Set_as_adventure_start_85952db","Set as adventure start")+"</label></div></div>");
+  html += ("<div class=\"form-group\"><label class=\"form-label\">"+DAL.uiLabel("ui_Start_Node_9681e48","Start Node")+"</label><div style=\"display:flex;align-items:center;gap:8px\"><input type=\"checkbox\" id=\"nodeIsStart\" ")+(adv.startNodeId===node.id?'checked':'')+' data-action="sg-set-start" data-nid="'+DAL.escapeHtml(node.id)+("\"><label for=\"nodeIsStart\" style=\"font-size:var(--ts-sm);cursor:pointer\">"+DAL.uiLabel("ui_Set_as_adventure_start_85952db","Set as adventure start")+"</label></div></div>");
 
   html += '<div class="form-group"><label class="form-label">Scene Kind '+DAL.infoIcon('A normal scene carries on through its choices. An ending scene closes the run the moment the reader arrives, and the closing screen shows the ending name you give it — useful for tracking which endings a reader has found.')+'</label>'+
-    '<select class="form-select" data-node-field="kind" data-nid="'+node.id+'">'+
+    '<select class="form-select" data-node-field="kind" data-nid="'+DAL.escapeHtml(node.id)+'">'+
       '<option value="normal"'+(node.kind!=='ending'?' selected':'')+(">"+DAL.uiLabel("ui_Normal_scene_4e2db66","Normal scene")+"</option>")+
       '<option value="ending"'+(node.kind==='ending'?' selected':'')+(">"+DAL.uiLabel("ui_Ending_the_run_stops_here_c660821","Ending — the run stops here")+"</option>")+
     '</select>';
   if(node.kind === 'ending'){
-    html += '<input class="form-input" style="margin-top:4px" value="'+DAL.escapeHtml(node.endingLabel||'')+'" data-node-field="endingLabel" data-nid="'+node.id+("\" placeholder=\""+DAL.uiLabel("ui_Ending_name_e_g_Crowned_in_Bone_181ab2b","Ending name, e.g. Crowned in Bone")+"\">");
+    html += '<input class="form-input" style="margin-top:4px" value="'+DAL.escapeHtml(node.endingLabel||'')+'" data-node-field="endingLabel" data-nid="'+DAL.escapeHtml(node.id)+("\" placeholder=\""+DAL.uiLabel("ui_Ending_name_e_g_Crowned_in_Bone_181ab2b","Ending name, e.g. Crowned in Bone")+"\">");
   }
   html += '</div>';
 
@@ -123,7 +126,7 @@ DAL.renderNodeDetail = function(proj, adv, node){
   (node.entryEffects||[]).forEach(function(eff, i){
     html += DAL.renderEffectRow('entry', i, eff, adv);
   });
-  html += '</div><button class="btn sm" data-action="sg-add-effect" data-nid="'+node.id+("\" data-effect-type=\"entry\">"+DAL.uiLabel("ui__Add_What_Changes_a09a338","+ Add What Changes")+"</button>");
+  html += '</div><button class="btn sm" data-action="sg-add-effect" data-nid="'+DAL.escapeHtml(node.id)+("\" data-effect-type=\"entry\">"+DAL.uiLabel("ui__Add_What_Changes_a09a338","+ Add What Changes")+"</button>");
   var entrySummary = DAL.describeEffectList(node.entryEffects, adv);
   if(entrySummary) html += '<div style="font-size:var(--ts-xs);color:var(--c-text-faint);margin-top:4px;font-style:italic">On arrival: '+DAL.escapeHtml(entrySummary)+'</div>';
   html += '</div>';
@@ -131,23 +134,23 @@ DAL.renderNodeDetail = function(proj, adv, node){
   html += '<div class="form-group"><label class="form-label">Choices '+DAL.infoIcon('A choice is a button the reader can tap to leave the current scene. Conditions (optional) hide a choice until the reader meets a requirement, e.g. a stat is high enough or a trait is set. Effects change the story state when the choice is picked — set a flag, raise a stat, give or take an item.')+("</label><p style=\"font-size:var(--ts-xs);color:var(--c-text-muted);margin-bottom:4px\">"+DAL.uiLabel("ui_Each_choice_sends_the_reader_to_another_sc_568ea19","Each choice sends the reader to another scene. Add conditions to control when a choice appears.")+"</p><div id=\"choicesList\" style=\"display:flex;flex-direction:column;gap:8px\">");
   (node.choices||[]).forEach(function(ch, i){
     html += '<div style="border:1px solid var(--c-border);border-radius:var(--radius);padding:8px;margin-bottom:4px">';
-    html += '<input class="form-input" style="margin-bottom:4px" value="'+DAL.escapeHtml(ch.label||'')+'" data-choice-label="'+i+'" data-nid="'+node.id+("\" placeholder=\""+DAL.uiLabel("ui_Choice_label_bbe0978","Choice label")+"\">");
-    html += '<select class="form-select" style="margin-bottom:4px;font-size:var(--ts-xs)" data-choice-target="'+i+'" data-nid="'+node.id+("\"><option value=\"\">"+DAL.uiLabel("ui__Which_scene_does_this_lead_to__68491d1","— Which scene does this lead to? —")+"</option>");
-    adv.nodes.forEach(function(n){ html += '<option value="'+n.id+'"'+(ch.targetNodeId===n.id?' selected':'')+'>'+DAL.escapeHtml(n.title||'Untitled')+'</option>'; });
+    html += '<input class="form-input" style="margin-bottom:4px" value="'+DAL.escapeHtml(ch.label||'')+'" data-choice-label="'+i+'" data-nid="'+DAL.escapeHtml(node.id)+("\" placeholder=\""+DAL.uiLabel("ui_Choice_label_bbe0978","Choice label")+"\">");
+    html += '<select class="form-select" style="margin-bottom:4px;font-size:var(--ts-xs)" data-choice-target="'+i+'" data-nid="'+DAL.escapeHtml(node.id)+("\"><option value=\"\">"+DAL.uiLabel("ui__Which_scene_does_this_lead_to__68491d1","— Which scene does this lead to? —")+"</option>");
+    adv.nodes.forEach(function(n){ html += '<option value="'+DAL.escapeHtml(n.id)+'"'+(ch.targetNodeId===n.id?' selected':'')+'>'+DAL.escapeHtml(n.title||'Untitled')+'</option>'; });
     html += '</select>';
     var condCount = (ch.conditions||[]).length;
     html += ("<div style=\"font-size:var(--ts-xs);color:var(--c-text-muted);margin-top:4px\">"+DAL.uiLabel("ui_Only_show_this_choice_if__631f62a","Only show this choice if:")+"</div><div id=\"choiceConds")+i+'">';
     (ch.conditions||[]).forEach(function(cond, ci){
       html += DAL.renderConditionRow(node.id, i, ci, cond, adv);
     });
-    html += '</div><button class="btn sm" style="margin-top:2px" data-action="sg-add-cond" data-nid="'+node.id+'" data-choice-idx="'+i+("\">"+DAL.uiLabel("ui__Add_Condition_ec91a29","+ Add Condition")+"</button>");
+    html += '</div><button class="btn sm" style="margin-top:2px" data-action="sg-add-cond" data-nid="'+DAL.escapeHtml(node.id)+'" data-choice-idx="'+i+("\">"+DAL.uiLabel("ui__Add_Condition_ec91a29","+ Add Condition")+"</button>");
     if(condCount > 1){
-      html += ' <select class="form-select" style="width:auto;display:inline-block;font-size:var(--ts-xs)" data-choice-field="condLogic" data-nid="'+node.id+'" data-choice-idx="'+i+'">'+
+      html += ' <select class="form-select" style="width:auto;display:inline-block;font-size:var(--ts-xs)" data-choice-field="condLogic" data-nid="'+DAL.escapeHtml(node.id)+'" data-choice-idx="'+i+'">'+
         '<option value="all"'+(ch.condLogic!=='any'?' selected':'')+(">"+DAL.uiLabel("ui_reader_must_meet_all_of_them_5f08f64","reader must meet all of them")+"</option>")+
         '<option value="any"'+(ch.condLogic==='any'?' selected':'')+(">"+DAL.uiLabel("ui_any_one_of_them_is_enough_5be90a6","any one of them is enough")+"</option></select>");
     }
     if(condCount){
-      html += ' <select class="form-select" style="width:auto;display:inline-block;font-size:var(--ts-xs)" data-choice-field="whenLocked" data-nid="'+node.id+'" data-choice-idx="'+i+'">'+
+      html += ' <select class="form-select" style="width:auto;display:inline-block;font-size:var(--ts-xs)" data-choice-field="whenLocked" data-nid="'+DAL.escapeHtml(node.id)+'" data-choice-idx="'+i+'">'+
         '<option value="inherit"'+(!ch.whenLocked||ch.whenLocked==='inherit'?' selected':'')+(">"+DAL.uiLabel("ui_when_unmet_follow_story_setting_b210882","when unmet: follow story setting")+"</option>")+
         '<option value="lock"'+(ch.whenLocked==='lock'?' selected':'')+(">"+DAL.uiLabel("ui_when_unmet_show_it_locked_f412491","when unmet: show it locked")+"</option>")+
         '<option value="hide"'+(ch.whenLocked==='hide'?' selected':'')+(">"+DAL.uiLabel("ui_when_unmet_hide_it_c66bf8a","when unmet: hide it")+"</option></select>");
@@ -157,17 +160,17 @@ DAL.renderNodeDetail = function(proj, adv, node){
     (ch.effects||[]).forEach(function(eff, ei){
       html += DAL.renderEffectRow('choice'+i, ei, eff, adv, node.id, i);
     });
-    html += '</div><button class="btn sm" style="margin-top:2px" data-action="sg-add-choice-effect" data-nid="'+node.id+'" data-choice-idx="'+i+("\">"+DAL.uiLabel("ui__Add_What_Changes_a09a338","+ Add What Changes")+"</button>");
+    html += '</div><button class="btn sm" style="margin-top:2px" data-action="sg-add-choice-effect" data-nid="'+DAL.escapeHtml(node.id)+'" data-choice-idx="'+i+("\">"+DAL.uiLabel("ui__Add_What_Changes_a09a338","+ Add What Changes")+"</button>");
     var effSummary = DAL.describeEffectList(ch.effects, adv);
     if(effSummary) html += '<div style="font-size:var(--ts-xs);color:var(--c-text-faint);margin-top:4px;font-style:italic">'+DAL.escapeHtml(effSummary.charAt(0).toUpperCase()+effSummary.slice(1))+'</div>';
-    html += '<button class="btn sm danger" style="margin-top:4px" data-action="sg-delete-choice" data-nid="'+node.id+'" data-choice-idx="'+i+("\">"+DAL.uiLabel("ui_Delete_Choice_1701a31","Delete Choice")+"</button>");
+    html += '<button class="btn sm danger" style="margin-top:4px" data-action="sg-delete-choice" data-nid="'+DAL.escapeHtml(node.id)+'" data-choice-idx="'+i+("\">"+DAL.uiLabel("ui_Delete_Choice_1701a31","Delete Choice")+"</button>");
     html += '</div>';
   });
-  html += '</div><button class="btn sm" data-action="sg-add-choice" data-nid="'+node.id+("\">"+DAL.uiLabel("ui__Add_Choice_6df1754","+ Add Choice")+"</button></div>");
+  html += '</div><button class="btn sm" data-action="sg-add-choice" data-nid="'+DAL.escapeHtml(node.id)+("\">"+DAL.uiLabel("ui__Add_Choice_6df1754","+ Add Choice")+"</button></div>");
 
   html += DAL.renderAudioBinding(proj, node, 'node', node.id);
 
-  html += '<button class="btn sm danger" style="margin-top:12px" data-action="sg-delete-node" data-nid="'+node.id+("\">"+DAL.uiLabel("ui_Delete_Scene_76b6f8a","Delete Scene")+"</button>");
+  html += '<button class="btn sm danger" style="margin-top:12px" data-action="sg-delete-node" data-nid="'+DAL.escapeHtml(node.id)+("\">"+DAL.uiLabel("ui_Delete_Scene_76b6f8a","Delete Scene")+"</button>");
   return html;
 };
 
@@ -212,7 +215,7 @@ DAL.renderEffectRow = function(prefix, idx, eff, adv, nid, choiceIdx){
   var type = prefix.indexOf('choice') === 0 ? 'choice' : 'entry';
   var lists = DAL.rpgPickLists(adv);
   var kind = eff.type || 'stat';
-  var attrs = ' data-eff-type="'+type+'" data-nid="'+(nid||'')+'" data-choice-idx="'+(choiceIdx!==undefined?choiceIdx:'')+'" data-idx="'+idx+'"';
+  var attrs = ' data-eff-type="'+type+'" data-nid="'+DAL.escapeHtml(nid||'')+'" data-choice-idx="'+(choiceIdx!==undefined?choiceIdx:'')+'" data-idx="'+idx+'"';
   function sel(field, opts, current, width, placeholder){
     return '<select class="form-select" style="'+width+';font-size:var(--ts-xs)" data-eff-field="'+field+'"'+attrs+'>'+
       DAL.rpgOptions(opts, current, placeholder)+'</select>';
@@ -222,8 +225,8 @@ DAL.renderEffectRow = function(prefix, idx, eff, adv, nid, choiceIdx){
 
   if(kind === 'flag'){
     var listId = 'effflags_'+(nid||'x')+'_'+prefix+'_'+idx;
-    html += '<input class="form-input" style="flex:1 1 42%;min-width:104px;font-size:var(--ts-xs)" list="'+listId+'" value="'+DAL.escapeHtml(eff.key||'')+'" data-eff-field="key"'+attrs+(" placeholder=\""+DAL.uiLabel("ui_flag_name_7d9737a","flag name")+"\">");
-    html += '<datalist id="'+listId+'">';
+    html += '<input class="form-input" style="flex:1 1 42%;min-width:104px;font-size:var(--ts-xs)" list="'+DAL.escapeHtml(listId)+'" value="'+DAL.escapeHtml(eff.key||'')+'" data-eff-field="key"'+attrs+(" placeholder=\""+DAL.uiLabel("ui_flag_name_7d9737a","flag name")+"\">");
+    html += '<datalist id="'+DAL.escapeHtml(listId)+'">';
     lists.flags.forEach(function(f){ html += '<option value="'+DAL.escapeHtml(f.value)+'"></option>'; });
     html += '</datalist>';
   } else if(kind === 'end'){
@@ -334,7 +337,7 @@ DAL.condNeedsValue = function(cond){
 DAL.renderConditionRow = function(nid, choiceIdx, condIdx, cond, adv){
   var lists = DAL.rpgPickLists(adv);
   var type = cond.type || 'stat';
-  var attrs = ' data-nid="'+nid+'" data-choice-idx="'+choiceIdx+'" data-cond-idx="'+condIdx+'"';
+  var attrs = ' data-nid="'+DAL.escapeHtml(nid)+'" data-choice-idx="'+choiceIdx+'" data-cond-idx="'+condIdx+'"';
   function sel(field, opts, current, width, placeholder){
     return '<select class="form-select" style="'+width+';font-size:var(--ts-xs)" data-cond-field="'+field+'"'+attrs+'>'+
       DAL.rpgOptions(opts, current, placeholder)+'</select>';
@@ -353,8 +356,8 @@ DAL.renderConditionRow = function(nid, choiceIdx, condIdx, cond, adv){
     /* Flags are declared by being used rather than in a table, so known flags
        are offered as suggestions without blocking a brand new name. */
     var listId = 'flags_'+nid+'_'+choiceIdx+'_'+condIdx;
-    html += '<input class="form-input" style="flex:1;min-width:104px;font-size:var(--ts-xs)" list="'+listId+'" value="'+DAL.escapeHtml(cond.key||'')+'" data-cond-field="key"'+attrs+(" placeholder=\""+DAL.uiLabel("ui_flag_name_7d9737a","flag name")+"\">");
-    html += '<datalist id="'+listId+'">';
+    html += '<input class="form-input" style="flex:1;min-width:104px;font-size:var(--ts-xs)" list="'+DAL.escapeHtml(listId)+'" value="'+DAL.escapeHtml(cond.key||'')+'" data-cond-field="key"'+attrs+(" placeholder=\""+DAL.uiLabel("ui_flag_name_7d9737a","flag name")+"\">");
+    html += '<datalist id="'+DAL.escapeHtml(listId)+'">';
     lists.flags.forEach(function(f){ html += '<option value="'+DAL.escapeHtml(f.value)+'"></option>'; });
     html += '</datalist>';
   } else {
@@ -537,7 +540,7 @@ DAL.renderItems = function(proj){
   html += ("<div class=\"card\"><table class=\"stats-table\"><thead><tr><th>"+DAL.uiLabel("ui_Image_1aa4cb0","Image")+"</th><th>"+DAL.uiLabel("worldField_name","Name")+"</th><th>"+DAL.uiLabel("ui_Description_526e008","Description")+"</th><th>"+DAL.uiLabel("ui_Stackable_29681e4","Stackable")+"</th><th>"+DAL.uiLabel("ui_Max_Stack_46b59b5","Max Stack")+"</th><th>"+DAL.uiLabel("ui_Slot_7968978","Slot")+"</th><th>"+DAL.uiLabel("ui_Icon_a35abcd","Icon")+"</th><th></th></tr></thead><tbody>");
   (adv.items||[]).forEach(function(it, i){
     html += '<tr><td><div class="item-image-cell">'+
-      (it.imageDataUrl?'<img src="'+it.imageDataUrl+'" class="item-thumb">':'<div class="item-thumb-placeholder">—</div>')+
+      (it.imageDataUrl?'<img src="'+DAL.escapeHtml(it.imageDataUrl)+'" class="item-thumb">':'<div class="item-thumb-placeholder">—</div>')+
       '<div style="display:flex;flex-direction:column;gap:2px">'+
       '<button class="btn sm" style="font-size:10px;padding:2px 6px" data-action="upload-item-image" data-idx="'+i+'">'+(it.imageDataUrl?'Change':'Upload')+'</button>'+
       (it.imageDataUrl?'<button class="btn sm danger" style="font-size:10px;padding:2px 6px" data-action="remove-item-image" data-idx="'+i+("\">"+DAL.uiLabel("remove","Remove")+"</button>"):'')+
@@ -572,12 +575,12 @@ DAL.renderPlaytest = function(proj){
 
   var html = '<div class="playtest-layout u-fill-body device-'+(proj.previewProfile||'responsive')+(DAL.playtestStyle==='terminal'?' terminal-mode':'')+'">';
   html += '<div class="playtest-main">';
-  html += '<div style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap">'+
+  html += '<div class="playtest-toolbar"><div class="playtest-toolbar-actions">'+
     ("<button class=\"btn sm\" data-action=\"pt-restart\">"+DAL.uiLabel("ui_Restart_6b983a8","Restart")+"</button>")+
     ("<button class=\"btn sm\" data-action=\"pt-stepback\">"+DAL.uiLabel("ui_Step_Back_1ddf073","Step Back")+"</button>")+
     ("<button class=\"btn sm\" data-action=\"pt-speedrun\">"+DAL.uiLabel("ui_Speed_run_451000c","Speed-run")+"</button>")+
     (DAL.previewProfileControl?DAL.previewProfileControl(proj):'')+
-    '<div style="margin-left:auto;display:flex;gap:4px;align-items:center">'+
+    '</div><div class="playtest-toolbar-settings">'+
       /* The story-wide answer to "what does an unmet choice look like?", set
          where the author can see the result immediately. */
       ("<select class=\"form-select\" style=\"width:auto;font-size:var(--ts-xs)\" data-adv-rule=\"lockedChoices\" title=\""+DAL.uiLabel("ui_What_readers_see_when_they_do_not_meet_a_c_3b5368f","What readers see when they do not meet a choice's requirements")+"\">")+
@@ -590,7 +593,7 @@ DAL.renderPlaytest = function(proj){
   html += '<div class="playtest-passage-title" style="font-family:var(--font-display);font-size:var(--ts-lg);font-weight:700;margin-bottom:12px">'+DAL.escapeHtml(currentNode.title||'')+'</div>';
   if(currentNode.images && currentNode.images.length){
     currentNode.images.forEach(function(img){
-      html += '<div class="playtest-scene-image"><img src="'+DAL.imageSrc(proj,img)+'"></div>';
+      html += '<div class="playtest-scene-image"><img src="'+DAL.escapeHtml(DAL.imageSrc(proj,img))+'"></div>';
     });
   }
   html += '<div class="playtest-passage">'+DAL.escapeHtml(currentNode.text||'')+'</div>';
@@ -612,7 +615,7 @@ DAL.renderPlaytest = function(proj){
     if(cs.hidden) return;
     shown++;
     if(cs.ok && !cs.broken){
-      html += '<button class="playtest-choice" data-action="pt-choice" data-nid="'+currentNode.id+'" data-choice-idx="'+cs.index+'">'+DAL.escapeHtml(cs.choice.label||'Continue')+'</button>';
+      html += '<button class="playtest-choice" data-action="pt-choice" data-nid="'+DAL.escapeHtml(currentNode.id)+'" data-choice-idx="'+cs.index+'">'+DAL.escapeHtml(cs.choice.label||'Continue')+'</button>';
     } else {
       var why = cs.broken ? 'leads nowhere yet' : cs.unmet.join(cs.logic === 'any' ? ' or ' : ' and ');
       html += '<button class="playtest-choice disabled" disabled>'+DAL.escapeHtml(cs.choice.label||'Locked')+
@@ -708,7 +711,7 @@ DAL.renderPlaytestPanels = function(adv){
   if(!invRows.length) html += ("<div class=\"playtest-empty\">"+DAL.uiLabel("ui_Empty_c6c094b","Empty")+"</div>");
   invRows.forEach(function(row){
     html += '<div class="playtest-item">';
-    if(row.image) html += '<img src="'+row.image+'" class="playtest-item-thumb">';
+    if(row.image) html += '<img src="'+DAL.escapeHtml(row.image)+'" class="playtest-item-thumb">';
     html += '<span>'+(row.symbol ? DAL.escapeHtml(row.symbol)+' ' : '')+DAL.escapeHtml(row.name)+(row.count > 1 ? ' ×'+row.count : '')+'</span>';
     if(row.slot){
       html += '<button class="btn sm playtest-equip" data-action="pt-equip" data-item="'+DAL.escapeHtml(row.key)+'">'+(row.equipped ? 'Put away' : 'Equip')+'</button>';
@@ -812,7 +815,7 @@ DAL.exportedGameUI = function(){
   var presented = null;
 
   function esc(t){
-    return String(t == null ? '' : t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(t == null ? '' : t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
   function imageSrc(img){
@@ -1031,20 +1034,10 @@ DAL.exportedGameCSS = function(){
     '@media (max-width:640px){body{padding:16px}.side{flex:1 1 100%}.choice{font-size:16px}}';
 };
 
-DAL.exportPlayableHTML = function(proj){
-  var adv = DAL.ensureAdventure(proj);
-  var data = {
-    name: proj.name, startNodeId: adv.startNodeId, nodes: adv.nodes,
-    stats: adv.stats, traits: adv.traits, items: adv.items, rules: adv.rules
-  };
-  return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">' +
-    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-    '<title>' + DAL.escapeHtml(proj.name || 'Adventure') + '</title>' +
-    '<style>' + DAL.exportedGameCSS() + '</style></head><body><div id="game"></div>' +
-    '<script>\nvar DATA=' + JSON.stringify(data) + ';\n' +
-    DAL.rpg.engineSource() +
-    '(' + DAL.exportedGameUI.toString() + ')();\n' +
-    '<\/script></body></html>';
+DAL.scriptSafeJSON = function(value){
+  return JSON.stringify(value).replace(/[<\u2028\u2029]/g, function(char){
+    return char === '<' ? '\\u003c' : char === '\u2028' ? '\\u2028' : '\\u2029';
+  });
 };
 
 /* Twine export
@@ -1587,7 +1580,7 @@ DAL.handleAdventureClick = function(action, el, e){
     var proj20 = DAL.state.projects[DAL.currentProjectId];
     var adv20 = DAL.ensureAdventure(proj20);
     var html = '<div class="form-group"><label class="form-label">Jump to node</label><select class="form-select" id="speedrunSelect">';
-    adv20.nodes.forEach(function(n){ html += '<option value="'+n.id+'">'+DAL.escapeHtml(n.title||'Untitled')+'</option>'; });
+    adv20.nodes.forEach(function(n){ html += '<option value="'+DAL.escapeHtml(n.id)+'">'+DAL.escapeHtml(n.title||'Untitled')+'</option>'; });
     html += '</select></div>';
     DAL.modal((DAL.i18n?DAL.i18n.text("ui_Speed_run_Jump_to_Node_d7fbbb7","Speed-run: Jump to Node"):"Speed-run: Jump to Node"), html, { footer: '<button class="btn" data-action="close-modal">Cancel</button><button class="btn primary" data-action="pt-speedrun-go">Jump</button>' });
     return;
@@ -2016,7 +2009,7 @@ document.addEventListener('focusout', function(e){
     var items = ("<div class=\"section-header\"><div class=\"section-title\">"+DAL.uiLabel("ui_Items_fb8e7a1","Items")+"</div><button class=\"btn primary\" data-action=\"sg-add-item\">"+DAL.uiLabel("ui__Add_Item_24da0c7","+ Add Item")+"</button></div><p class=\"rpg-intro\">"+DAL.uiLabel("ui_Stack_limits_and_capacity_are_enforced_at__68fddca","Stack limits and capacity are enforced at play time. Consumables spend one item and then run their listed effects.")+"</p><label class=\"form-label\">"+DAL.uiLabel("ui_Carrying_capacity_4170ff2","Carrying capacity ")+"<span class=\"u-hint\">"+DAL.uiLabel("ui_Leave_blank_for_unlimited_total_weight__84077d5","Leave blank for unlimited total weight.")+"</span></label><input class=\"form-input rpg-capacity\" value=\"")+DAL.escapeHtml(String(adv.rules.capacity == null ? '' : adv.rules.capacity))+("\" data-adv-capacity placeholder=\""+DAL.uiLabel("ui_unlimited_2044fbd","unlimited")+"\" inputmode=\"decimal\"><div class=\"card rpg-table-wrap\"><table class=\"stats-table rpg-responsive-table rpg-items-table\"><thead><tr><th>"+DAL.uiLabel("ui_Item_652bcc3","Item")+"</th><th>"+DAL.uiLabel("ui_Type_baaddf7","Type")+"</th><th>"+DAL.uiLabel("ui_Stack_e551641","Stack")+"</th><th>"+DAL.uiLabel("ui_Weight_81d27ef","Weight")+"</th><th>"+DAL.uiLabel("ui_Gear_slot_f9b07c1","Gear slot")+"</th><th>"+DAL.uiLabel("ui_Use_c36d819","Use")+"</th><th></th></tr></thead><tbody>");
     (adv.items||[]).forEach(function(item, i){
       var use = (item.useEffects||[]);
-      items += '<tr data-sel="rpg-item:'+item.id+'" data-ctx="rpg-item" data-ctx-id="'+item.id+'" data-drag="rpg-item:'+item.id+'" data-drag-label="'+DAL.escapeHtml(item.name||'Untitled item')+'"><td data-label="Item"><input value="'+DAL.escapeHtml(item.name||'')+'" data-item-field="name" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("worldField_name","Name")+"\"><input value=\"")+DAL.escapeHtml(item.description||'')+'" data-item-field="description" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("ui_Description_526e008","Description")+"\"></td><td data-label=\"Type\"><input value=\"")+DAL.escapeHtml(item.type||'')+'" data-item-field="type" data-idx="'+i+("\" list=\"rpgItemTypes\" placeholder=\""+DAL.uiLabel("ui_e_g_blade_75ce4ff","e.g. blade")+"\"></td><td data-label=\"Stack\"><select data-item-field=\"stackable\" data-idx=\"")+i+'"><option value="false"'+(!item.stackable?' selected':'')+(">"+DAL.uiLabel("ui_single_947f187","single")+"</option><option value=\"true\"")+(item.stackable?' selected':'')+(">"+DAL.uiLabel("ui_stack_6ee08e6","stack")+"</option></select><input value=\"")+DAL.escapeHtml(String(item.maxStack||1))+'" data-item-field="maxStack" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("ui_limit_55ea09e","limit")+"\"></td><td data-label=\"Weight\"><input value=\"")+DAL.escapeHtml(String(item.weight||0))+'" data-item-field="weight" data-idx="'+i+'" inputmode="decimal"></td><td data-label="Gear slot"><select data-item-field="slot" data-idx="'+i+'">'+DAL.slotOptions(adv, item.slot)+'</select></td><td data-label="Use"><select data-item-field="consumable" data-idx="'+i+'"><option value="false"'+(!item.consumable?' selected':'')+(">"+DAL.uiLabel("ui_not_usable_9e2c58e","not usable")+"</option><option value=\"true\"")+(item.consumable?' selected':'')+(">"+DAL.uiLabel("ui_consumable_242e701","consumable")+"</option></select>")+(item.consumable?'<button class="btn sm" data-action="item-add-use-effect" data-idx="'+i+("\">"+DAL.uiLabel("ui__effect_dc25f09","+ effect")+"</button><span class=\"u-hint\">")+use.length+' effect'+(use.length===1?'':'s')+'</span>':'')+'</td><td class="rpg-row-actions"><button class="btn sm danger" data-action="sg-delete-item" data-idx="'+i+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></td></tr>");
+      items += '<tr data-sel="rpg-item:'+DAL.escapeHtml(item.id)+'" data-ctx="rpg-item" data-ctx-id="'+DAL.escapeHtml(item.id)+'" data-drag="rpg-item:'+DAL.escapeHtml(item.id)+'" data-drag-label="'+DAL.escapeHtml(item.name||'Untitled item')+'"><td data-label="Item"><input value="'+DAL.escapeHtml(item.name||'')+'" data-item-field="name" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("worldField_name","Name")+"\"><input value=\"")+DAL.escapeHtml(item.description||'')+'" data-item-field="description" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("ui_Description_526e008","Description")+"\"></td><td data-label=\"Type\"><input value=\"")+DAL.escapeHtml(item.type||'')+'" data-item-field="type" data-idx="'+i+("\" list=\"rpgItemTypes\" placeholder=\""+DAL.uiLabel("ui_e_g_blade_75ce4ff","e.g. blade")+"\"></td><td data-label=\"Stack\"><select data-item-field=\"stackable\" data-idx=\"")+i+'"><option value="false"'+(!item.stackable?' selected':'')+(">"+DAL.uiLabel("ui_single_947f187","single")+"</option><option value=\"true\"")+(item.stackable?' selected':'')+(">"+DAL.uiLabel("ui_stack_6ee08e6","stack")+"</option></select><input value=\"")+DAL.escapeHtml(String(item.maxStack||1))+'" data-item-field="maxStack" data-idx="'+i+("\" placeholder=\""+DAL.uiLabel("ui_limit_55ea09e","limit")+"\"></td><td data-label=\"Weight\"><input value=\"")+DAL.escapeHtml(String(item.weight||0))+'" data-item-field="weight" data-idx="'+i+'" inputmode="decimal"></td><td data-label="Gear slot"><select data-item-field="slot" data-idx="'+i+'">'+DAL.slotOptions(adv, item.slot)+'</select></td><td data-label="Use"><select data-item-field="consumable" data-idx="'+i+'"><option value="false"'+(!item.consumable?' selected':'')+(">"+DAL.uiLabel("ui_not_usable_9e2c58e","not usable")+"</option><option value=\"true\"")+(item.consumable?' selected':'')+(">"+DAL.uiLabel("ui_consumable_242e701","consumable")+"</option></select>")+(item.consumable?'<button class="btn sm" data-action="item-add-use-effect" data-idx="'+i+("\">"+DAL.uiLabel("ui__effect_dc25f09","+ effect")+"</button><span class=\"u-hint\">")+use.length+' effect'+(use.length===1?'':'s')+'</span>':'')+'</td><td class="rpg-row-actions"><button class="btn sm danger" data-action="sg-delete-item" data-idx="'+i+("\">"+DAL.uiLabel("menu_edit_delete","Delete")+"</button></td></tr>");
       if(item.consumable && use.length){ items += '<tr class="rpg-effect-row"><td colspan="7" class="rpg-use-effects">'+use.map(function(eff, ei){ return DAL.renderItemUseEffect(i, ei, eff, adv); }).join('')+'</td></tr>'; }
     });
     if(!(adv.items||[]).length) items += ("<tr><td colspan=\"7\" class=\"rpg-empty\">"+DAL.uiLabel("ui_No_items_defined_801b73d","No items defined")+"</td></tr>");
@@ -2035,7 +2028,7 @@ document.addEventListener('focusout', function(e){
   DAL.renderEffectRow = function(prefix, idx, eff, adv, nid, choiceIdx){
     var html = oldEffectRow(prefix, idx, eff, adv, nid, choiceIdx);
     if((eff.type||'stat') === 'stat' && eff.op === 'copy'){
-      var attrs = ' data-eff-type="'+(prefix.indexOf('choice')===0?'choice':'entry')+'" data-nid="'+(nid||'')+'" data-choice-idx="'+(choiceIdx===undefined?'':choiceIdx)+'" data-idx="'+idx+'"';
+      var attrs = ' data-eff-type="'+(prefix.indexOf('choice')===0?'choice':'entry')+'" data-nid="'+DAL.escapeHtml(nid||'')+'" data-choice-idx="'+(choiceIdx===undefined?'':choiceIdx)+'" data-idx="'+idx+'"';
       html = html.replace('</div>', '<select class="form-select" data-eff-field="valueStatKey"'+attrs+'>'+DAL.rpgOptions(DAL.rpgPickLists(adv).stats, eff.valueStatKey, '— source stat —')+'</select></div>');
     }
     return html;
@@ -2044,7 +2037,7 @@ document.addEventListener('focusout', function(e){
   DAL.renderConditionRow = function(nid, choiceIdx, condIdx, cond, adv){
     var html = oldConditionRow(nid, choiceIdx, condIdx, cond, adv);
     if((cond.type||'stat') === 'stat'){
-      var attrs = ' data-nid="'+nid+'" data-choice-idx="'+choiceIdx+'" data-cond-idx="'+condIdx+'"';
+      var attrs = ' data-nid="'+DAL.escapeHtml(nid)+'" data-choice-idx="'+choiceIdx+'" data-cond-idx="'+condIdx+'"';
       var mode = '<select class="form-select" data-cond-field="valueSource"'+attrs+'><option value="literal"'+(cond.valueSource !== 'stat'?' selected':'')+(">"+DAL.uiLabel("ui_number_12886f9","number")+"</option><option value=\"stat\"")+(cond.valueSource === 'stat'?' selected':'')+(">"+DAL.uiLabel("ui_another_stat_e9964c4","another stat")+"</option></select>");
       var value = cond.valueSource === 'stat' ? '<select class="form-select" data-cond-field="valueStatKey"'+attrs+'>'+DAL.rpgOptions(DAL.rpgPickLists(adv).numStats, cond.valueStatKey, '— compare with —')+'</select>' : '';
       html = html.replace('</div>', mode+value+'</div>');
@@ -2198,7 +2191,7 @@ document.addEventListener('focusout', function(e){
 
   DAL.exportPlayableHTML = function(proj){
     return exportData(proj).then(function(out){
-      var content = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+DAL.escapeHtml(proj.name||'Adventure')+'</title><style>'+DAL.exportedGameCSS()+'</style></head><body><div id="game"></div><script>\nvar DATA='+JSON.stringify(out.data)+';\n'+DAL.rpg.engineSource()+'('+DAL.exportedGameUI.toString()+')();\n<\/script></body></html>';
+      var content = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+DAL.escapeHtml(proj.name||'Adventure')+'</title><style>'+DAL.exportedGameCSS()+'</style></head><body><div id="game"></div><script>\nvar DATA='+DAL.scriptSafeJSON(out.data)+';\n'+DAL.rpg.engineSource()+'('+DAL.exportedGameUI.toString()+')();\n<\/script></body></html>';
       return { content: content, missing: out.missing, bytes: out.bytes };
     });
   };
@@ -2206,7 +2199,7 @@ document.addEventListener('focusout', function(e){
   DAL.exportTwee = function(proj){
     return exportData(proj).then(function(out){
       var css = DAL.exportedGameCSS();
-      var content = [':: StoryTitle',proj.name||'Adventure','', ':: StoryData','{"format":"SugarCube","format-version":"2.36.1"}','', ':: StoryStylesheet [stylesheet]',css,'', ':: StoryJavaScript [script]','setup.DAL_DATA='+JSON.stringify(out.data)+';\n'+DAL.rpg.engineSource(),'', ':: Start','<div id="game"></div>','<<script>>','var DATA=setup.DAL_DATA;','('+DAL.exportedGameUI.toString()+')();','<</script>>','', ':: Export Notes [nobr]','This SugarCube export embeds Draft A Lore’s adventure runtime rather than translating rules into a partial macro set. Authored gear slots and restrictions, item stack limits, carrying capacity, stat clamping, consumables, run-ending rules, scene artwork, bound audio, narration and visit counts play exactly as in the app.'].join('\n');
+      var content = [':: StoryTitle',proj.name||'Adventure','', ':: StoryData','{"format":"SugarCube","format-version":"2.36.1"}','', ':: StoryStylesheet [stylesheet]',css,'', ':: StoryJavaScript [script]','setup.DAL_DATA='+DAL.scriptSafeJSON(out.data)+';\n'+DAL.rpg.engineSource(),'', ':: Start','<div id="game"></div>','<<script>>','var DATA=setup.DAL_DATA;','('+DAL.exportedGameUI.toString()+')();','<</script>>','', ':: Export Notes [nobr]','This SugarCube export embeds Draft A Lore’s adventure runtime rather than translating rules into a partial macro set. Authored gear slots and restrictions, item stack limits, carrying capacity, stat clamping, consumables, run-ending rules, scene artwork, bound audio, narration and visit counts play exactly as in the app.'].join('\n');
       return { content: content, missing: out.missing, bytes: out.bytes };
     });
   };

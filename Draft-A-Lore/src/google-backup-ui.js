@@ -25,7 +25,7 @@ DAL = DAL || {};
     panel+='<p class="writer-muted">'+label('googleBackupDisclosure','Off by default. Connect only if you want to store project snapshots, their linked World Bible, and attachments in your own Google account. Only this app’s private backup area is accessible—not your ordinary Drive files. Your writing is not sent to the developer. Backups use your Google storage; local writing always works without Google.')+'</p>';
     panel+='<p class="writer-muted">'+label('googleBackupTesting','Preview: Google authorization is currently limited to approved test accounts. This is an explicit backup/restore feature, not live cloud editing or automatic synchronization.')+'</p>';
     if(platform==='unsupported'){
-      panel+='<p>'+label('googleBackupUnsupported','Google sign-in cannot run directly from a downloaded HTML file or an unregistered website. Use the Windows launcher, Android app, or official hosted web app. You can still move complete projects with local .dalz bundles.')+'</p>';
+      panel+='<p>'+label('googleBackupUnsupported','Google sign-in cannot run directly from a downloaded HTML file or an unregistered website. Use the Windows launcher, Android app, or official hosted web app. You can still move complete projects with local ZIP files.')+'</p>';
     }else if(!active){
       if(!cloud.ready)panel+='<button class="btn" data-action="google-prepare"'+disabled+'>'+label('googleBackupPrepare','Enable Google sign-in for this session')+'</button>';
       else{
@@ -37,7 +37,7 @@ DAL = DAL || {};
       if(!cloud.files.length)panel+='<p>'+label('googleBackupEmpty','No completed backups are listed. Refresh to check your account.')+'</p>';
       else panel+='<ul class="google-backup-list">'+cloud.files.map(function(file){
         var date=Date.parse(file.createdTime),name=String(file.name||'Project backup').slice(0,200),size=(Number(file.size)/1048576).toFixed(2)+' MB';
-        return '<li><div><strong>'+DAL.escapeHtml(name)+'</strong><span class="writer-muted">'+DAL.escapeHtml((Number.isFinite(date)?DAL.uiDate(date):'Unknown date')+' · '+size)+'</span></div><button class="btn" data-action="google-restore-copy" data-cloud-id="'+file.id+'"'+disabled+'>'+label('googleBackupRestore','Restore as a separate project')+'</button></li>';
+        return '<li><div><strong>'+DAL.escapeHtml(name)+'</strong><span class="writer-muted">'+DAL.escapeHtml((Number.isFinite(date)?DAL.uiDate(date):'Unknown date')+' · '+size)+'</span></div><button class="btn" data-action="google-restore-copy" data-cloud-id="'+DAL.escapeHtml(file.id)+'"'+disabled+'>'+label('googleBackupRestore','Restore as a separate project')+'</button></li>';
       }).join('')+'</ul>';
     }
     if(cloud.busy)panel+='<p role="status" aria-live="polite">'+DAL.escapeHtml(cloud.busy)+'</p>';
