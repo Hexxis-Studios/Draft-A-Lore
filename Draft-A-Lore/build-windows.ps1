@@ -45,8 +45,12 @@ using System.Windows.Forms;
 internal static class DraftALoreLauncher
 {
     [STAThread]
-    private static int Main()
+    private static int Main(string[] args)
     {
+        if (args != null && args.Length > 0 &&
+            String.Equals(args[0], "--install-shortcuts", StringComparison.OrdinalIgnoreCase))
+            return InstallShortcuts();
+
         string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
         string htmlPath = Path.Combine(appDirectory, "DraftALore.html");
         if (!File.Exists(htmlPath))
@@ -102,6 +106,104 @@ internal static class DraftALoreLauncher
         }
     }
 
+    private static int InstallShortcuts()
+    {
+        DialogResult desktopChoice = MessageBox.Show(
+            "Create a Draft A Lore shortcut on the Desktop?",
+            "Draft A Lore Shortcuts",
+            MessageBoxButtons.YesNoCancel,
+            MessageBoxIcon.Question);
+        if (desktopChoice == DialogResult.Cancel) return 0;
+
+        DialogResult startChoice = MessageBox.Show(
+            "Add Draft A Lore to the Start Menu?",
+            "Draft A Lore Shortcuts",
+            MessageBoxButtons.YesNoCancel,
+            MessageBoxIcon.Question);
+        if (startChoice == DialogResult.Cancel) return 0;
+        if (desktopChoice == DialogResult.No && startChoice == DialogResult.No)
+        {
+            MessageBox.Show("No shortcuts were created.", "Draft A Lore");
+            return 0;
+        }
+
+        try
+        {
+            string launcherPath = Process.GetCurrentProcess().MainModule.FileName;
+            string appDirectory = Path.GetDirectoryName(launcherPath);
+            int created = 0;
+            if (desktopChoice == DialogResult.Yes)
+            {
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                CreateShortcut(Path.Combine(desktop, "Draft A Lore.lnk"), launcherPath, appDirectory);
+                created++;
+            }
+            if (startChoice == DialogResult.Yes)
+            {
+                string programs = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
+                Directory.CreateDirectory(programs);
+                CreateShortcut(Path.Combine(programs, "Draft A Lore.lnk"), launcherPath, appDirectory);
+                created++;
+            }
+            MessageBox.Show("Created " + created + " shortcut" + (created == 1 ? "." : "s."), "Draft A Lore");
+            return 0;
+        }
+        catch (Exception error)
+        {
+            MessageBox.Show(
+                "Draft A Lore could not create the shortcuts.\n\n" + error.Message,
+                "Draft A Lore",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+            return 1;
+        }
+    }
+
+    private static void CreateShortcut(string linkPath, string launcherPath, string appDirectory)
+    {
+        Type shellType = Type.GetTypeFromProgID("WScript.Shell");
+        if (shellType == null) throw new InvalidOperationException("Windows shortcut support is unavailable.");
+        object shell = Activator.CreateInstance(shellType);
+        object shortcut = null;
+        try
+        {
+            shortcut = shellType.InvokeMember(
+                "CreateShortcut",
+                BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Instance,
+                null,
+                shell,
+                new object[] { linkPath });
+            Type shortcutType = shortcut.GetType();
+            SetShortcutProperty(shortcutType, shortcut, "TargetPath", launcherPath);
+            SetShortcutProperty(shortcutType, shortcut, "Arguments", "");
+            SetShortcutProperty(shortcutType, shortcut, "WorkingDirectory", appDirectory);
+            SetShortcutProperty(shortcutType, shortcut, "Description", "Draft A Lore writing and RPG studio");
+            SetShortcutProperty(shortcutType, shortcut, "IconLocation", launcherPath + ",0");
+            shortcutType.InvokeMember(
+                "Save",
+                BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Instance,
+                null,
+                shortcut,
+                null);
+        }
+        finally
+        {
+            if (shortcut != null && System.Runtime.InteropServices.Marshal.IsComObject(shortcut))
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(shortcut);
+            if (System.Runtime.InteropServices.Marshal.IsComObject(shell))
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(shell);
+        }
+    }
+
+    private static void SetShortcutProperty(Type shortcutType, object shortcut, string name, object value)
+    {
+        shortcutType.InvokeMember(
+            name,
+            BindingFlags.SetProperty | BindingFlags.Public | BindingFlags.Instance,
+            null,
+            shortcut,
+            new object[] { value });
+    }
     private static string FindBrowser()
     {
         string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);

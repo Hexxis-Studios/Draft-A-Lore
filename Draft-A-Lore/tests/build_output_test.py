@@ -10,6 +10,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BuildOutputTests(unittest.TestCase):
+    def test_generated_pages_include_the_offline_compatible_security_policy(self):
+        for metadata in (True, False):
+            html = render_html(include_web_metadata=metadata)
+            self.assertIn('http-equiv="Content-Security-Policy"', html)
+            self.assertIn("connect-src 'self' https://www.googleapis.com https://accounts.google.com https://oauth2.googleapis.com http://127.0.0.1:*", html)
+            self.assertIn("object-src 'none'; base-uri 'none'", html)
+
     def test_optional_google_backup_is_shared_and_not_automatically_connected(self):
         for metadata in (True, False):
             html = render_html(include_web_metadata=metadata)

@@ -235,6 +235,7 @@ def render_html(include_web_metadata=True):
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0F1116">
 <meta name="application-name" content="Draft A Lore">
+<meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://www.googleapis.com https://accounts.google.com https://oauth2.googleapis.com http://127.0.0.1:*; object-src 'none'; base-uri 'none'">
 {web_meta}
 <title>Draft A Lore</title>
 {head_links}

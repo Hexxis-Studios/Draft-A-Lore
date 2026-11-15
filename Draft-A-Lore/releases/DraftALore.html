@@ -15,6 +15,7 @@
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0F1116">
 <meta name="application-name" content="Draft A Lore">
+<meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://www.googleapis.com https://accounts.google.com https://oauth2.googleapis.com http://127.0.0.1:*; object-src 'none'; base-uri 'none'">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Draft A Lore">
@@ -2869,9 +2870,9 @@ DAL.toolLabel=function(id,fallback){return DAL.i18n?DAL.i18n.text('tool_'+id,fal
 DAL.uiLabel=function(key,fallback,values){return DAL.escapeHtml(DAL.i18n?DAL.i18n.text(key,fallback,values):fallback);};
 DAL.uiNumber=function(value,options){return DAL.escapeHtml(String(DAL.i18n?DAL.i18n.number(value,options):new Intl.NumberFormat('en',options).format(value)));};
 DAL.uiDate=function(value,options){try{return DAL.escapeHtml(DAL.i18n?DAL.i18n.date(value,options||{dateStyle:'medium',timeStyle:'short'}):new Intl.DateTimeFormat('en',options||{dateStyle:'medium',timeStyle:'short'}).format(new Date(value)));}catch(error){return DAL.uiLabel('undated','Undated');}};
-DAL.uid = function(prefix){ return (prefix||'id') + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); };
+DAL.uid = function(prefix){ var cryptoApi=(typeof window!=='undefined'&&window.crypto)||(typeof crypto!=='undefined'?crypto:null), value=''; try{if(cryptoApi&&typeof cryptoApi.randomUUID==='function')value=cryptoApi.randomUUID().replace(/-/g,'');else if(cryptoApi&&typeof cryptoApi.getRandomValues==='function'){var bytes=new Uint8Array(16);cryptoApi.getRandomValues(bytes);value=Array.from(bytes).map(function(byte){return byte.toString(16).padStart(2,'0');}).join('');}}catch(error){} if(!value)value=Date.now().toString(36)+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2); return (prefix||'id')+'_'+value; };
 DAL.clone = function(obj){ return JSON.parse(JSON.stringify(obj)); };
-DAL.escapeHtml = function(str){ if(!str) return ''; var d=document.createElement('div'); d.textContent=str; return d.innerHTML; };
+DAL.escapeHtml = function(str){ if(str==null) return ''; return String(str).replace(/[&<>"']/g,function(ch){return ch==='&'?'&amp;':ch==='<'?'&lt;':ch==='>'?'&gt;':ch==='"'?'&quot;':'&#39;';}); };
 DAL.manuscriptTextModel = function(root,includeNodes){
   var chunks=[],length=0,last='',nodes=[];
   if(!root||!root.childNodes)return {text:root&&(root.textContent||root.innerText)||'',nodes:nodes};
